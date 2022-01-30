@@ -1,0 +1,74 @@
+version: '3'
+
+services:
+  api:
+    container_name: api_container
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      - RSA_PUBLIC_KEY_PATH=${RSA_PUBLIC_KEY_PATH}
+      - RSA_PRIVATE_KEY_PATH=${RSA_PRIVATE_KEY_PATH}
+      - TOKEN_EXP_TIME_IN_SEC=${TOKEN_EXP_TIME_IN_SEC}
+      - TIME_BEFORE_TOKEN_EXP_TIME_IN_SEC=${TIME_BEFORE_TOKEN_EXP_TIME_IN_SEC}
+      - DB_DRIVER=${DB_DRIVER}
+      - DB_USER=${DB_USER}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - DB_HOST=${DB_HOST}
+      - DB_PORT=${DB_PORT}
+      - DB_NAME=${DB_NAME}
+    restart: on-failure
+    ports:
+      - "8080:8080"
+    expose:
+      - "8080"
+    depends_on:
+      - postgresdb
+      # - testdb
+
+  postgresdb:
+    container_name: postgresdb_container
+    build:
+      context: ./database/postgres
+      dockerfile: Dockerfile
+    env_file:
+      - ./database/postgres/.env
+    restart: on-failure
+    ports:
+      - "5433:5432"
+    expose:
+      - "5433"
+    volumes:
+      - postgresdb-data:/var/lib/postgresql/data
+
+  # testdb:
+  #   container_name: testdb_container
+  #   build:
+  #     context: ./database
+  #     dockerfile: Dockerfile
+  #   env_file:
+  #     - ./database/.env.test
+  #   restart: on-failure
+  #   ports:
+  #     - "5434:5432"
+  #   expose:
+  #     - "5434"
+  #   volumes:
+  #     - testdb-data:/var/lib/postgresql/test-data
+
+#   # pgadmin:
+#   #   image: dpage/pgadmin4
+#   #   container_name: pgadmin_container
+#   #   environment:
+#   #     - PGADMIN_DEFAULT_EMAIL=pgadmin4@pgadmin.org
+#   #     - PGADMIN_DEFAULT_PASSWORD=admin
+#   #   restart: on-failure
+#   #   ports:
+#   #     - "5050:80"
+#   #   volumes:
+#   #      - pgadmin:/root/.pgadmin
+
+volumes:
+  db-data:
+  testdb-data:
+#   # pgadmin:
