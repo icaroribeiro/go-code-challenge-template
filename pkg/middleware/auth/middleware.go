@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"strings"
 
-	authmodel "github.com/icaroribeiro/new-go-code-challenge-template/internal/core/domain/model/auth"
+	authmodel "github.com/icaroribeiro/new-go-code-challenge-template/internal/core/domain/model"
 	authpkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/auth"
 	"github.com/icaroribeiro/new-go-code-challenge-template/pkg/customerror"
 	requesthttputilpkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/httputil/request"
@@ -21,7 +21,7 @@ func Auth(db *gorm.DB, authN authpkg.Auth, timeBeforeTokenExpTimeInSec int) func
 
 			if len(hdrAuth) == 0 {
 				errorMessage := "the auth header must be informed along with the token"
-				responsehttputilpkg.RespondErrorWithJSON(w, customerror.BadRequest.New(errorMessage))
+				responsehttputilpkg.RespondErrorWithJson(w, customerror.BadRequest.New(errorMessage))
 				return
 			}
 
@@ -29,7 +29,7 @@ func Auth(db *gorm.DB, authN authpkg.Auth, timeBeforeTokenExpTimeInSec int) func
 
 			if len(bearerToken) != 2 {
 				errorMessage := "the token must be associated with the auth header"
-				responsehttputilpkg.RespondErrorWithJSON(w, customerror.BadRequest.New(errorMessage))
+				responsehttputilpkg.RespondErrorWithJson(w, customerror.BadRequest.New(errorMessage))
 				return
 			}
 
@@ -43,13 +43,13 @@ func Auth(db *gorm.DB, authN authpkg.Auth, timeBeforeTokenExpTimeInSec int) func
 
 			token, err := authN.VerifyToken(bearerToken[1], isToRefreshToken, timeBeforeTokenExpTimeInSec)
 			if err != nil {
-				responsehttputilpkg.RespondErrorWithJSON(w, customerror.Unauthorized.New(err.Error()))
+				responsehttputilpkg.RespondErrorWithJson(w, customerror.Unauthorized.New(err.Error()))
 				return
 			}
 
 			auth, err := authN.FetchAuth(token)
 			if err != nil {
-				responsehttputilpkg.RespondErrorWithJSON(w, err)
+				responsehttputilpkg.RespondErrorWithJson(w, err)
 				return
 			}
 
@@ -59,19 +59,19 @@ func Auth(db *gorm.DB, authN authpkg.Auth, timeBeforeTokenExpTimeInSec int) func
 
 			result := db.Find(&authAux, "id=?", auth.ID)
 			if result.Error != nil {
-				responsehttputilpkg.RespondErrorWithJSON(w, result.Error)
+				responsehttputilpkg.RespondErrorWithJson(w, result.Error)
 				return
 			}
 
 			if authAux.IsEmpty() {
 				errorMessage := "you are not logged in, then perform a login to get a token before proceeding"
-				responsehttputilpkg.RespondErrorWithJSON(w, customerror.BadRequest.New(errorMessage))
+				responsehttputilpkg.RespondErrorWithJson(w, customerror.BadRequest.New(errorMessage))
 				return
 			}
 
 			if auth.UserID.String() != authAux.UserID.String() {
 				errorMessage := "the token's auth_id and user_id are not associated"
-				responsehttputilpkg.RespondErrorWithJSON(w, customerror.BadRequest.New(errorMessage))
+				responsehttputilpkg.RespondErrorWithJson(w, customerror.BadRequest.New(errorMessage))
 				return
 			}
 
