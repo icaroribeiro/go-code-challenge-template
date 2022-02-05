@@ -21,10 +21,10 @@ doc/api:
 
 test/api:
 	. ./scripts/setup_env.test.sh; \
-	go test ./... -v -coverprofile=./docs/api/tests/unit/coverage_report.out
+	go test ./... -v -coverprofile=./docs/api/tests/unit/coverage.out
 
 analyze/api:
-	go tool cover -func=./docs/api/tests/unit/coverage_report.out
+	go tool cover -func=./docs/api/tests/unit/coverage.out > ./docs/api/tests/unit/coverage_report.out
 
 build/mocks:
 	. ./scripts/build_mocks.sh
