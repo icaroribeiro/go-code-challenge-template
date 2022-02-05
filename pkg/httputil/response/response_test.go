@@ -59,7 +59,7 @@ func (ts *TestSuite) TestRespondAndJson() {
 				assert.Equal(t, statusCode, res.Result().StatusCode)
 				message := messagehttputilpkg.Message{}
 				err := json.NewDecoder(res.Body).Decode(&message)
-				assert.Nil(t, err, fmt.Sprintf("Unexpected error %v.", err))
+				assert.Nil(t, err, fmt.Sprintf("Unexpected error: %v", err))
 				assert.Equal(t, payload, message)
 			} else {
 				assert.Equal(t, res.Result().Header.Get("Content-Type"), "application/json")
@@ -148,7 +148,7 @@ func (ts *TestSuite) TestRespondErrorAndJson() {
 			assert.Equal(t, statusCode, res.Result().StatusCode)
 			errMessage := errorhttputil.Error{}
 			err := json.NewDecoder(res.Body).Decode(&errMessage)
-			assert.Nil(t, err, fmt.Sprintf("Unexpected error %v.", err))
+			assert.Nil(t, err, fmt.Sprintf("Unexpected error: %v", err))
 			assert.Equal(t, payload, errMessage)
 		})
 	}

@@ -49,9 +49,9 @@ func (ts *TestSuite) TestNew() {
 			_, err := validatorpkg.New(validationFuncs)
 
 			if !tc.WantError {
-				assert.Nil(t, err, fmt.Sprintf("Unexpected error %v.", err))
+				assert.Nil(t, err, fmt.Sprintf("Unexpected error: %v", err))
 			} else {
-				assert.NotNil(t, err, "Predicted error lost.")
+				assert.NotNil(t, err, "Predicted error lost")
 			}
 		})
 	}
@@ -59,7 +59,7 @@ func (ts *TestSuite) TestNew() {
 
 func (ts *TestSuite) TestValidate() {
 	validator, err := validatorpkg.New(nil)
-	assert.Nil(ts.T(), err, fmt.Sprintf("Unexpected error %v.", err))
+	assert.Nil(ts.T(), err, fmt.Sprintf("Unexpected error: %v", err))
 
 	ts.Cases = Cases{
 		{
@@ -81,9 +81,9 @@ func (ts *TestSuite) TestValidate() {
 			err := validator.Validate(tc.Inf)
 
 			if !tc.WantError {
-				assert.Nil(t, err, fmt.Sprintf("Unexpected error %v.", err))
+				assert.Nil(t, err, fmt.Sprintf("Unexpected error: %v", err))
 			} else {
-				assert.NotNil(t, err, "Predicted error lost.")
+				assert.NotNil(t, err, "Predicted error lost")
 			}
 		})
 	}
@@ -95,7 +95,7 @@ func (ts *TestSuite) TestValidateWithTags() {
 	}
 
 	validator, err := validatorpkg.New(validationFuncs)
-	assert.Nil(ts.T(), err, fmt.Sprintf("Unexpected error %v.", err))
+	assert.Nil(ts.T(), err, fmt.Sprintf("Unexpected error: %v", err))
 
 	ts.Cases = Cases{
 		{
@@ -123,9 +123,9 @@ func (ts *TestSuite) TestValidateWithTags() {
 			err := validator.ValidateWithTags(tc.Inf, tc.Tags)
 
 			if !tc.WantError {
-				assert.Nil(t, err, fmt.Sprintf("Unexpected error %v.", err))
+				assert.Nil(t, err, fmt.Sprintf("Unexpected error: %v", err))
 			} else {
-				assert.NotNil(t, err, "Predicted error lost.")
+				assert.NotNil(t, err, "Predicted error lost")
 			}
 		})
 	}

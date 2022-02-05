@@ -48,9 +48,9 @@ func (ts *TestSuite) TestValidate() {
 			err := uuidvalidator.Validate(tc.Inf, tc.Param)
 
 			if !tc.WantError {
-				assert.Nil(t, err, fmt.Sprintf("Unexpected error %v.", err))
+				assert.Nil(t, err, fmt.Sprintf("Unexpected error: %v", err))
 			} else {
-				assert.NotNil(t, err, "Predicted error lost.")
+				assert.NotNil(t, err, "Predicted error lost")
 			}
 		})
 	}

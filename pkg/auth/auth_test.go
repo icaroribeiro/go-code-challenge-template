@@ -1,5 +1,17 @@
 package auth_test
 
+import (
+	"fmt"
+	"testing"
+
+	fake "github.com/brianvoe/gofakeit/v5"
+	domainmodel "github.com/icaroribeiro/new-go-code-challenge-template/internal/core/domain/model"
+	authpkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/auth"
+	uuid "github.com/satori/go.uuid"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/suite"
+)
+
 // import (
 // 	"errors"
 // 	"fmt"
@@ -9,60 +21,60 @@ package auth_test
 // 	fake "github.com/brianvoe/gofakeit/v5"
 // 	"github.com/dgrijalva/jwt-go"
 // 	"github.com/icaroribeiro/new-go-code-challenge-template/internal/application/customerror"
-// 	authdomain "github.com/icaroribeiro/new-go-code-challenge-template/internal/core/domain/model/auth"
-// 	authinfra "github.com/icaroribeiro/new-go-code-challenge-template/internal/infrastructure/auth"
+// 	domainmodel "github.com/icaroribeiro/new-go-code-challenge-template/internal/core/domain/model/auth"
+// 	authpkg "github.com/icaroribeiro/new-go-code-challenge-template/internal/infrastructure/auth"
 // 	uuid "github.com/satori/go.uuid"
 // 	"github.com/stretchr/testify/assert"
 // 	"github.com/stretchr/testify/suite"
 // )
 
-// func TestAuth(t *testing.T) {
-// 	suite.Run(t, new(TestSuite))
-// }
+func TestAuth(t *testing.T) {
+	suite.Run(t, new(TestSuite))
+}
 
-// func (ts *TestSuite) TestCreateToken() {
-// 	rsaKeys := ts.RSAKeys
+func (ts *TestSuite) TestCreateToken() {
+	rsaKeys := ts.RSAKeys
 
-// 	auth := authdomain.Auth{}
+	auth := domainmodel.Auth{}
 
-// 	tokenExpTimeInSec := 0
+	tokenExpTimeInSec := 0
 
-// 	ts.Cases = Cases{
-// 		{
-// 			Context: "ItShouldSucceedInCreatingAToken",
-// 			SetUp: func(t *testing.T) {
-// 				id := uuid.NewV4()
-// 				userID := uuid.NewV4()
+	ts.Cases = Cases{
+		{
+			Context: "ItShouldSucceedInCreatingAToken",
+			SetUp: func(t *testing.T) {
+				id := uuid.NewV4()
+				userID := uuid.NewV4()
 
-// 				auth = authdomain.Auth{
-// 					ID:     id,
-// 					UserID: userID,
-// 				}
+				auth = domainmodel.Auth{
+					ID:     id,
+					UserID: userID,
+				}
 
-// 				tokenExpTimeInSec = fake.Number(30, 60)
-// 			},
-// 			WantError: false,
-// 		},
-// 	}
+				tokenExpTimeInSec = fake.Number(30, 60)
+			},
+			WantError: false,
+		},
+	}
 
-// 	for _, tc := range ts.Cases {
-// 		ts.T().Run(tc.Context, func(t *testing.T) {
-// 			tc.SetUp(t)
+	for _, tc := range ts.Cases {
+		ts.T().Run(tc.Context, func(t *testing.T) {
+			tc.SetUp(t)
 
-// 			authInfra := authinfra.New(rsaKeys)
+			authpkg := authpkg.New(rsaKeys)
 
-// 			tokenString, err := authInfra.CreateToken(auth, tokenExpTimeInSec)
+			tokenString, err := authpkg.CreateToken(auth, tokenExpTimeInSec)
 
-// 			if !tc.WantError {
-// 				assert.Nil(t, err, fmt.Sprintf("Unexpected error %v.", err))
-// 				assert.NotEmpty(t, tokenString, "Unexpected empty token.")
-// 			}
-// 		})
-// 	}
-// }
+			if !tc.WantError {
+				assert.Nil(t, err, fmt.Sprintf("Unexpected error: %v", err))
+				assert.NotEmpty(t, tokenString, "Unexpected empty token")
+			}
+		})
+	}
+}
 
 // func (ts *TestSuite) TestVerifyToken() {
-// 	auth := authdomain.Auth{}
+// 	auth := domainmodel.Auth{}
 
 // 	issuedAt := time.Now().Unix()
 
@@ -70,7 +82,7 @@ package auth_test
 
 // 	rsaKeys := ts.RSAKeys
 
-// 	authInfra := authinfra.New(rsaKeys)
+// 	authpkg := authpkg.New(rsaKeys)
 
 // 	err := errors.New("")
 
@@ -89,7 +101,7 @@ package auth_test
 // 				id := uuid.NewV4()
 // 				userID := uuid.NewV4()
 
-// 				auth = authdomain.Auth{
+// 				auth = domainmodel.Auth{
 // 					ID:     id,
 // 					UserID: userID,
 // 				}
@@ -99,8 +111,8 @@ package auth_test
 // 				duration := time.Second * time.Duration(tokenExpTimeInSec)
 // 				expiredAt = time.Now().Add(duration).Unix()
 
-// 				tokenString, err = authInfra.CreateToken(auth, tokenExpTimeInSec)
-// 				assert.Nil(t, err, fmt.Sprintf("Unexpected error %v.", err))
+// 				tokenString, err = authpkg.CreateToken(auth, tokenExpTimeInSec)
+// 				assert.Nil(t, err, fmt.Sprintf("Unexpected error: %v", err))
 // 				assert.NotEmpty(t, tokenString, "")
 // 			},
 // 			WantError: false,
@@ -112,7 +124,7 @@ package auth_test
 // 				id := uuid.NewV4()
 // 				userID := uuid.NewV4()
 
-// 				auth = authdomain.Auth{
+// 				auth = domainmodel.Auth{
 // 					ID:     id,
 // 					UserID: userID,
 // 				}
@@ -131,7 +143,7 @@ package auth_test
 
 // 				token := jwt.NewWithClaims(jwt.SigningMethodNone, claims)
 // 				tokenString, err = token.SignedString(jwt.UnsafeAllowNoneSignatureType)
-// 				assert.Nil(t, err, fmt.Sprintf("Unexpected error %v.", err))
+// 				assert.Nil(t, err, fmt.Sprintf("Unexpected error: %v", err))
 // 				assert.NotEmpty(t, tokenString, "")
 
 // 				isToRefreshToken = false
@@ -147,15 +159,15 @@ package auth_test
 // 				id := uuid.NewV4()
 // 				userID := uuid.NewV4()
 
-// 				auth = authdomain.Auth{
+// 				auth = domainmodel.Auth{
 // 					ID:     id,
 // 					UserID: userID,
 // 				}
 
 // 				tokenExpTimeInSec := fake.Number(-10, -2)
 
-// 				tokenString, err = authInfra.CreateToken(auth, tokenExpTimeInSec)
-// 				assert.Nil(t, err, fmt.Sprintf("Unexpected error %v.", err))
+// 				tokenString, err = authpkg.CreateToken(auth, tokenExpTimeInSec)
+// 				assert.Nil(t, err, fmt.Sprintf("Unexpected error: %v", err))
 // 				assert.NotEmpty(t, tokenString, "")
 
 // 				isToRefreshToken = false
@@ -171,7 +183,7 @@ package auth_test
 // 				id := uuid.NewV4()
 // 				userID := uuid.NewV4()
 
-// 				auth = authdomain.Auth{
+// 				auth = domainmodel.Auth{
 // 					ID:     id,
 // 					UserID: userID,
 // 				}
@@ -191,7 +203,7 @@ package auth_test
 // 				id := uuid.NewV4()
 // 				userID := uuid.NewV4()
 
-// 				auth = authdomain.Auth{
+// 				auth = domainmodel.Auth{
 // 					ID:     id,
 // 					UserID: userID,
 // 				}
@@ -209,7 +221,7 @@ package auth_test
 
 // 				token := jwt.NewWithClaims(jwt.SigningMethodRS256, claims)
 // 				tokenString, err = token.SignedString(ts.RSAKeys.PrivateKey)
-// 				assert.Nil(t, err, fmt.Sprintf("Unexpected error %v.", err))
+// 				assert.Nil(t, err, fmt.Sprintf("Unexpected error: %v", err))
 // 				assert.NotEmpty(t, tokenString, "")
 
 // 				isToRefreshToken = true
@@ -225,15 +237,15 @@ package auth_test
 // 				id := uuid.NewV4()
 // 				userID := uuid.NewV4()
 
-// 				auth = authdomain.Auth{
+// 				auth = domainmodel.Auth{
 // 					ID:     id,
 // 					UserID: userID,
 // 				}
 
 // 				tokenExpTimeInSec := fake.Number(90, 120)
 
-// 				tokenString, err = authInfra.CreateToken(auth, tokenExpTimeInSec)
-// 				assert.Nil(t, err, fmt.Sprintf("Unexpected error %v.", err))
+// 				tokenString, err = authpkg.CreateToken(auth, tokenExpTimeInSec)
+// 				assert.Nil(t, err, fmt.Sprintf("Unexpected error: %v", err))
 // 				assert.NotEmpty(t, tokenString, "")
 
 // 				isToRefreshToken = true
@@ -248,25 +260,25 @@ package auth_test
 // 		ts.T().Run(tc.Context, func(t *testing.T) {
 // 			tc.SetUp(t)
 
-// 			token, err := authInfra.VerifyToken(tokenString, isToRefreshToken, timeBeforeTokenExpTimeInSec)
+// 			token, err := authpkg.VerifyToken(tokenString, isToRefreshToken, timeBeforeTokenExpTimeInSec)
 
 // 			if !tc.WantError {
-// 				assert.Nil(t, err, fmt.Sprintf("Unexpected error %v.", err))
-// 				assert.NotEmpty(t, tokenString, "Unexpected empty token.")
+// 				assert.Nil(t, err, fmt.Sprintf("Unexpected error: %v", err))
+// 				assert.NotEmpty(t, tokenString, "Unexpected empty token")
 // 				claims, ok := token.Claims.(jwt.MapClaims)
-// 				assert.True(t, ok, "Unexpected type assertion error.")
+// 				assert.True(t, ok, "Unexpected type assertion error")
 // 				assert.Equal(t, auth.ID.String(), claims["auth_id"])
 // 				assert.Equal(t, auth.UserID.String(), claims["user_id"])
 // 				iat, ok := claims["iat"].(float64)
-// 				assert.True(t, ok, "Unexpected type assertion error.")
+// 				assert.True(t, ok, "Unexpected type assertion error")
 // 				assert.WithinDuration(t, time.Unix(issuedAt, 0), time.Unix(int64(iat), 0), time.Second)
 // 				if !isToRefreshToken {
 // 					exp, ok := claims["exp"].(float64)
-// 					assert.True(t, ok, "Unexpected type assertion error.")
+// 					assert.True(t, ok, "Unexpected type assertion error")
 // 					assert.WithinDuration(t, time.Unix(expiredAt, 0), time.Unix(int64(exp), 0), time.Second)
 // 				}
 // 			} else {
-// 				assert.NotNil(t, err, "Predicted error lost.")
+// 				assert.NotNil(t, err, "Predicted error lost")
 // 				assert.Equal(t, errorType, customerror.GetType(err))
 // 				assert.Nil(t, token, "Token is not nil")
 // 			}
@@ -278,7 +290,7 @@ package auth_test
 
 // func (ts *TestSuite) TestFetchAuth() {
 // 	rsaKeys := ts.RSAKeys
-// 	authInfra := authinfra.New(rsaKeys)
+// 	authpkg := authpkg.New(rsaKeys)
 
 // 	id := uuid.NewV4()
 // 	userID := uuid.NewV4()
@@ -364,14 +376,14 @@ package auth_test
 // 		ts.T().Run(tc.Context, func(t *testing.T) {
 // 			tc.SetUp(t)
 
-// 			auth, err := authInfra.FetchAuth(token)
+// 			auth, err := authpkg.FetchAuth(token)
 
 // 			if !tc.WantError {
-// 				assert.Nil(t, err, fmt.Sprintf("Unexpected error %v.", err))
+// 				assert.Nil(t, err, fmt.Sprintf("Unexpected error: %v", err))
 // 				assert.Equal(t, id, auth.ID)
 // 				assert.Equal(t, userID, auth.UserID)
 // 			} else {
-// 				assert.NotNil(t, err, "Predicted error lost.")
+// 				assert.NotNil(t, err, "Predicted error lost")
 // 				assert.Equal(t, errorType, customerror.GetType(err))
 // 				assert.Empty(t, auth, "Auth is not empty")
 // 			}
