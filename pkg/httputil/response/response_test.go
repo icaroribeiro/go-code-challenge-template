@@ -2,6 +2,7 @@ package response_test
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"net/http"
 	"net/http/httptest"
@@ -72,7 +73,7 @@ func (ts *TestSuite) TestRespondAndJson() {
 func (ts *TestSuite) TestRespondErrorAndJson() {
 	res := &httptest.ResponseRecorder{}
 	statusCode := 0
-	var err error
+	err := errors.New("")
 	payload := errorhttputil.Error{}
 
 	ts.Cases = Cases{

@@ -77,24 +77,18 @@ func (ts *TestSuite) TestCreateToken() {
 	}
 }
 
-func (ts *TestSuite) TestVerifyToken() {
+func (ts *TestSuite) TestDecodeToken() {
 	auth := domainmodel.Auth{}
 
 	issuedAt := time.Now().Unix()
-
 	expiredAt := time.Now().Unix()
 
 	rsaKeys := ts.RSAKeys
-
 	authpkg := authpkg.New(rsaKeys)
 
 	err := errors.New("")
 
 	tokenString := ""
-
-	isToRefreshToken := false
-
-	timeBeforeTokenExpTimeInSec := 60
 
 	errorType := customerror.NoType
 
@@ -150,15 +144,13 @@ func (ts *TestSuite) TestVerifyToken() {
 				assert.Nil(t, err, fmt.Sprintf("Unexpected error: %v", err))
 				assert.NotEmpty(t, tokenString, "")
 
-				isToRefreshToken = false
-
 				errorType = customerror.NoType
 			},
 			WantError: true,
 			TearDown:  func(t *testing.T) {},
 		},
 		{
-			Context: "ItShouldFailIfTheTokenHasExpiredAndItWillNotBeRefreshed",
+			Context: "ItShouldFailIfTheTokenHasExpired",
 			SetUp: func(t *testing.T) {
 				id := uuid.NewV4()
 				userID := uuid.NewV4()
@@ -174,9 +166,7 @@ func (ts *TestSuite) TestVerifyToken() {
 				assert.Nil(t, err, fmt.Sprintf("Unexpected error: %v", err))
 				assert.NotEmpty(t, tokenString, "")
 
-				isToRefreshToken = false
-
-				errorType = customerror.BadRequest
+				errorType = customerror.Unauthorized
 			},
 			WantError: true,
 			TearDown:  func(t *testing.T) {},
@@ -194,8 +184,6 @@ func (ts *TestSuite) TestVerifyToken() {
 
 				tokenString = fake.Word()
 
-				isToRefreshToken = true
-
 				errorType = customerror.NoType
 			},
 			WantError: true,
@@ -206,7 +194,7 @@ func (ts *TestSuite) TestVerifyToken() {
 		ts.T().Run(tc.Context, func(t *testing.T) {
 			tc.SetUp(t)
 
-			token, err := authpkg.VerifyToken(tokenString, isToRefreshToken, timeBeforeTokenExpTimeInSec)
+			token, err := authpkg.DecodeToken(tokenString)
 
 			if !tc.WantError {
 				assert.Nil(t, err, fmt.Sprintf("Unexpected error: %v", err))
@@ -218,11 +206,9 @@ func (ts *TestSuite) TestVerifyToken() {
 				iat, ok := claims["iat"].(float64)
 				assert.True(t, ok, "Unexpected type assertion error")
 				assert.WithinDuration(t, time.Unix(issuedAt, 0), time.Unix(int64(iat), 0), time.Second)
-				if !isToRefreshToken {
-					exp, ok := claims["exp"].(float64)
-					assert.True(t, ok, "Unexpected type assertion error")
-					assert.WithinDuration(t, time.Unix(expiredAt, 0), time.Unix(int64(exp), 0), time.Second)
-				}
+				exp, ok := claims["exp"].(float64)
+				assert.True(t, ok, "Unexpected type assertion error")
+				assert.WithinDuration(t, time.Unix(expiredAt, 0), time.Unix(int64(exp), 0), time.Second)
 			} else {
 				assert.NotNil(t, err, "Predicted error lost")
 				assert.Equal(t, errorType, customerror.GetType(err))
@@ -260,7 +246,7 @@ func (ts *TestSuite) TestFetchAuth() {
 			WantError: false,
 		},
 		{
-			Context: "ItShouldFailIfTheAuthIDValueFromTokenIsNotAString",
+			Context: "ItShouldFailIfTheAuthIDFromTokenIsNotAString",
 			SetUp: func(t *testing.T) {
 				claims := jwt.MapClaims{
 					"auth_id": fake.Number(1, 10),
@@ -274,7 +260,7 @@ func (ts *TestSuite) TestFetchAuth() {
 			WantError: true,
 		},
 		{
-			Context: "ItShouldFailIfTheAuthIDValueFromTokenIsNotAUUIDString",
+			Context: "ItShouldFailIfTheAuthIDFromTokenIsNotAUUIDString",
 			SetUp: func(t *testing.T) {
 				claims := jwt.MapClaims{
 					"auth_id": fake.Word(),
@@ -288,7 +274,7 @@ func (ts *TestSuite) TestFetchAuth() {
 			WantError: true,
 		},
 		{
-			Context: "ItShouldFailIfTheUserIDValueFromTokenIsNotAString",
+			Context: "ItShouldFailIfTheUserIDFromTokenIsNotAString",
 			SetUp: func(t *testing.T) {
 				claims := jwt.MapClaims{
 					"auth_id": id.String(),
@@ -303,7 +289,7 @@ func (ts *TestSuite) TestFetchAuth() {
 			WantError: true,
 		},
 		{
-			Context: "ItShouldFailIfTheUserIDValueFromTokenIsNotAUUIDString",
+			Context: "ItShouldFailIfTheUserIDFromTokenIsNotAUUIDString",
 			SetUp: func(t *testing.T) {
 				claims := jwt.MapClaims{
 					"auth_id": id.String(),
@@ -312,6 +298,15 @@ func (ts *TestSuite) TestFetchAuth() {
 
 				token = jwt.NewWithClaims(jwt.SigningMethodRS256, claims)
 				assert.NotNil(t, token, "Token is nil")
+
+				errorType = customerror.NoType
+			},
+			WantError: true,
+		},
+		{
+			Context: "ItShouldFailIfTheTokenIsNil",
+			SetUp: func(t *testing.T) {
+				token = nil
 
 				errorType = customerror.NoType
 			},

@@ -36,12 +36,13 @@ func Auth(db *gorm.DB, authN authpkg.Auth, timeBeforeTokenExpTimeInSec int) func
 			// It is necessary to have a flag in order to check if the API request performed is to refresh the token or not.
 			// If so, during the token verification do not stop the flow of execution if token is expired.
 			// For any other error, do not proceed to next steps of the following operation.
-			isToRefreshToken := false
-			if strings.Compare(r.Method, "POST") == 0 && strings.Compare(r.RequestURI, "/refresh_token") == 0 {
-				isToRefreshToken = true
-			}
+			// isToRefreshToken := false
+			// if strings.Compare(r.Method, "POST") == 0 && strings.Compare(r.RequestURI, "/refresh_token") == 0 {
+			// 	isToRefreshToken = true
+			// }
 
-			token, err := authN.VerifyToken(bearerToken[1], isToRefreshToken, timeBeforeTokenExpTimeInSec)
+			token, err := authN.DecodeToken(bearerToken[1])
+			//token, err := authN.DecodeToken(bearerToken[1], isToRefreshToken, timeBeforeTokenExpTimeInSec)
 			if err != nil {
 				responsehttputilpkg.RespondErrorWithJson(w, customerror.Unauthorized.New(err.Error()))
 				return

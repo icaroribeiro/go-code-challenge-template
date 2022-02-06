@@ -1,7 +1,7 @@
 github.com/icaroribeiro/new-go-code-challenge-template/pkg/auth/auth.go:23:			New				100.0%
 github.com/icaroribeiro/new-go-code-challenge-template/pkg/auth/auth.go:33:			CreateToken			100.0%
-github.com/icaroribeiro/new-go-code-challenge-template/pkg/auth/auth.go:50:			VerifyToken			100.0%
-github.com/icaroribeiro/new-go-code-challenge-template/pkg/auth/auth.go:98:			FetchAuth			94.7%
+github.com/icaroribeiro/new-go-code-challenge-template/pkg/auth/auth.go:51:			DecodeToken			100.0%
+github.com/icaroribeiro/new-go-code-challenge-template/pkg/auth/auth.go:75:			FetchAuth			100.0%
 github.com/icaroribeiro/new-go-code-challenge-template/pkg/customerror/customerror.go:32:	New				100.0%
 github.com/icaroribeiro/new-go-code-challenge-template/pkg/customerror/customerror.go:37:	Newf				100.0%
 github.com/icaroribeiro/new-go-code-challenge-template/pkg/customerror/customerror.go:42:	Error				100.0%
@@ -23,4 +23,4 @@ github.com/icaroribeiro/new-go-code-challenge-template/pkg/validator/uuid/valida
 github.com/icaroribeiro/new-go-code-challenge-template/pkg/validator/validator.go:14:		New				100.0%
 github.com/icaroribeiro/new-go-code-challenge-template/pkg/validator/validator.go:31:		Validate			100.0%
 github.com/icaroribeiro/new-go-code-challenge-template/pkg/validator/validator.go:36:		ValidateWithTags		100.0%
-total:												(statements)			73.6%
+total:												(statements)			75.5%

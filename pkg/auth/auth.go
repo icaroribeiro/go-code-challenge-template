@@ -46,8 +46,9 @@ func (a *Auth) CreateToken(auth domainmodel.Auth, tokenExpTimeInSec int) (string
 	return token.SignedString(a.RSAKeys.PrivateKey)
 }
 
-// VerifyToken is the function that translates the token string in jwt token and checks if the jwt token is valid or not.
-func (a *Auth) VerifyToken(tokenString string, isToRefreshToken bool, timeBeforeTokenExpTimeInSec int) (*jwt.Token, error) {
+// DecodeToken is the function that translates the token string in jwt token
+// and checks if the jwt token is valid or not.
+func (a *Auth) DecodeToken(tokenString string) (*jwt.Token, error) {
 	keyFunc := func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodRSA); !ok {
 			return nil, customerror.New("unexpected signing method when trying to decode the token")
@@ -60,48 +61,49 @@ func (a *Auth) VerifyToken(tokenString string, isToRefreshToken bool, timeBefore
 	if verr, ok := err.(*jwt.ValidationError); ok {
 		switch verr.Errors {
 		case jwt.ValidationErrorExpired:
-			if !isToRefreshToken {
-				errorMessage := "the token has expired, then perform a refresh action to get a new one"
-				return nil, customerror.BadRequest.New(errorMessage)
-			}
+			errorMessage := "the token has expired"
+			return nil, customerror.Unauthorized.New(errorMessage)
 		default:
 			return nil, err
 		}
 	}
 
-	// claims, ok := token.Claims.(jwt.MapClaims)
-	// if !ok {
-	// 	errorMessage := "failed to fetch data from the token"
-	// 	return nil, customerror.New(errorMessage)
-	// }
-
-	// if isToRefreshToken {
-	// 	// It is necessary to ensure that a new token will not be issued until enough time has elapsed.
-	// 	expiredAt, ok := claims["exp"].(float64)
-	// 	if !ok {
-	// 		errorMessage := "failed to fetch data from the token"
-	// 		return nil, customerror.New(errorMessage)
-	// 	}
-
-	// 	duration := time.Second * time.Duration(timeBeforeTokenExpTimeInSec)
-
-	// 	if time.Until(time.Unix(int64(expiredAt), 0)) > duration {
-	// 		errorMessage := "the token expiration time is not within the time prior to the expiration time"
-	// 		return nil, customerror.BadRequest.New(errorMessage)
-	// 	}
-	// }
-
 	return token, nil
+}
+
+// CheckTokenRenewal is the function that...
+func CheckTokenRenewal(token *jwt.Token, timeBeforeTokenExpTimeInSec int) error {
+	if token == nil {
+		return customerror.New("the token is nil")
+	}
+
+	claims, _ := token.Claims.(jwt.MapClaims)
+
+	expiredAt, ok := claims["exp"].(float64)
+	if !ok {
+		errorMessage := "failed to fetch exp data from the token"
+		return customerror.New(errorMessage)
+	}
+
+	duration := time.Second * time.Duration(timeBeforeTokenExpTimeInSec)
+
+	if time.Until(time.Unix(int64(expiredAt), 0)) > duration {
+		errorMessage := "the token expiration time is not within the time prior to the expiration time"
+		return customerror.BadRequest.New(errorMessage)
+	}
+
+	return nil
 }
 
 // FetchAuth is the function that get auth data from the token.
 func (a *Auth) FetchAuth(token *jwt.Token) (domainmodel.Auth, error) {
 	auth := domainmodel.Auth{}
 
-	claims, ok := token.Claims.(jwt.MapClaims)
-	if !ok {
-		return auth, customerror.New("failed to fetch data from the token")
+	if token == nil {
+		return auth, customerror.New("the token is nil")
 	}
+
+	claims, _ := token.Claims.(jwt.MapClaims)
 
 	id, ok := claims["auth_id"].(string)
 	if !ok {
