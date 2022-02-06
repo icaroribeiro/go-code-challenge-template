@@ -201,64 +201,6 @@ func (ts *TestSuite) TestVerifyToken() {
 			WantError: true,
 			TearDown:  func(t *testing.T) {},
 		},
-		{
-			Context: "ItShouldFailIfTheTokenWouldBeRefreshedAndItsExpirationTimeIsAnImproperlyFormattedFloatValue",
-			SetUp: func(t *testing.T) {
-				id := uuid.NewV4()
-				userID := uuid.NewV4()
-
-				auth = domainmodel.Auth{
-					ID:     id,
-					UserID: userID,
-				}
-
-				issuedAt = time.Now().Unix()
-				expiredAt := fake.Date()
-
-				claims := jwt.MapClaims{
-					"authID":     auth.ID,
-					"userID":     auth.UserID,
-					"iat":        issuedAt,
-					"exp":        expiredAt,
-					"authorized": true,
-				}
-
-				token := jwt.NewWithClaims(jwt.SigningMethodRS256, claims)
-				tokenString, err = token.SignedString(ts.RSAKeys.PrivateKey)
-				assert.Nil(t, err, fmt.Sprintf("Unexpected error: %v", err))
-				assert.NotEmpty(t, tokenString, "")
-
-				isToRefreshToken = true
-
-				errorType = customerror.NoType
-			},
-			WantError: true,
-			TearDown:  func(t *testing.T) {},
-		},
-		{
-			Context: "ItShouldFailIfTheTokenHasExpiredAndItWouldBeRefreshedButItsExpirationTimeIsNotWithinTheTimePriorToTheExpirationTime",
-			SetUp: func(t *testing.T) {
-				id := uuid.NewV4()
-				userID := uuid.NewV4()
-
-				auth = domainmodel.Auth{
-					ID:     id,
-					UserID: userID,
-				}
-
-				tokenExpTimeInSec := fake.Number(90, 120)
-
-				tokenString, err = authpkg.CreateToken(auth, tokenExpTimeInSec)
-				assert.Nil(t, err, fmt.Sprintf("Unexpected error: %v", err))
-				assert.NotEmpty(t, tokenString, "")
-
-				isToRefreshToken = true
-
-				errorType = customerror.BadRequest
-			},
-			WantError: true,
-			TearDown:  func(t *testing.T) {},
-		},
 	}
 	for _, tc := range ts.Cases {
 		ts.T().Run(tc.Context, func(t *testing.T) {

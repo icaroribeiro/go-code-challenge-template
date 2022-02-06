@@ -69,27 +69,27 @@ func (a *Auth) VerifyToken(tokenString string, isToRefreshToken bool, timeBefore
 		}
 	}
 
-	claims, ok := token.Claims.(jwt.MapClaims)
-	if !ok {
-		errorMessage := "failed to fetch data from the token"
-		return nil, customerror.New(errorMessage)
-	}
+	// claims, ok := token.Claims.(jwt.MapClaims)
+	// if !ok {
+	// 	errorMessage := "failed to fetch data from the token"
+	// 	return nil, customerror.New(errorMessage)
+	// }
 
-	if isToRefreshToken {
-		// It is necessary to ensure that a new token will not be issued until enough time has elapsed.
-		expiredAt, ok := claims["exp"].(float64)
-		if !ok {
-			errorMessage := "failed to fetch data from the token"
-			return nil, customerror.New(errorMessage)
-		}
+	// if isToRefreshToken {
+	// 	// It is necessary to ensure that a new token will not be issued until enough time has elapsed.
+	// 	expiredAt, ok := claims["exp"].(float64)
+	// 	if !ok {
+	// 		errorMessage := "failed to fetch data from the token"
+	// 		return nil, customerror.New(errorMessage)
+	// 	}
 
-		duration := time.Second * time.Duration(timeBeforeTokenExpTimeInSec)
+	// 	duration := time.Second * time.Duration(timeBeforeTokenExpTimeInSec)
 
-		if time.Until(time.Unix(int64(expiredAt), 0)) > duration {
-			errorMessage := "the token expiration time is not within the time prior to the expiration time"
-			return nil, customerror.BadRequest.New(errorMessage)
-		}
-	}
+	// 	if time.Until(time.Unix(int64(expiredAt), 0)) > duration {
+	// 		errorMessage := "the token expiration time is not within the time prior to the expiration time"
+	// 		return nil, customerror.BadRequest.New(errorMessage)
+	// 	}
+	// }
 
 	return token, nil
 }
