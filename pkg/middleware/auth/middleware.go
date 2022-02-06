@@ -14,7 +14,7 @@ import (
 )
 
 // Auth is the function that wraps a http.Handler to evaluate the authentication of API based on a JWT token.
-func Auth(db *gorm.DB, authN authpkg.Auth, timeBeforeTokenExpTimeInSec int) func(http.HandlerFunc) http.HandlerFunc {
+func Auth(db *gorm.DB, authN authpkg.Auth, timeBeforeExpTimeInSec int) func(http.HandlerFunc) http.HandlerFunc {
 	return func(next http.HandlerFunc) http.HandlerFunc {
 		return func(w http.ResponseWriter, r *http.Request) {
 			hdrAuth := r.Header.Get("Authorization")
@@ -42,7 +42,7 @@ func Auth(db *gorm.DB, authN authpkg.Auth, timeBeforeTokenExpTimeInSec int) func
 			// }
 
 			token, err := authN.DecodeToken(bearerToken[1])
-			//token, err := authN.DecodeToken(bearerToken[1], isToRefreshToken, timeBeforeTokenExpTimeInSec)
+			//token, err := authN.DecodeToken(bearerToken[1], isToRefreshToken, timeBeforeExpTimeInSec)
 			if err != nil {
 				responsehttputilpkg.RespondErrorWithJson(w, customerror.Unauthorized.New(err.Error()))
 				return

@@ -72,7 +72,7 @@ func (a *Auth) DecodeToken(tokenString string) (*jwt.Token, error) {
 }
 
 // CheckTokenRenewal is the function that...
-func CheckTokenRenewal(token *jwt.Token, timeBeforeTokenExpTimeInSec int) error {
+func CheckTokenRenewal(token *jwt.Token, timeBeforeExpTimeInSec int) error {
 	if token == nil {
 		return customerror.New("the token is nil")
 	}
@@ -85,7 +85,7 @@ func CheckTokenRenewal(token *jwt.Token, timeBeforeTokenExpTimeInSec int) error 
 		return customerror.New(errorMessage)
 	}
 
-	duration := time.Second * time.Duration(timeBeforeTokenExpTimeInSec)
+	duration := time.Second * time.Duration(timeBeforeExpTimeInSec)
 
 	if time.Until(time.Unix(int64(expiredAt), 0)) > duration {
 		errorMessage := "the token expiration time is not within the time prior to the expiration time"
