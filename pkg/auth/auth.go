@@ -46,17 +46,21 @@ func (a *Auth) CreateToken(auth domainmodel.Auth, tokenExpTimeInSec int) (string
 	return token.SignedString(a.RSAKeys.PrivateKey)
 }
 
-// DecodeToken is the function that translates the token string in jwt token
-// and checks if the jwt token is valid or not.
-func (a *Auth) DecodeToken(tokenString string) (*jwt.Token, error) {
+func parseToken(tokenString string, publicKey *rsa.PublicKey) (*jwt.Token, error) {
 	keyFunc := func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodRSA); !ok {
 			return nil, customerror.New("unexpected signing method when trying to decode the token")
 		}
-		return a.RSAKeys.PublicKey, nil
+		return publicKey, nil
 	}
 
-	token, err := jwt.Parse(tokenString, keyFunc)
+	return jwt.Parse(tokenString, keyFunc)
+}
+
+// DecodeToken is the function that translates a token string in a jwt token
+// and checks if the jwt token is valid or not.
+func (a *Auth) DecodeToken(tokenString string) (*jwt.Token, error) {
+	token, err := parseToken(tokenString, a.RSAKeys.PublicKey)
 
 	if verr, ok := err.(*jwt.ValidationError); ok {
 		switch verr.Errors {
@@ -71,10 +75,17 @@ func (a *Auth) DecodeToken(tokenString string) (*jwt.Token, error) {
 	return token, nil
 }
 
-// CheckTokenRenewal is the function that...
-func CheckTokenRenewal(token *jwt.Token, timeBeforeExpTimeInSec int) error {
-	if token == nil {
-		return customerror.New("the token is nil")
+// ValidateTokenRenewal is the function that translates a token string in a jwt token and validates if the jwt token is already expired to be renewed.
+func (a *Auth) ValidateTokenRenewal(tokenString string, timeBeforeExpTimeInSec int) error {
+	token, err := parseToken(tokenString, a.RSAKeys.PublicKey)
+
+	if verr, ok := err.(*jwt.ValidationError); ok {
+		switch verr.Errors {
+		case jwt.ValidationErrorExpired:
+			break
+		default:
+			return err
+		}
 	}
 
 	claims, _ := token.Claims.(jwt.MapClaims)
@@ -95,8 +106,8 @@ func CheckTokenRenewal(token *jwt.Token, timeBeforeExpTimeInSec int) error {
 	return nil
 }
 
-// FetchAuth is the function that get auth data from the token.
-func (a *Auth) FetchAuth(token *jwt.Token) (domainmodel.Auth, error) {
+// FetchAuthFromToken is the function that get auth data from the token.
+func (a *Auth) FetchAuthFromToken(token *jwt.Token) (domainmodel.Auth, error) {
 	auth := domainmodel.Auth{}
 
 	if token == nil {

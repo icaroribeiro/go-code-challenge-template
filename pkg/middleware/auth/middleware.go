@@ -48,7 +48,7 @@ func Auth(db *gorm.DB, authN authpkg.Auth, timeBeforeExpTimeInSec int) func(http
 				return
 			}
 
-			auth, err := authN.FetchAuth(token)
+			auth, err := authN.FetchAuthFromToken(token)
 			if err != nil {
 				responsehttputilpkg.RespondErrorWithJson(w, err)
 				return

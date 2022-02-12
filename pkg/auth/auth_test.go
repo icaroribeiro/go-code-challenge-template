@@ -3,6 +3,7 @@ package auth_test
 import (
 	"errors"
 	"fmt"
+	"log"
 	"testing"
 	"time"
 
@@ -15,22 +16,6 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/suite"
 )
-
-// import (
-// 	"errors"
-// 	"fmt"
-// 	"testing"
-// 	"time"
-
-// 	fake "github.com/brianvoe/gofakeit/v5"
-// 	"github.com/dgrijalva/jwt-go"
-// 	"github.com/icaroribeiro/new-go-code-challenge-template/internal/application/customerror"
-// 	domainmodel "github.com/icaroribeiro/new-go-code-challenge-template/internal/core/domain/model/auth"
-// 	authpkg "github.com/icaroribeiro/new-go-code-challenge-template/internal/infrastructure/auth"
-// 	uuid "github.com/satori/go.uuid"
-// 	"github.com/stretchr/testify/assert"
-// 	"github.com/stretchr/testify/suite"
-// )
 
 func TestAuth(t *testing.T) {
 	suite.Run(t, new(TestSuite))
@@ -171,25 +156,8 @@ func (ts *TestSuite) TestDecodeToken() {
 			WantError: true,
 			TearDown:  func(t *testing.T) {},
 		},
-		{
-			Context: "ItShouldFailIfTheTokenIsInvalid",
-			SetUp: func(t *testing.T) {
-				id := uuid.NewV4()
-				userID := uuid.NewV4()
-
-				auth = domainmodel.Auth{
-					ID:     id,
-					UserID: userID,
-				}
-
-				tokenString = fake.Word()
-
-				errorType = customerror.NoType
-			},
-			WantError: true,
-			TearDown:  func(t *testing.T) {},
-		},
 	}
+
 	for _, tc := range ts.Cases {
 		ts.T().Run(tc.Context, func(t *testing.T) {
 			tc.SetUp(t)
@@ -220,7 +188,39 @@ func (ts *TestSuite) TestDecodeToken() {
 	}
 }
 
-func (ts *TestSuite) TestFetchAuth() {
+func (ts *TestSuite) TestValidateTokenRenewal() {
+	rsaKeys := ts.RSAKeys
+	authpkg := authpkg.New(rsaKeys)
+
+	tokenString := ""
+	timeBeforeExpTimeInSec := 0
+
+	ts.Cases = Cases{
+		{
+			Context: "ItShouldSucceed",
+			SetUp: func(t *testing.T) {
+				log.Println("A")
+			},
+			WantError: false,
+		},
+	}
+
+	for _, tc := range ts.Cases {
+		ts.T().Run(tc.Context, func(t *testing.T) {
+			tc.SetUp(t)
+
+			err := authpkg.ValidateTokenRenewal(tokenString, timeBeforeExpTimeInSec)
+
+			if !tc.WantError {
+				assert.Nil(t, err, fmt.Sprintf("Unexpected error: %v", err))
+			} else {
+				assert.NotNil(t, err, "Predicted error lost")
+			}
+		})
+	}
+}
+
+func (ts *TestSuite) TestFetchAuthFromToken() {
 	rsaKeys := ts.RSAKeys
 	authpkg := authpkg.New(rsaKeys)
 
@@ -313,11 +313,12 @@ func (ts *TestSuite) TestFetchAuth() {
 			WantError: true,
 		},
 	}
+
 	for _, tc := range ts.Cases {
 		ts.T().Run(tc.Context, func(t *testing.T) {
 			tc.SetUp(t)
 
-			auth, err := authpkg.FetchAuth(token)
+			auth, err := authpkg.FetchAuthFromToken(token)
 
 			if !tc.WantError {
 				assert.Nil(t, err, fmt.Sprintf("Unexpected error: %v", err))
