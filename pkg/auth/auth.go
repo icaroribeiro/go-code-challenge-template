@@ -75,7 +75,8 @@ func (a *Auth) DecodeToken(tokenString string) (*jwt.Token, error) {
 	return token, nil
 }
 
-// ValidateTokenRenewal is the function that translates a token string in a jwt token and validates if the jwt token is already expired to be renewed.
+// ValidateTokenRenewal is the function that translates a token string in a jwt token
+// and validates if the jwt token is already expired to be renewed.
 func (a *Auth) ValidateTokenRenewal(tokenString string, timeBeforeExpTimeInSec int) error {
 	token, err := parseToken(tokenString, a.RSAKeys.PublicKey)
 
