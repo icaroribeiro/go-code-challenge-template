@@ -3,7 +3,6 @@ package auth_test
 import (
 	"errors"
 	"fmt"
-	"log"
 	"testing"
 	"time"
 
@@ -189,19 +188,64 @@ func (ts *TestSuite) TestDecodeToken() {
 }
 
 func (ts *TestSuite) TestValidateTokenRenewal() {
+	auth := domainmodel.Auth{}
+
 	rsaKeys := ts.RSAKeys
 	authpkg := authpkg.New(rsaKeys)
 
 	tokenString := ""
-	timeBeforeExpTimeInSec := 0
+	timeBeforeExpTimeInSec := 60
+
+	err := errors.New("")
+
+	errorType := customerror.NoType
 
 	ts.Cases = Cases{
 		{
-			Context: "ItShouldSucceed",
+			Context: "ItShouldSucceedInValidatingTokenRenewal",
 			SetUp: func(t *testing.T) {
-				log.Println("A")
+				id := uuid.NewV4()
+				userID := uuid.NewV4()
+
+				auth = domainmodel.Auth{
+					ID:     id,
+					UserID: userID,
+				}
+
+				tokenExpTimeInSec := fake.Number(30, 60)
+
+				tokenString, err = authpkg.CreateToken(auth, tokenExpTimeInSec)
+				assert.Nil(t, err, fmt.Sprintf("Unexpected error: %v", err))
+				assert.NotEmpty(t, tokenString, "")
 			},
 			WantError: false,
+		},
+		{
+			Context: "ItShouldFailIf...",
+			SetUp: func(t *testing.T) {
+			},
+			WantError: false,
+		},
+		{
+			Context: "ItShouldFailIf...",
+			SetUp: func(t *testing.T) {
+				errorType = customerror.NoType
+			},
+			WantError: true,
+		},
+		{
+			Context: "ItShouldFailIf...",
+			SetUp: func(t *testing.T) {
+				errorType = customerror.NoType
+			},
+			WantError: true,
+		},
+		{
+			Context: "ItShouldFailIf...",
+			SetUp: func(t *testing.T) {
+				errorType = customerror.BadRequest
+			},
+			WantError: true,
 		},
 	}
 
@@ -215,6 +259,7 @@ func (ts *TestSuite) TestValidateTokenRenewal() {
 				assert.Nil(t, err, fmt.Sprintf("Unexpected error: %v", err))
 			} else {
 				assert.NotNil(t, err, "Predicted error lost")
+				assert.Equal(t, errorType, customerror.GetType(err))
 			}
 		})
 	}
