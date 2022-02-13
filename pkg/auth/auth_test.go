@@ -220,33 +220,33 @@ func (ts *TestSuite) TestValidateTokenRenewal() {
 			},
 			WantError: false,
 		},
-		{
-			Context: "ItShouldFailIf...",
-			SetUp: func(t *testing.T) {
-			},
-			WantError: false,
-		},
-		{
-			Context: "ItShouldFailIf...",
-			SetUp: func(t *testing.T) {
-				errorType = customerror.NoType
-			},
-			WantError: true,
-		},
-		{
-			Context: "ItShouldFailIf...",
-			SetUp: func(t *testing.T) {
-				errorType = customerror.NoType
-			},
-			WantError: true,
-		},
-		{
-			Context: "ItShouldFailIf...",
-			SetUp: func(t *testing.T) {
-				errorType = customerror.BadRequest
-			},
-			WantError: true,
-		},
+		// {
+		// 	Context: "ItShouldFailIf...",
+		// 	SetUp: func(t *testing.T) {
+		// 	},
+		// 	WantError: false,
+		// },
+		// {
+		// 	Context: "ItShouldFailIf...",
+		// 	SetUp: func(t *testing.T) {
+		// 		errorType = customerror.NoType
+		// 	},
+		// 	WantError: true,
+		// },
+		// {
+		// 	Context: "ItShouldFailIf...",
+		// 	SetUp: func(t *testing.T) {
+		// 		errorType = customerror.NoType
+		// 	},
+		// 	WantError: true,
+		// },
+		// {
+		// 	Context: "ItShouldFailIf...",
+		// 	SetUp: func(t *testing.T) {
+		// 		errorType = customerror.BadRequest
+		// 	},
+		// 	WantError: true,
+		// },
 	}
 
 	for _, tc := range ts.Cases {
