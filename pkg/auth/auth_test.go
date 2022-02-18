@@ -202,7 +202,26 @@ func (ts *TestSuite) TestValidateTokenRenewal() {
 
 	ts.Cases = Cases{
 		{
-			Context: "ItShouldSucceedInValidatingTokenRenewal",
+			Context: "ItShouldSucceedInValidatingTokenRenewalIfTokenHasExpired",
+			SetUp: func(t *testing.T) {
+				id := uuid.NewV4()
+				userID := uuid.NewV4()
+
+				auth = domainmodel.Auth{
+					ID:     id,
+					UserID: userID,
+				}
+
+				tokenExpTimeInSec := fake.Number(-60, -30)
+
+				tokenString, err = authpkg.CreateToken(auth, tokenExpTimeInSec)
+				assert.Nil(t, err, fmt.Sprintf("Unexpected error: %v", err))
+				assert.NotEmpty(t, tokenString, "")
+			},
+			WantError: false,
+		},
+		{
+			Context: "ItShouldSucceedIfTokenHasNotExpiredButItsExpTimeIsWithinTheTimePriorToTheTimeBeforeTokenExpTime",
 			SetUp: func(t *testing.T) {
 				id := uuid.NewV4()
 				userID := uuid.NewV4()
@@ -220,33 +239,44 @@ func (ts *TestSuite) TestValidateTokenRenewal() {
 			},
 			WantError: false,
 		},
-		// {
-		// 	Context: "ItShouldFailIf...",
-		// 	SetUp: func(t *testing.T) {
-		// 	},
-		// 	WantError: false,
-		// },
-		// {
-		// 	Context: "ItShouldFailIf...",
-		// 	SetUp: func(t *testing.T) {
-		// 		errorType = customerror.NoType
-		// 	},
-		// 	WantError: true,
-		// },
-		// {
-		// 	Context: "ItShouldFailIf...",
-		// 	SetUp: func(t *testing.T) {
-		// 		errorType = customerror.NoType
-		// 	},
-		// 	WantError: true,
-		// },
-		// {
-		// 	Context: "ItShouldFailIf...",
-		// 	SetUp: func(t *testing.T) {
-		// 		errorType = customerror.BadRequest
-		// 	},
-		// 	WantError: true,
-		// },
+		{
+			Context: "ItShouldFailIfTheTokenIsInvalid",
+			SetUp: func(t *testing.T) {
+				id := uuid.NewV4()
+				userID := uuid.NewV4()
+
+				auth = domainmodel.Auth{
+					ID:     id,
+					UserID: userID,
+				}
+
+				tokenString = fake.Word()
+
+				errorType = customerror.NoType
+			},
+			WantError: true,
+		},
+		{
+			Context: "ItShouldFailIfTokenHasNotExpiredButItsExpTimeIsNotWithinTheTimePriorToTheTimeBeforeTokenExpTime",
+			SetUp: func(t *testing.T) {
+				id := uuid.NewV4()
+				userID := uuid.NewV4()
+
+				auth = domainmodel.Auth{
+					ID:     id,
+					UserID: userID,
+				}
+
+				tokenExpTimeInSec := fake.Number(300, 600)
+
+				tokenString, err = authpkg.CreateToken(auth, tokenExpTimeInSec)
+				assert.Nil(t, err, fmt.Sprintf("Unexpected error: %v", err))
+				assert.NotEmpty(t, tokenString, "")
+
+				errorType = customerror.BadRequest
+			},
+			WantError: true,
+		},
 	}
 
 	for _, tc := range ts.Cases {

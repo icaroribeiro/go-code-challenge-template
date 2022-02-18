@@ -91,16 +91,12 @@ func (a *Auth) ValidateTokenRenewal(tokenString string, timeBeforeExpTimeInSec i
 
 	claims, _ := token.Claims.(jwt.MapClaims)
 
-	expiredAt, ok := claims["exp"].(float64)
-	if !ok {
-		errorMessage := "failed to fetch exp data from the token"
-		return customerror.New(errorMessage)
-	}
+	expiredAt, _ := claims["exp"].(float64)
 
 	duration := time.Second * time.Duration(timeBeforeExpTimeInSec)
 
 	if time.Until(time.Unix(int64(expiredAt), 0)) > duration {
-		errorMessage := "the token expiration time is not within the time prior to the expiration time"
+		errorMessage := "the token expiration time is not within the time prior to the time before token expiration time"
 		return customerror.BadRequest.New(errorMessage)
 	}
 
