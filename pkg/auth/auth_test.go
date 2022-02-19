@@ -16,7 +16,7 @@ import (
 	"github.com/stretchr/testify/suite"
 )
 
-func TestAuth(t *testing.T) {
+func TestAuthUnit(t *testing.T) {
 	suite.Run(t, new(TestSuite))
 }
 
@@ -165,7 +165,6 @@ func (ts *TestSuite) TestDecodeToken() {
 
 			if !tc.WantError {
 				assert.Nil(t, err, fmt.Sprintf("Unexpected error: %v", err))
-				assert.NotEmpty(t, tokenString, "Unexpected empty token")
 				claims, ok := token.Claims.(jwt.MapClaims)
 				assert.True(t, ok, "Unexpected type assertion error")
 				assert.Equal(t, auth.ID.String(), claims["auth_id"])
@@ -190,6 +189,9 @@ func (ts *TestSuite) TestDecodeToken() {
 func (ts *TestSuite) TestValidateTokenRenewal() {
 	auth := domainmodel.Auth{}
 
+	issuedAt := time.Now().Unix()
+	expiredAt := time.Now().Unix()
+
 	rsaKeys := ts.RSAKeys
 	authpkg := authpkg.New(rsaKeys)
 
@@ -212,7 +214,10 @@ func (ts *TestSuite) TestValidateTokenRenewal() {
 					UserID: userID,
 				}
 
+				issuedAt = time.Now().Unix()
 				tokenExpTimeInSec := fake.Number(-60, -30)
+				duration := time.Second * time.Duration(tokenExpTimeInSec)
+				expiredAt = time.Now().Add(duration).Unix()
 
 				tokenString, err = authpkg.CreateToken(auth, tokenExpTimeInSec)
 				assert.Nil(t, err, fmt.Sprintf("Unexpected error: %v", err))
@@ -221,7 +226,7 @@ func (ts *TestSuite) TestValidateTokenRenewal() {
 			WantError: false,
 		},
 		{
-			Context: "ItShouldSucceedIfTokenHasNotExpiredButItsExpTimeIsWithinTheTimePriorToTheTimeBeforeTokenExpTime",
+			Context: "ItShouldSucceedInValidatingTokenRenewalIfTokenHasNotExpiredButItsExpTimeIsWithinTheTimePriorToTheTimeBeforeTokenExpTime",
 			SetUp: func(t *testing.T) {
 				id := uuid.NewV4()
 				userID := uuid.NewV4()
@@ -231,7 +236,10 @@ func (ts *TestSuite) TestValidateTokenRenewal() {
 					UserID: userID,
 				}
 
+				issuedAt = time.Now().Unix()
 				tokenExpTimeInSec := fake.Number(30, 60)
+				duration := time.Second * time.Duration(tokenExpTimeInSec)
+				expiredAt = time.Now().Add(duration).Unix()
 
 				tokenString, err = authpkg.CreateToken(auth, tokenExpTimeInSec)
 				assert.Nil(t, err, fmt.Sprintf("Unexpected error: %v", err))
@@ -283,10 +291,20 @@ func (ts *TestSuite) TestValidateTokenRenewal() {
 		ts.T().Run(tc.Context, func(t *testing.T) {
 			tc.SetUp(t)
 
-			err := authpkg.ValidateTokenRenewal(tokenString, timeBeforeExpTimeInSec)
+			token, err := authpkg.ValidateTokenRenewal(tokenString, timeBeforeExpTimeInSec)
 
 			if !tc.WantError {
 				assert.Nil(t, err, fmt.Sprintf("Unexpected error: %v", err))
+				claims, ok := token.Claims.(jwt.MapClaims)
+				assert.True(t, ok, "Unexpected type assertion error")
+				assert.Equal(t, auth.ID.String(), claims["auth_id"])
+				assert.Equal(t, auth.UserID.String(), claims["user_id"])
+				iat, ok := claims["iat"].(float64)
+				assert.True(t, ok, "Unexpected type assertion error")
+				assert.WithinDuration(t, time.Unix(issuedAt, 0), time.Unix(int64(iat), 0), time.Second)
+				exp, ok := claims["exp"].(float64)
+				assert.True(t, ok, "Unexpected type assertion error")
+				assert.WithinDuration(t, time.Unix(expiredAt, 0), time.Unix(int64(exp), 0), time.Second)
 			} else {
 				assert.NotNil(t, err, "Predicted error lost")
 				assert.Equal(t, errorType, customerror.GetType(err))

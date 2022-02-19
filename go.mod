@@ -11,6 +11,7 @@ require (
 	github.com/satori/go.uuid v1.2.0
 	github.com/stretchr/testify v1.7.0
 	github.com/swaggo/swag v1.7.9
+	golang.org/x/crypto v0.0.0-20210921155107-089bfa567519
 	gopkg.in/validator.v2 v2.0.0-20210331031555-b37d688a7fb0
 	gorm.io/driver/postgres v1.2.3
 	gorm.io/gorm v1.22.5
@@ -39,7 +40,6 @@ require (
 	github.com/mailru/easyjson v0.7.6 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/stretchr/objx v0.2.0 // indirect
-	golang.org/x/crypto v0.0.0-20210921155107-089bfa567519 // indirect
 	golang.org/x/net v0.0.0-20210805182204-aaa1db679c0d // indirect
 	golang.org/x/sys v0.0.0-20210809222454-d867a43fc93e // indirect
 	golang.org/x/text v0.3.7 // indirect

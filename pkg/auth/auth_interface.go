@@ -9,6 +9,6 @@ import (
 type IAuth interface {
 	CreateToken(auth domainmodel.Auth, tokenExpTimeInSec int) (string, error)
 	DecodeToken(tokenString string) (*jwt.Token, error)
-	ValidateTokenRenewal(tokenString string, timeBeforeExpTimeInSec int) error
+	ValidateTokenRenewal(tokenString string, timeBeforeExpTimeInSec int) (*jwt.Token, error)
 	FetchAuthFromToken(token *jwt.Token) (domainmodel.Auth, error)
 }

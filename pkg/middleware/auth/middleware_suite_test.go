@@ -2,7 +2,6 @@ package auth_test
 
 import (
 	"database/sql"
-	"errors"
 	"log"
 	"testing"
 
@@ -30,7 +29,7 @@ type TestSuite struct {
 
 func (ts *TestSuite) SetupSuite() {
 	var sqlDB *sql.DB
-	err := errors.New("")
+	var err error
 
 	sqlDB, ts.SQLMock, err = sqlmock.New(sqlmock.MonitorPingsOption(true))
 	if err != nil {

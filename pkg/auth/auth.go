@@ -77,7 +77,7 @@ func (a *Auth) DecodeToken(tokenString string) (*jwt.Token, error) {
 
 // ValidateTokenRenewal is the function that translates a token string in a jwt token
 // and validates if the jwt token is already expired to be renewed.
-func (a *Auth) ValidateTokenRenewal(tokenString string, timeBeforeExpTimeInSec int) error {
+func (a *Auth) ValidateTokenRenewal(tokenString string, timeBeforeExpTimeInSec int) (*jwt.Token, error) {
 	token, err := parseToken(tokenString, a.RSAKeys.PublicKey)
 
 	if verr, ok := err.(*jwt.ValidationError); ok {
@@ -85,7 +85,7 @@ func (a *Auth) ValidateTokenRenewal(tokenString string, timeBeforeExpTimeInSec i
 		case jwt.ValidationErrorExpired:
 			break
 		default:
-			return err
+			return token, err
 		}
 	}
 
@@ -97,10 +97,10 @@ func (a *Auth) ValidateTokenRenewal(tokenString string, timeBeforeExpTimeInSec i
 
 	if time.Until(time.Unix(int64(expiredAt), 0)) > duration {
 		errorMessage := "the token expiration time is not within the time prior to the time before token expiration time"
-		return customerror.BadRequest.New(errorMessage)
+		return token, customerror.BadRequest.New(errorMessage)
 	}
 
-	return nil
+	return token, nil
 }
 
 // FetchAuthFromToken is the function that get auth data from the token.
