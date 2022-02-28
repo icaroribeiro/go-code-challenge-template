@@ -137,7 +137,7 @@ func (ts *TestSuite) TestWith() {
 
 			router.ServeHTTP(resprec, req)
 
-			assert.Equal(t, statusCode, resprec.Code)
+			assert.Equal(t, statusCode, resprec.Result().StatusCode)
 		})
 	}
 }

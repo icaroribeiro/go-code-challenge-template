@@ -20,7 +20,7 @@ func TestResponseUnit(t *testing.T) {
 	suite.Run(t, new(TestSuite))
 }
 
-func (ts *TestSuite) TestRespondAndJson() {
+func (ts *TestSuite) TestRespondWithJson() {
 	res := &httptest.ResponseRecorder{}
 	statusCode := 0
 	var payload interface{}
@@ -63,7 +63,6 @@ func (ts *TestSuite) TestRespondAndJson() {
 				assert.Nil(t, err, fmt.Sprintf("Unexpected error: %v", err))
 				assert.Equal(t, payload, message)
 			} else {
-				assert.Equal(t, res.Result().Header.Get("Content-Type"), "application/json")
 				assert.Equal(t, statusCode, res.Result().StatusCode)
 			}
 		})

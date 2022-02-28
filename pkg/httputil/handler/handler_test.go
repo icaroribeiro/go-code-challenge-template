@@ -38,7 +38,7 @@ func (ts *TestSuite) TestGetNotFoundHandler() {
 
 			handler.ServeHTTP(resprec, req)
 
-			assert.Equal(t, statusCode, resprec.Code)
+			assert.Equal(t, statusCode, resprec.Result().StatusCode)
 		})
 	}
 }
@@ -67,7 +67,7 @@ func (ts *TestSuite) TestGetMethodNotAllowedHandler() {
 
 			handler.ServeHTTP(resprec, req)
 
-			assert.Equal(t, statusCode, resprec.Code)
+			assert.Equal(t, statusCode, resprec.Result().StatusCode)
 		})
 	}
 }
