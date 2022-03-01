@@ -1,90 +1,97 @@
 package datastore_test
 
-// import (
-// 	"testing"
+import (
+	"fmt"
+	"testing"
 
-// 	"github.com/stretchr/testify/suite"
-// )
+	datastorepkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/datastore"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/suite"
+)
 
-// func TestDatabase(t *testing.T) {
-// 	suite.Run(t, new(TestSuite))
-// }
+func TestDatastore(t *testing.T) {
+	suite.Run(t, new(TestSuite))
+}
 
-// func (ts *TestSuite) TestNew() {
-// 	ts.Cases = Cases{
-// 		{
-// 			Context:   "ItShouldSucceedInInitializingTheDatabase",
-// 			SetUp:     func(t *testing.T) {},
-// 			WantError: false,
-// 		},
-// 		{
-// 			Context:   "ItShouldFailIfAnErrorIsReturnedWhenSettingTheDialector",
-// 			SetUp:     func(t *testing.T) {},
-// 			WantError: false,
-// 		},
-// 		{
-// 			Context:   "ItShouldFailIfAnErrorIsReturnedWhenOpeningTheDatabaseSessionBasedOnTheDialector",
-// 			SetUp:     func(t *testing.T) {},
-// 			WantError: false,
-// 		},
-// 	}
+func (ts *TestSuite) TestNew() {
+	dbConfig := map[string]string{}
 
-// 	for _, tc := range ts.Cases {
-// 		ts.T().Run(tc.Context, func(t *testing.T) {
-// 			tc.SetUp(t)
+	ts.Cases = Cases{
+		{
+			Context: "ItShouldSucceedInInitializingThePostgresDriver",
+			SetUp: func(t *testing.T) {
+				dbConfig["DB_DRIVER"] = "postgres"
+			},
+			WantError: false,
+		},
+		{
+			Context: "ItShouldFailIfTheSQLDatabaseDriverIsNotRecognized",
+			SetUp: func(t *testing.T) {
+				dbConfig["DB_DRIVER"] = "testing"
+			},
+			WantError: true,
+		},
+	}
 
-// 			if !tc.WantError {
-// 			} else {
-// 			}
-// 		})
-// 	}
-// }
+	for _, tc := range ts.Cases {
+		ts.T().Run(tc.Context, func(t *testing.T) {
+			tc.SetUp(t)
 
-// func (ts *TestSuite) TestGetInstance() {
-// 	ts.Cases = Cases{
-// 		{
-// 			Context:   "ItShouldSucceedInGettingTheDatabaseInstance",
-// 			SetUp:     func(t *testing.T) {},
-// 			WantError: false,
-// 		},
-// 	}
+			i, err := datastorepkg.New(dbConfig)
 
-// 	for _, tc := range ts.Cases {
-// 		ts.T().Run(tc.Context, func(t *testing.T) {
-// 			tc.SetUp(t)
+			if !tc.WantError {
+				_, ok := i.(datastorepkg.IDatastore)
+				assert.True(t, ok, "Unexpected type assertion fail")
+			} else {
+				assert.NotNil(t, err, "Predicted error lost")
+			}
+		})
+	}
+}
 
-// 			if !tc.WantError {
-// 			}
-// 		})
-// 	}
-// }
+func (ts *TestSuite) TestClose() {
+	connPool := ts.DB.ConnPool
 
-// func (ts *TestSuite) TestClose() {
-// 	ts.Cases = Cases{
-// 		{
-// 			Context:   "ItShouldSucceedInClosingTheDatabase",
-// 			SetUp:     func(t *testing.T) {},
-// 			WantError: false,
-// 		},
-// 		{
-// 			Context:   "ItShouldFailIfAnErrorIsReturnedWhenGettingTheSQLDatabase",
-// 			SetUp:     func(t *testing.T) {},
-// 			WantError: true,
-// 		},
-// 		{
-// 			Context:   "ItShouldFailIfAnErrorIsReturnedWhenClosingTheSQLDatabase",
-// 			SetUp:     func(t *testing.T) {},
-// 			WantError: true,
-// 		},
-// 	}
+	ts.Cases = Cases{
+		{
+			Context: "ItShouldSucceedInClosingTheDatabase",
+			SetUp: func(t *testing.T) {
+				ts.Mock.ExpectClose()
+			},
+			WantError: false,
+			TearDown:  func(t *testing.T) {},
+		},
+		{
+			Context: "ItShouldFailIfAnErrorOccursWhenGettingTheSQLDatabase",
+			SetUp: func(t *testing.T) {
+				ts.DB.ConnPool = nil
+			},
+			WantError: true,
+			TearDown: func(t *testing.T) {
+				ts.DB.ConnPool = connPool
+			},
+		},
+	}
 
-// 	for _, tc := range ts.Cases {
-// 		ts.T().Run(tc.Context, func(t *testing.T) {
-// 			tc.SetUp(t)
+	for _, tc := range ts.Cases {
+		ts.T().Run(tc.Context, func(t *testing.T) {
+			tc.SetUp(t)
 
-// 			if !tc.WantError {
-// 			} else {
-// 			}
-// 		})
-// 	}
-// }
+			provider := datastorepkg.Provider{DB: ts.DB}
+			err := provider.Close()
+
+			if !tc.WantError {
+				assert.Nil(t, err, fmt.Sprintf("Unexpected error: %v", err))
+			} else {
+				assert.NotNil(t, err, "Predicted error lost")
+			}
+
+			tc.TearDown(t)
+		})
+	}
+}
+
+func (ts *TestSuite) AfterTest(_, _ string) {
+	err := ts.Mock.ExpectationsWereMet()
+	assert.Nil(ts.T(), err, fmt.Sprintf("There were unfulfilled expectations: %v.", err))
+}

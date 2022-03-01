@@ -10,6 +10,10 @@ github.com/icaroribeiro/new-go-code-challenge-template/pkg/customerror/customerr
 github.com/icaroribeiro/new-go-code-challenge-template/pkg/customerror/customerror.go:47:	New				100.0%
 github.com/icaroribeiro/new-go-code-challenge-template/pkg/customerror/customerror.go:52:	Newf				100.0%
 github.com/icaroribeiro/new-go-code-challenge-template/pkg/customerror/customerror.go:57:	GetType				100.0%
+github.com/icaroribeiro/new-go-code-challenge-template/pkg/datastore/datastore.go:13:		New				100.0%
+github.com/icaroribeiro/new-go-code-challenge-template/pkg/datastore/datastore.go:25:		Close				100.0%
+github.com/icaroribeiro/new-go-code-challenge-template/pkg/datastore/postgres_driver.go:16:	NewPostgresDriver		77.8%
+github.com/icaroribeiro/new-go-code-challenge-template/pkg/datastore/postgres_driver.go:46:	Close				0.0%
 github.com/icaroribeiro/new-go-code-challenge-template/pkg/env/env.go:9:			GetEnvWithDefaultValue		100.0%
 github.com/icaroribeiro/new-go-code-challenge-template/pkg/httputil/adapter/adapter.go:16:	AdaptFunc			100.0%
 github.com/icaroribeiro/new-go-code-challenge-template/pkg/httputil/adapter/adapter.go:23:	With				100.0%
@@ -31,4 +35,4 @@ github.com/icaroribeiro/new-go-code-challenge-template/pkg/validator/uuid/valida
 github.com/icaroribeiro/new-go-code-challenge-template/pkg/validator/validator.go:14:		New				100.0%
 github.com/icaroribeiro/new-go-code-challenge-template/pkg/validator/validator.go:31:		Validate			100.0%
 github.com/icaroribeiro/new-go-code-challenge-template/pkg/validator/validator.go:36:		ValidateWithTags		100.0%
-total:												(statements)			100.0%
+total:												(statements)			98.5%

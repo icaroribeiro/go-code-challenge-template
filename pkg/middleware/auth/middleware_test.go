@@ -20,9 +20,9 @@ import (
 	requesthttputilpkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/httputil/request"
 	responsehttputilpkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/httputil/response"
 	authmiddlewarepkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/middleware/auth"
-	mockauthpkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/mockauth"
 	domainmodelfactory "github.com/icaroribeiro/new-go-code-challenge-template/tests/factory/core/domain/model"
 	datastoremodelfactory "github.com/icaroribeiro/new-go-code-challenge-template/tests/factory/infrastructure/storage/datastore/model"
+	mockauthpkg "github.com/icaroribeiro/new-go-code-challenge-template/tests/pkg/mockauth"
 	uuid "github.com/satori/go.uuid"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/suite"
@@ -319,4 +319,9 @@ func (ts *TestSuite) TestAuth() {
 			}
 		})
 	}
+}
+
+func (ts *TestSuite) AfterTest(_, _ string) {
+	err := ts.SQLMock.ExpectationsWereMet()
+	assert.Nil(ts.T(), err, fmt.Sprintf("There were unfulfilled expectations: %v.", err))
 }
