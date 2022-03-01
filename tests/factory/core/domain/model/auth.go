@@ -2,44 +2,29 @@ package model
 
 import (
 	"github.com/bluele/factory-go/factory"
-	fake "github.com/brianvoe/gofakeit/v5"
 	domainmodel "github.com/icaroribeiro/new-go-code-challenge-template/internal/core/domain/model"
+	uuid "github.com/satori/go.uuid"
 )
 
 // NewAuth is the function that returns an instance of the auth's domain model for performing tests.
-func NewAuth(args map[string]interface{}) domainmodel.Chunk {
-
-	chunkFactory := factory.NewFactory(
-		domainmodel.Chunk{},
-	).Attr("Offset", func(fArgs factory.Args) (interface{}, error) {
-		offset := fake.Int64()
-		if val, ok := args["offset"]; ok {
-			offset = val.(int64)
+func NewAuth(args map[string]interface{}) domainmodel.Auth {
+	authFactory := factory.NewFactory(
+		domainmodel.Auth{},
+	).Attr("ID", func(fArgs factory.Args) (interface{}, error) {
+		id := uuid.NewV4()
+		if val, ok := args["id"]; ok {
+			id = val.(uuid.UUID)
 		}
 
-		return offset, nil
-	}).Attr("Limit", func(fArgs factory.Args) (interface{}, error) {
-		limit := fake.Int64()
-		if val, ok := args["limit"]; ok {
-			limit = val.(int64)
+		return id, nil
+	}).Attr("UserID", func(fArgs factory.Args) (interface{}, error) {
+		userID := uuid.NewV4()
+		if val, ok := args["userID"]; ok {
+			userID = val.(uuid.UUID)
 		}
 
-		return limit, nil
-	}).Attr("BytesRead", func(fArgs factory.Args) (interface{}, error) {
-		bytesRead := fake.Int64()
-		if val, ok := args["bytesRead"]; ok {
-			bytesRead = val.(int64)
-		}
-
-		return bytesRead, nil
-	}).Attr("BytestreamToString", func(fArgs factory.Args) (interface{}, error) {
-		bytestreamToString := fake.Name()
-		if val, ok := args["byteStreamToString"]; ok {
-			bytestreamToString = val.(string)
-		}
-
-		return bytestreamToString, nil
+		return userID, nil
 	})
 
-	return chunkFactory.MustCreate().(domainmodel.Auth)
+	return authFactory.MustCreate().(domainmodel.Auth)
 }

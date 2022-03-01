@@ -20,7 +20,7 @@ github.com/icaroribeiro/new-go-code-challenge-template/pkg/httputil/request/requ
 github.com/icaroribeiro/new-go-code-challenge-template/pkg/httputil/request/request.go:60:	SetRequestContext		100.0%
 github.com/icaroribeiro/new-go-code-challenge-template/pkg/httputil/response/response.go:13:	RespondWithJson			100.0%
 github.com/icaroribeiro/new-go-code-challenge-template/pkg/httputil/response/response.go:28:	RespondErrorWithJson		100.0%
-github.com/icaroribeiro/new-go-code-challenge-template/pkg/middleware/auth/middleware.go:18:	Auth				28.6%
+github.com/icaroribeiro/new-go-code-challenge-template/pkg/middleware/auth/middleware.go:17:	Auth				100.0%
 github.com/icaroribeiro/new-go-code-challenge-template/pkg/security/security.go:11:		New				100.0%
 github.com/icaroribeiro/new-go-code-challenge-template/pkg/security/security.go:16:		HashPassword			100.0%
 github.com/icaroribeiro/new-go-code-challenge-template/pkg/security/security.go:25:		VerifyPasswords			100.0%
@@ -31,4 +31,4 @@ github.com/icaroribeiro/new-go-code-challenge-template/pkg/validator/uuid/valida
 github.com/icaroribeiro/new-go-code-challenge-template/pkg/validator/validator.go:14:		New				100.0%
 github.com/icaroribeiro/new-go-code-challenge-template/pkg/validator/validator.go:31:		Validate			100.0%
 github.com/icaroribeiro/new-go-code-challenge-template/pkg/validator/validator.go:36:		ValidateWithTags		100.0%
-total:												(statements)			83.7%
+total:												(statements)			100.0%

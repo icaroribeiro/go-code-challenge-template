@@ -10,6 +10,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gorilla/mux"
 	domainmodel "github.com/icaroribeiro/new-go-code-challenge-template/internal/core/domain/model"
@@ -20,6 +21,8 @@ import (
 	responsehttputilpkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/httputil/response"
 	authmiddlewarepkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/middleware/auth"
 	mockauthpkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/mockauth"
+	domainmodelfactory "github.com/icaroribeiro/new-go-code-challenge-template/tests/factory/core/domain/model"
+	datastoremodelfactory "github.com/icaroribeiro/new-go-code-challenge-template/tests/factory/infrastructure/storage/datastore/model"
 	uuid "github.com/satori/go.uuid"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/suite"
@@ -43,25 +46,49 @@ func (ts *TestSuite) TestAuth() {
 	returnArgs := ReturnArgs{}
 
 	ts.Cases = Cases{
-		// {
-		// 	Context: "ItShouldSucceedInWrappingAFunctionAndApplyingAuthenticationToARequest",
-		// 	SetUp: func(t *testing.T) {
-		// 		key := "Authorization"
-		// 		value := "kkk"
-		// 		headers = map[string][]string{
-		// 			key: {value},
-		// 		}
+		{
+			Context: "ItShouldSucceedInWrappingAFunctionAndApplyingAuthenticationToARequest",
+			SetUp: func(t *testing.T) {
+				bearerToken = []string{"Bearer", "token"}
 
-		// 		statusCode = http.StatusOK
-		// 		payload = messagehttputilpkg.Message{Text: "OK"}
+				key := "Authorization"
+				value := strings.Join(bearerToken[:], " ")
+				headers = map[string][]string{
+					key: {value},
+				}
 
-		// 		returnArgs = ReturnArgs{
-		// 			{},
-		// 			{},
-		// 			{},
-		// 		}
-		// 	},
-		// },
+				token = &jwt.Token{}
+
+				statusCode = http.StatusOK
+				payload = messagehttputilpkg.Message{Text: "OK"}
+
+				id := uuid.NewV4()
+				userID := uuid.NewV4()
+
+				args := map[string]interface{}{
+					"id":     id,
+					"userID": userID,
+				}
+
+				returnArgs = ReturnArgs{
+					{token, nil},
+					{domainmodelfactory.NewAuth(args), nil},
+				}
+
+				sqlQuery := `SELECT * FROM "auths" WHERE id=$1`
+
+				authFromDB := datastoremodelfactory.NewAuth(args)
+
+				rows := sqlmock.
+					NewRows([]string{"id", "user_id", "created_at"}).
+					AddRow(authFromDB.ID, authFromDB.UserID, authFromDB.CreatedAt)
+
+				ts.SQLMock.ExpectQuery(regexp.QuoteMeta(sqlQuery)).
+					WithArgs(id).
+					WillReturnRows(rows)
+			},
+			WantError: false,
+		},
 		{
 			Context: "ItShouldFailIfTheAuthorizationHeaderIsNotSetInTheRequestHeader",
 			SetUp: func(t *testing.T) {
@@ -76,6 +103,7 @@ func (ts *TestSuite) TestAuth() {
 					{domainmodel.Auth{}, nil},
 				}
 			},
+			WantError: true,
 		},
 		{
 			Context: "ItShouldFailIfTheAuthenticationTokenIsNotSetInAuthorizationHeader",
@@ -95,6 +123,7 @@ func (ts *TestSuite) TestAuth() {
 					{domainmodel.Auth{}, nil},
 				}
 			},
+			WantError: true,
 		},
 		{
 			Context: "ItShouldFailIfTheTokenIsNotDecoded",
@@ -114,6 +143,7 @@ func (ts *TestSuite) TestAuth() {
 					{domainmodel.Auth{}, nil},
 				}
 			},
+			WantError: true,
 		},
 		{
 			Context: "ItShouldFailIfTheAuthIsNotFetchedFromTheToken",
@@ -134,6 +164,7 @@ func (ts *TestSuite) TestAuth() {
 					{domainmodel.Auth{}, customerror.New("failed")},
 				}
 			},
+			WantError: true,
 		},
 		{
 			Context: "ItShouldFailIfAnErrorOccursWhenTryingToFindTheAuthInTheDatabase",
@@ -148,62 +179,101 @@ func (ts *TestSuite) TestAuth() {
 
 				token = &jwt.Token{}
 
-				sqlQuery := `SELECT * FROM "auth" WHERE id=$1`
+				statusCode = http.StatusInternalServerError
 
 				id := uuid.NewV4()
+
+				args := map[string]interface{}{
+					"id": id,
+				}
+
+				returnArgs = ReturnArgs{
+					{token, nil},
+					{domainmodelfactory.NewAuth(args), nil},
+				}
+
+				sqlQuery := `SELECT * FROM "auths" WHERE id=$1`
 
 				ts.SQLMock.ExpectQuery(regexp.QuoteMeta(sqlQuery)).
 					WithArgs(id).
 					WillReturnError(errors.New("failed"))
+			},
+			WantError: true,
+		},
+		{
+			Context: "ItShouldFailIfTheAuthIsNotFoundInTheDatabase",
+			SetUp: func(t *testing.T) {
+				bearerToken = []string{"Bearer", "token"}
 
-				statusCode = http.StatusInternalServerError
+				key := "Authorization"
+				value := strings.Join(bearerToken[:], " ")
+				headers = map[string][]string{
+					key: {value},
+				}
+
+				token = &jwt.Token{}
+
+				statusCode = http.StatusBadRequest
+
+				id := uuid.NewV4()
+
+				args := map[string]interface{}{
+					"id": id,
+				}
 
 				returnArgs = ReturnArgs{
 					{token, nil},
-					{domainmodel.Auth{}, nil},
+					{domainmodelfactory.NewAuth(args), nil},
 				}
+
+				sqlQuery := `SELECT * FROM "auths" WHERE id=$1`
+
+				ts.SQLMock.ExpectQuery(regexp.QuoteMeta(sqlQuery)).
+					WithArgs(id).
+					WillReturnRows(&sqlmock.Rows{})
 			},
+			WantError: true,
 		},
-		// {
-		// 	Context: "ItShouldFailIfTheAuthIsNotFoundInTheDatabase",
-		// 	SetUp: func(t *testing.T) {
-		// 		// bearerToken = []string{"Bearer", "token"}
+		{
+			Context: "ItShouldFailIfTheUserIDFromTokenDoesNotMatchWithTheUserIDFromAuthRecordFromTheDatabase",
+			SetUp: func(t *testing.T) {
+				bearerToken = []string{"Bearer", "token"}
 
-		// 		// key := "Authorization"
-		// 		// value := strings.Join(bearerToken[:], " ")
-		// 		// headers = map[string][]string{
-		// 		// 	key: {value},
-		// 		// }
+				key := "Authorization"
+				value := strings.Join(bearerToken[:], " ")
+				headers = map[string][]string{
+					key: {value},
+				}
 
-		// 		// token = &jwt.Token{}
-		// 		statusCode = http.StatusBadRequest
+				token = &jwt.Token{}
 
-		// 		// returnArgs = ReturnArgs{
-		// 		// 	{token, nil},
-		// 		// 	{domainmodel.Auth{}, customerror.New("failed")},
-		// 		// }
-		// 	},
-		// },
-		// {
-		// 	Context: "ItShouldFailIfTheUserIDFromTokenDoesNotMatchWithTheUserIDFromAuthRecordFromTheDatabase",
-		// 	SetUp: func(t *testing.T) {
-		// 		// bearerToken = []string{"Bearer", "token"}
+				statusCode = http.StatusBadRequest
 
-		// 		// key := "Authorization"
-		// 		// value := strings.Join(bearerToken[:], " ")
-		// 		// headers = map[string][]string{
-		// 		// 	key: {value},
-		// 		// }
+				id := uuid.NewV4()
 
-		// 		// token = &jwt.Token{}
-		// 		statusCode = http.StatusBadRequest
+				args := map[string]interface{}{
+					"id": id,
+				}
 
-		// 		// returnArgs = ReturnArgs{
-		// 		// 	{token, nil},
-		// 		// 	{domainmodel.Auth{}, customerror.New("failed")},
-		// 		// }
-		// 	},
-		// },
+				returnArgs = ReturnArgs{
+					{token, nil},
+					{domainmodelfactory.NewAuth(args), nil},
+				}
+
+				sqlQuery := `SELECT * FROM "auths" WHERE id=$1`
+
+				authFromDB := datastoremodelfactory.NewAuth(args)
+
+				rows := sqlmock.
+					NewRows([]string{"id", "user_id", "created_at"}).
+					AddRow(authFromDB.ID, authFromDB.UserID, authFromDB.CreatedAt)
+
+				ts.SQLMock.ExpectQuery(regexp.QuoteMeta(sqlQuery)).
+					WithArgs(id).
+					WillReturnRows(rows)
+			},
+			WantError: true,
+		},
 	}
 
 	for _, tc := range ts.Cases {
