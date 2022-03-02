@@ -91,7 +91,7 @@ func (ts *TestSuite) TestClose() {
 	}
 }
 
-func (ts *TestSuite) AfterTest(_, _ string) {
-	err := ts.Mock.ExpectationsWereMet()
-	assert.Nil(ts.T(), err, fmt.Sprintf("There were unfulfilled expectations: %v.", err))
-}
+// func (ts *TestSuite) AfterTest(_, _ string) {
+// 	err := ts.Mock.ExpectationsWereMet()
+// 	assert.Nil(ts.T(), err, fmt.Sprintf("There were unfulfilled expectations: %v.", err))
+// }

@@ -21,8 +21,6 @@ type Cases []Case
 
 type TestSuite struct {
 	suite.Suite
-	//DB    *gorm.DB
-	Mock  sqlmock.Sqlmock
 	Cases Cases
 }
 
@@ -60,8 +58,4 @@ func NewMock() (*gorm.DB, sqlmock.Sqlmock) {
 	}
 
 	return db, mock
-}
-
-func (ts *TestSuite) SetupSuite() {
-	ts.DB, ts.Mock = NewMock()
 }
