@@ -1,101 +1,23 @@
 basePath: /
 definitions:
-  error.Error:
-    properties:
-      error:
-        type: string
-    type: object
   message.Message:
     properties:
       message:
         type: string
-    type: object
-  model.Chunk:
-    properties:
-      bytes_read:
-        type: integer
-      bytestream_to_string:
-        type: string
-      limit:
-        type: integer
-      offset:
-        type: integer
-    type: object
-  model.File:
-    properties:
-      id:
-        type: string
-      modTime:
-        type: string
-      name:
-        type: string
-      size:
-        type: integer
     type: object
 host: localhost:8080
 info:
   contact:
     email: icaroribeiro@hotmail.com
     name: API Support
-  description: A REST API developed using Golang for uploading and reading files in chunks of bytes defined by offset and limit parameters.
+  description: A REST API developed using Golang, Json Web Token and PostgreSQL database.
   license:
     name: Apache 2.0
     url: http://www.apache.org/licenses/LICENSE-2.0.html
   termsOfService: http://swagger.io/terms/
-  title: Avenue Securities API
+  title: New Go Code Challenge Template API
   version: "1.0"
 paths:
-  /files/{fileID}/chunk:
-    get:
-      operationId: Read
-      parameters:
-      - description: The number of bytes to skip before starting returning the bytes. 0 is to skip no entry, 1 is to skip the first byte and so on. If not informed, the default value will be set to 0.
-        in: query
-        name: offset
-        type: integer
-      - description: The maximum number of bytes to be returned. If not informed, the default value will be set to 10.
-        in: query
-        name: limit
-        type: integer
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/model.Chunk'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/error.Error'
-      summary: API endpoint used to read a chunk of bytes of a file identified by its id using the offset and limit parameters.
-      tags:
-      - file
-  /files/upload:
-    post:
-      consumes:
-      - multipart/form-data
-      operationId: Upload
-      parameters:
-      - description: The file to be uploaded.
-        in: formData
-        name: file
-        required: true
-        type: file
-      produces:
-      - application/json
-      responses:
-        "201":
-          description: Created
-          schema:
-            $ref: '#/definitions/model.File'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/error.Error'
-      summary: API endpoint used to store a file on disk by uploading it.
-      tags:
-      - file
   /status:
     get:
       operationId: GetStatus
@@ -115,5 +37,5 @@ swagger: "2.0"
 tags:
 - description: It refers to the operation related to health check.
   name: health check
-- description: It refers to the operations related to file.
-  name: file
+- description: It refers to the operations related to authentication.
+  name: authentication

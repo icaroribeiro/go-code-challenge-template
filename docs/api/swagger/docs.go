@@ -32,84 +32,6 @@ var doc = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/files/upload": {
-            "post": {
-                "consumes": [
-                    "multipart/form-data"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "file"
-                ],
-                "summary": "API endpoint used to store a file on disk by uploading it",
-                "operationId": "Upload",
-                "parameters": [
-                    {
-                        "type": "file",
-                        "description": "The file to be uploaded",
-                        "name": "file",
-                        "in": "formData",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "201": {
-                        "description": "Created",
-                        "schema": {
-                            "$ref": "#/definitions/model.File"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/error.Error"
-                        }
-                    }
-                }
-            }
-        },
-        "/files/{fileID}/chunk": {
-            "get": {
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "file"
-                ],
-                "summary": "API endpoint used to read a chunk of bytes of a file identified by its id using the offset and limit parameters",
-                "operationId": "Read",
-                "parameters": [
-                    {
-                        "type": "integer",
-                        "description": "The number of bytes to skip before starting returning the bytes. 0 is to skip no entry, 1 is to skip the first byte and so on. If not informed, the default value will be set to 0",
-                        "name": "offset",
-                        "in": "query"
-                    },
-                    {
-                        "type": "integer",
-                        "description": "The maximum number of bytes to be returned. If not informed, the default value will be set to 10",
-                        "name": "limit",
-                        "in": "query"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/model.Chunk"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/error.Error"
-                        }
-                    }
-                }
-            }
-        },
         "/status": {
             "get": {
                 "produces": [
@@ -118,7 +40,7 @@ var doc = `{
                 "tags": [
                     "health check"
                 ],
-                "summary": "API endpoint used to verify if the service has started up correctly and is ready to accept requests",
+                "summary": "API endpoint used to verify if the service has started up correctly and is ready to accept requests.",
                 "operationId": "GetStatus",
                 "responses": {
                     "200": {
@@ -132,14 +54,6 @@ var doc = `{
         }
     },
     "definitions": {
-        "error.Error": {
-            "type": "object",
-            "properties": {
-                "error": {
-                    "type": "string"
-                }
-            }
-        },
         "message.Message": {
             "type": "object",
             "properties": {
@@ -147,50 +61,16 @@ var doc = `{
                     "type": "string"
                 }
             }
-        },
-        "model.Chunk": {
-            "type": "object",
-            "properties": {
-                "bytes_read": {
-                    "type": "integer"
-                },
-                "bytestream_to_string": {
-                    "type": "string"
-                },
-                "limit": {
-                    "type": "integer"
-                },
-                "offset": {
-                    "type": "integer"
-                }
-            }
-        },
-        "model.File": {
-            "type": "object",
-            "properties": {
-                "id": {
-                    "type": "string"
-                },
-                "modTime": {
-                    "type": "string"
-                },
-                "name": {
-                    "type": "string"
-                },
-                "size": {
-                    "type": "integer"
-                }
-            }
         }
     },
     "tags": [
         {
-            "description": "It refers to the operation related to health check",
+            "description": "It refers to the operation related to health check.",
             "name": "health check"
         },
         {
-            "description": "It refers to the operations related to file",
-            "name": "file"
+            "description": "It refers to the operations related to authentication.",
+            "name": "authentication"
         }
     ]
 }`
@@ -210,8 +90,8 @@ var SwaggerInfo = swaggerInfo{
 	Host:        "localhost:8080",
 	BasePath:    "/",
 	Schemes:     []string{"http"},
-	Title:       "Avenue Securities API",
-	Description: "A REST API developed using Golang for uploading and reading files in chunks of bytes defined by offset and limit parameters",
+	Title:       "New Go Code Challenge Template API",
+	Description: "A REST API developed using Golang, Json Web Token and PostgreSQL database.",
 }
 
 type s struct{}

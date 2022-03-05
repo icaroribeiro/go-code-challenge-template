@@ -33,6 +33,7 @@ func TestMiddlewareUnit(t *testing.T) {
 }
 
 func (ts *TestSuite) TestAuth() {
+	db, mock := NewMock()
 	bearerToken := []string{"", ""}
 
 	var token *jwt.Token
@@ -83,7 +84,7 @@ func (ts *TestSuite) TestAuth() {
 					NewRows([]string{"id", "user_id", "created_at"}).
 					AddRow(authFromDB.ID, authFromDB.UserID, authFromDB.CreatedAt)
 
-				ts.SQLMock.ExpectQuery(regexp.QuoteMeta(sqlQuery)).
+				mock.ExpectQuery(regexp.QuoteMeta(sqlQuery)).
 					WithArgs(id).
 					WillReturnRows(rows)
 			},
@@ -194,7 +195,7 @@ func (ts *TestSuite) TestAuth() {
 
 				sqlQuery := `SELECT * FROM "auths" WHERE id=$1`
 
-				ts.SQLMock.ExpectQuery(regexp.QuoteMeta(sqlQuery)).
+				mock.ExpectQuery(regexp.QuoteMeta(sqlQuery)).
 					WithArgs(id).
 					WillReturnError(errors.New("failed"))
 			},
@@ -228,7 +229,7 @@ func (ts *TestSuite) TestAuth() {
 
 				sqlQuery := `SELECT * FROM "auths" WHERE id=$1`
 
-				ts.SQLMock.ExpectQuery(regexp.QuoteMeta(sqlQuery)).
+				mock.ExpectQuery(regexp.QuoteMeta(sqlQuery)).
 					WithArgs(id).
 					WillReturnRows(&sqlmock.Rows{})
 			},
@@ -268,7 +269,7 @@ func (ts *TestSuite) TestAuth() {
 					NewRows([]string{"id", "user_id", "created_at"}).
 					AddRow(authFromDB.ID, authFromDB.UserID, authFromDB.CreatedAt)
 
-				ts.SQLMock.ExpectQuery(regexp.QuoteMeta(sqlQuery)).
+				mock.ExpectQuery(regexp.QuoteMeta(sqlQuery)).
 					WithArgs(id).
 					WillReturnRows(rows)
 			},
@@ -284,7 +285,7 @@ func (ts *TestSuite) TestAuth() {
 			authN.On("DecodeToken", bearerToken[1]).Return(returnArgs[0]...)
 			authN.On("FetchAuthFromToken", token).Return(returnArgs[1]...)
 
-			authMiddleware := authmiddlewarepkg.Auth(ts.DB, authN, timeBeforeExpTimeInSec)
+			authMiddleware := authmiddlewarepkg.Auth(db, authN, timeBeforeExpTimeInSec)
 
 			handlerFunc := func(w http.ResponseWriter, r *http.Request) {
 				responsehttputilpkg.RespondWithJson(w, http.StatusOK, messagehttputilpkg.Message{Text: "OK"})
@@ -317,11 +318,9 @@ func (ts *TestSuite) TestAuth() {
 			} else {
 				assert.Equal(t, statusCode, resprec.Result().StatusCode)
 			}
+
+			err := mock.ExpectationsWereMet()
+			assert.Nil(ts.T(), err, fmt.Sprintf("There were unfulfilled expectations: %v.", err))
 		})
 	}
-}
-
-func (ts *TestSuite) AfterTest(_, _ string) {
-	err := ts.SQLMock.ExpectationsWereMet()
-	assert.Nil(ts.T(), err, fmt.Sprintf("There were unfulfilled expectations: %v.", err))
 }

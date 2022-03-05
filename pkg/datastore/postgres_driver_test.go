@@ -16,23 +16,53 @@ func TestPostgresDriver(t *testing.T) {
 }
 
 // func (ts *TestSuite) TestPostgresDriverNew() {
+// 	_, err := dockertest.NewPool("")
+// 	if err != nil {
+// 		log.Fatalf("Could not connect to docker: %s", err)
+// 	}
+
+// 	resource, err := pool.RunWithOptions(&dockertest.RunOptions{
+// 		Repository: "postgres",
+// 		Tag:        "11",
+// 		Env: []string{
+// 			"POSTGRES_DB=test",
+// 			"POSTGRES_USER=test",
+// 			"POSTGRES_PASSWORD=test",
+// 			"listen_addresses = '*'",
+// 		},
+// 	}, func(config *docker.HostConfig) {
+// 		config.AutoRemove = true
+// 		config.RestartPolicy = docker.RestartPolicy{
+// 			Name: "no",
+// 		}
+// 	})
+
+// 	fmt.Print(resource.GetPort("5432"))
+
 // 	dbConfig := map[string]string{}
 
 // 	ts.Cases = Cases{
 // 		{
-// 			Context: "ItShouldSucceedInInitializingThePostgresDriver",
+// 			Context: "ItShouldSucceedUsingAURL",
 // 			SetUp: func(t *testing.T) {
-// 				dbConfig["DB_DRIVER"] = "postgres"
-// 			},
-// 			WantError: false,
-// 		},
-// 		{
-// 			Context: "ItShouldFailIfTheSQLDatabaseDriverIsNotRecognized",
-// 			SetUp: func(t *testing.T) {
-// 				dbConfig["DB_DRIVER"] = "testing"
+// 				dbConfig["url"] = "postgres://test:test@postgres:5432/test?sslmode=disable"
 // 			},
 // 			WantError: true,
 // 		},
+// 		// {
+// 		// 	Context: "ItShouldSucceedUsingAConnectionString",
+// 		// 	SetUp: func(t *testing.T) {
+// 		// 		dbConfig["url"] = "testing"
+// 		// 	},
+// 		// 	WantError: false,
+// 		// },
+// 		// {
+// 		// 	Context: "ItShouldFailIfItIsNotPossibleToParseDSN",
+// 		// 	SetUp: func(t *testing.T) {
+// 		// 		dbConfig["url"] = fake.Word()
+// 		// 	},
+// 		// 	WantError: true,
+// 		// },
 // 	}
 
 // 	for _, tc := range ts.Cases {
@@ -48,7 +78,7 @@ func TestPostgresDriver(t *testing.T) {
 // 				assert.NotNil(t, err, "Predicted error lost")
 // 			}
 // 		})
-// 	}
+//	}
 // }
 
 func (ts *TestSuite) TestPostgresDriverClose() {
@@ -67,10 +97,7 @@ func (ts *TestSuite) TestPostgresDriverClose() {
 				mock.ExpectClose()
 			},
 			WantError: false,
-			TearDown: func(t *testing.T) {
-				err := mock.ExpectationsWereMet()
-				assert.Nil(ts.T(), err, fmt.Sprintf("There were unfulfilled expectations: %v.", err))
-			},
+			TearDown:  func(t *testing.T) {},
 		},
 		{
 			Context: "ItShouldFailIfAnErrorOccursWhenGettingTheSQLDatabase",
@@ -99,6 +126,9 @@ func (ts *TestSuite) TestPostgresDriverClose() {
 			} else {
 				assert.NotNil(t, err, "Predicted error lost")
 			}
+
+			err = mock.ExpectationsWereMet()
+			assert.Nil(ts.T(), err, fmt.Sprintf("There were unfulfilled expectations: %v.", err))
 
 			tc.TearDown(t)
 		})

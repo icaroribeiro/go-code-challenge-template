@@ -50,13 +50,14 @@ func (ts *TestSuite) TestNew() {
 }
 
 func (ts *TestSuite) TestClose() {
-	connPool := ts.DB.ConnPool
+	db, mock := NewMock()
+	connPool := db.ConnPool
 
 	ts.Cases = Cases{
 		{
 			Context: "ItShouldSucceedInClosingTheDatabase",
 			SetUp: func(t *testing.T) {
-				ts.Mock.ExpectClose()
+				mock.ExpectClose()
 			},
 			WantError: false,
 			TearDown:  func(t *testing.T) {},
@@ -64,11 +65,11 @@ func (ts *TestSuite) TestClose() {
 		{
 			Context: "ItShouldFailIfAnErrorOccursWhenGettingTheSQLDatabase",
 			SetUp: func(t *testing.T) {
-				ts.DB.ConnPool = nil
+				db.ConnPool = nil
 			},
 			WantError: true,
 			TearDown: func(t *testing.T) {
-				ts.DB.ConnPool = connPool
+				db.ConnPool = connPool
 			},
 		},
 	}
@@ -77,7 +78,7 @@ func (ts *TestSuite) TestClose() {
 		ts.T().Run(tc.Context, func(t *testing.T) {
 			tc.SetUp(t)
 
-			provider := datastorepkg.Provider{DB: ts.DB}
+			provider := datastorepkg.Provider{DB: db}
 			err := provider.Close()
 
 			if !tc.WantError {
@@ -86,12 +87,10 @@ func (ts *TestSuite) TestClose() {
 				assert.NotNil(t, err, "Predicted error lost")
 			}
 
+			err = mock.ExpectationsWereMet()
+			assert.Nil(ts.T(), err, fmt.Sprintf("There were unfulfilled expectations: %v.", err))
+
 			tc.TearDown(t)
 		})
 	}
 }
-
-// func (ts *TestSuite) AfterTest(_, _ string) {
-// 	err := ts.Mock.ExpectationsWereMet()
-// 	assert.Nil(ts.T(), err, fmt.Sprintf("There were unfulfilled expectations: %v.", err))
-// }
