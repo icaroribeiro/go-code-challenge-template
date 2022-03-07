@@ -13,14 +13,14 @@ check/api:
 	go run cmd/api/main.go version
 
 run/api:
-	. ./scripts/setup_env.sh; \
+	. ./scripts/setup_env_vars.sh; \
 	go run cmd/api/main.go run
 
 doc/api:
 	swag init -g ./cmd/api/main.go -o ./docs/api/swagger
 
 test/api:
-	. ./scripts/setup_env.test.sh; \
+	. ./scripts/setup_env_vars.test.sh; \
 	go test ./... -v -coverprofile=./docs/api/tests/unit/coverage.out
 
 analyze/api:
@@ -48,18 +48,18 @@ init/deploy:
 	terraform init
 
 plan/deploy:
-	. ./deployments/heroku/scripts/setup_env.sh; \
+	. ./deployments/heroku/scripts/setup_env_vars.sh; \
 	cd deployments/heroku/terraform; \
 	terraform plan
 
 apply/deploy:
-	. ./deployments/heroku/scripts/copy_code.sh; \
-	. ./deployments/heroku/scripts/setup_env.sh; \
+	. ./deployments/heroku/scripts/build_app.sh; \
+	. ./deployments/heroku/scripts/setup_env_vars.sh; \
 	cd deployments/heroku/terraform; \
 	terraform apply
 
 destroy/deploy:
-	. ./deployments/heroku/scripts/delete_code.sh; \
-	. ./deployments/heroku/scripts/setup_env.sh; \
+	. ./deployments/heroku/scripts/destroy_app.sh; \
+	. ./deployments/heroku/scripts/setup_env_vars.sh; \
 	cd deployments/heroku/terraform; \
 	terraform destroy
