@@ -15,8 +15,6 @@ type Case struct {
 
 type Cases []Case
 
-type ReturnArgs [][]interface{}
-
 type TestSuite struct {
 	suite.Suite
 	Cases Cases

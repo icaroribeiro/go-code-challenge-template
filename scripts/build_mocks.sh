@@ -1,5 +1,11 @@
 #!/bin/bash
 
+# SERVICE layer
+# Generate a mock object related to healthcheck service.
+HEALTHCHECK_SERVICE_PATH="internal/core/ports/application/service/healthcheck"
+MOCK_HEALTHCHECK_SERVICE_PATH="internal/core/ports/application/mockservice/healthcheck"
+mockery -dir "$HEALTHCHECK_SERVICE_PATH" -name IService -outpkg healthcheck -structname MockService -output "$MOCK_HEALTHCHECK_SERVICE_PATH" -filename mock_service.go
+
 # PKG
 # Generate a mock object related to auth.
 AUTH_PATH="pkg/auth"
