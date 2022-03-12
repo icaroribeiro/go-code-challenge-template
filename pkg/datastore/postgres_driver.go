@@ -43,6 +43,11 @@ func NewPostgresDriver(dbConfig map[string]string) (IDatastore, error) {
 }
 
 // Close is the function that closes the database connection, releasing any open resources.
+func (d *PostgresDriver) GetDB() *gorm.DB {
+	return d.Provider.GetDB()
+}
+
+// Close is the function that closes the database connection, releasing any open resources.
 func (d *PostgresDriver) Close() error {
 	return d.Provider.Close()
 }

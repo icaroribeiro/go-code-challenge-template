@@ -37,11 +37,10 @@ func (ts *TestSuite) TestNew() {
 		ts.T().Run(tc.Context, func(t *testing.T) {
 			tc.SetUp(t)
 
-			i, err := datastorepkg.New(dbConfig)
+			_, err := datastorepkg.New(dbConfig)
 
 			if !tc.WantError {
-				_, ok := i.(datastorepkg.IDatastore)
-				assert.True(t, ok, "Unexpected type assertion fail")
+				assert.Nil(t, err, fmt.Sprintf("Unexpected error: %v", err))
 			} else {
 				assert.NotNil(t, err, "Predicted error lost")
 			}

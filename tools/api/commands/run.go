@@ -12,9 +12,11 @@ import (
 
 	"github.com/gorilla/mux"
 	_ "github.com/icaroribeiro/new-go-code-challenge-template/docs/api/swagger"
+	healthcheckservice "github.com/icaroribeiro/new-go-code-challenge-template/internal/application/service/healthcheck"
 	healthcheckhandler "github.com/icaroribeiro/new-go-code-challenge-template/internal/transport/http/presentation/handler/healthcheck"
 	healthcheckrouter "github.com/icaroribeiro/new-go-code-challenge-template/internal/transport/http/router/healthcheck"
 	swaggerrouter "github.com/icaroribeiro/new-go-code-challenge-template/internal/transport/http/router/swagger"
+	datastorepkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/datastore"
 	envpkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/env"
 	handlerhttputilpkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/httputil/handler"
 	routehttputilpkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/httputil/route"
@@ -36,10 +38,30 @@ var (
 
 	httpHost = envpkg.GetEnvWithDefaultValue("HTTP_HOST", "localhost")
 	httpPort = envpkg.GetEnvWithDefaultValue("HTTP_PORT", "8080")
+
+	dbDriver   = envpkg.GetEnvWithDefaultValue("DB_DRIVER", "postgres")
+	dbUser     = envpkg.GetEnvWithDefaultValue("DB_USER", "postgres")
+	dbPassword = envpkg.GetEnvWithDefaultValue("DB_PASSWORD", "postgres")
+	dbHost     = envpkg.GetEnvWithDefaultValue("DB_HOST", "localhost")
+	dbPort     = envpkg.GetEnvWithDefaultValue("DB_PORT", "5432")
+	dbName     = envpkg.GetEnvWithDefaultValue("DB_NAME", "db")
 )
 
 func execRunCmd(cmd *cobra.Command, args []string) {
 	tcpAddress := setupTcpAddress()
+
+	dbConfig, err := setupDBConfig()
+	if err != nil {
+		log.Panic(err.Error())
+	}
+
+	datastore, err := datastorepkg.New(dbConfig)
+	if err != nil {
+		log.Panic(err.Error())
+	}
+	defer datastore.Close()
+
+	db := datastore.GetDB()
 
 	// validationFuncs := map[string]validatorv2.ValidationFunc{
 	// 	"uuid": uuidvalidator.Validate,
@@ -54,7 +76,8 @@ func execRunCmd(cmd *cobra.Command, args []string) {
 
 	routes = append(routes, swaggerrouter.ConfigureRoutes()...)
 
-	healthCheckHandler := healthcheckhandler.New()
+	healthCheckService := healthcheckservice.New(db)
+	healthCheckHandler := healthcheckhandler.New(healthCheckService)
 	routes = append(routes, healthcheckrouter.ConfigureRoutes(healthCheckHandler)...)
 
 	// fileHddStorageRepository := filehddstoragerepository.New(storage)
@@ -91,6 +114,31 @@ func setupTcpAddress() string {
 	}
 
 	return fmt.Sprintf("%s:%s", httpHost, httpPort)
+}
+
+// setupDBConfig is the function that configures a map of parameters used to connect to the database.
+func setupDBConfig() (map[string]string, error) {
+	dbURL := ""
+
+	if deploy == "YES" {
+		if dbURL = os.Getenv("DATABASE_URL"); dbURL == "" {
+			return nil, fmt.Errorf("failed to read the DATABASE_URL environment variable to the application deployment")
+		}
+	}
+
+	dbConfig := map[string]string{
+		"DRIVER":   dbDriver,
+		"USER":     dbUser,
+		"PASSWORD": dbPassword,
+		"HOST":     dbHost,
+		"PORT":     dbPort,
+		"NAME":     dbName,
+		"URL":      dbURL,
+	}
+
+	log.Println(dbConfig)
+
+	return dbConfig, nil
 }
 
 // setupRouter is the function that builds the router by arranging API routes.

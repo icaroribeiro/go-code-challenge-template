@@ -11,14 +11,19 @@ type Provider struct {
 
 // New is the factory function that encapsulates the implementation related to datastore.
 func New(dbConfig map[string]string) (IDatastore, error) {
-	dbDriver := dbConfig["DB_DRIVER"]
+	driver := dbConfig["DRIVER"]
 
-	switch dbDriver {
+	switch driver {
 	case "postgres":
 		return NewPostgresDriver(dbConfig)
 	}
 
-	return nil, customerror.Newf("sql database driver %s is not recognized", dbDriver)
+	return nil, customerror.Newf("sql database driver %s is not recognized", driver)
+}
+
+// Close is the function that closes the database connection, releasing any open resources.
+func (p *Provider) GetDB() *gorm.DB {
+	return p.DB
 }
 
 // Close is the function that closes the database connection, releasing any open resources.
