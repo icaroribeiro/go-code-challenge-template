@@ -6,6 +6,8 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+    # env_file:
+    #   - ./.env
     environment:
       - RSA_PUBLIC_KEY_PATH=${RSA_PUBLIC_KEY_PATH}
       - RSA_PRIVATE_KEY_PATH=${RSA_PRIVATE_KEY_PATH}
@@ -69,6 +71,5 @@ services:
 #   #      - pgadmin:/root/.pgadmin
 
 volumes:
-  db-data:
-  testdb-data:
+  postgresdb-data:
 #   # pgadmin:

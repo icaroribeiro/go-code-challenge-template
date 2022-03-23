@@ -1,6 +1,7 @@
 package healthcheck
 
 import (
+	"log"
 	"net/http"
 
 	healthcheckservice "github.com/icaroribeiro/new-go-code-challenge-template/internal/core/ports/application/service/healthcheck"
@@ -29,6 +30,7 @@ func New(healthCheckService healthcheckservice.IService) IHandler {
 // @Failure 500 {object} error.Error
 // @Router /status [GET]
 func (h *Handler) GetStatus(w http.ResponseWriter, r *http.Request) {
+	log.Println("Aqui")
 	text := "everything is up and running"
 
 	if err := h.HealthCheckService.GetStatus(); err != nil {

@@ -63,6 +63,8 @@ func execRunCmd(cmd *cobra.Command, args []string) {
 
 	db := datastore.GetDB()
 
+	log.Println("Funcionou!")
+
 	// validationFuncs := map[string]validatorv2.ValidationFunc{
 	// 	"uuid": uuidvalidator.Validate,
 	// }
@@ -135,8 +137,6 @@ func setupDBConfig() (map[string]string, error) {
 		"NAME":     dbName,
 		"URL":      dbURL,
 	}
-
-	log.Println(dbConfig)
 
 	return dbConfig, nil
 }

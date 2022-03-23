@@ -2,10 +2,12 @@ package datastore_test
 
 import (
 	"fmt"
+	"log"
 	"testing"
 
 	"github.com/DATA-DOG/go-sqlmock"
 	datastorepkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/datastore"
+	"github.com/ory/dockertest"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/suite"
 	"gorm.io/gorm"
@@ -15,7 +17,17 @@ func TestPostgresDriver(t *testing.T) {
 	suite.Run(t, new(TestSuite))
 }
 
-func (ts *TestSuite) TestPostgresDriverClose() {
+func (ts *TestSuite) TestNewPostgresDriver() {
+	_, err := dockertest.NewPool("")
+	if err != nil {
+		log.Fatalf("Could not connect to docker: %s", err)
+	}
+}
+
+func (ts *TestSuite) TestGetDBPostgresDriver() {
+}
+
+func (ts *TestSuite) TestClosePostgresDriver() {
 	db := &gorm.DB{}
 	var mock sqlmock.Sqlmock
 	provider := datastorepkg.Provider{}

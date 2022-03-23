@@ -2,6 +2,7 @@ package datastore
 
 import (
 	"fmt"
+	"log"
 
 	"github.com/icaroribeiro/new-go-code-challenge-template/pkg/customerror"
 	"gorm.io/driver/postgres"
@@ -16,17 +17,19 @@ type PostgresDriver struct {
 func NewPostgresDriver(dbConfig map[string]string) (IDatastore, error) {
 	dsn := ""
 
-	if dbConfig["url"] != "" {
-		dsn = dbConfig["url"]
+	if dbConfig["URL"] != "" {
+		dsn = dbConfig["URL"]
 	} else {
 		dsn = fmt.Sprintf("user=%s password=%s host=%s port=%s dbname=%s sslmode=disable",
-			dbConfig["user"],
-			dbConfig["password"],
-			dbConfig["host"],
-			dbConfig["port"],
-			dbConfig["name"],
+			dbConfig["USER"],
+			dbConfig["PASSWORD"],
+			dbConfig["HOST"],
+			dbConfig["PORT"],
+			dbConfig["NAME"],
 		)
 	}
+
+	log.Println(dsn)
 
 	dialector := postgres.Open(dsn)
 
