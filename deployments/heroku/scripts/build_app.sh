@@ -1,6 +1,9 @@
 #!/bin/bash
 
-# Configure the temporary directory used as the context for building the Docker container.
+#
+# Temporary directory
+#
+# Configure a temporary directory used as the context for building the Docker container.
 SOURCE="."
 DESTINATION="deployments/heroku/app/.temp"
 
