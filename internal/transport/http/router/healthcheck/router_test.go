@@ -25,7 +25,7 @@ func (ts *TestSuite) TestConfigureRoutes() {
 
 	loggingMiddleware := loggingmiddlewarepkg.Logging()
 
-	healthCheckService := new(healthcheckmockservice.MockService)
+	healthCheckService := new(healthcheckmockservice.Service)
 	healthCheckHandler := healthcheckhandler.New(healthCheckService)
 
 	ts.Cases = Cases{

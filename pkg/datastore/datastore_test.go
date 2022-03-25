@@ -14,41 +14,79 @@ func TestDatastore(t *testing.T) {
 }
 
 func (ts *TestSuite) TestNew() {
-	// dbConfig := map[string]string{}
+	dbConfig := map[string]string{}
 
-	// ts.Cases = Cases{
-	// 	{
-	// 		Context: "ItShouldSucceedInInitializingThePostgresDriver",
-	// 		SetUp: func(t *testing.T) {
-	// 			dbConfig["DRIVER"] = "postgres"
-	// 		},
-	// 		WantError: false,
-	// 	},
-	// 	{
-	// 		Context: "ItShouldFailIfTheSQLDatabaseDriverIsNotRecognized",
-	// 		SetUp: func(t *testing.T) {
-	// 			dbConfig["DRIVER"] = "testing"
-	// 		},
-	// 		WantError: true,
-	// 	},
-	// }
+	ts.Cases = Cases{
+		{
+			Context: "ItShouldSucceedInInitializingThePostgresDriver",
+			SetUp: func(t *testing.T) {
+				dbConfig = ts.PostgresDBConfig
+			},
+			WantError: false,
+		},
+		{
+			Context: "ItShouldFailIfTheSQLDatabaseDriverIsNotRecognized",
+			SetUp: func(t *testing.T) {
+				dbConfig["DRIVER"] = "testing"
+			},
+			WantError: true,
+		},
+	}
 
-	// for _, tc := range ts.Cases {
-	// 	ts.T().Run(tc.Context, func(t *testing.T) {
-	// 		tc.SetUp(t)
+	for _, tc := range ts.Cases {
+		ts.T().Run(tc.Context, func(t *testing.T) {
+			tc.SetUp(t)
 
-	// 		_, err := datastorepkg.New(dbConfig)
+			_, err := datastorepkg.New(dbConfig)
 
-	// 		if !tc.WantError {
-	// 			assert.Nil(t, err, fmt.Sprintf("Unexpected error: %v", err))
-	// 		} else {
-	// 			assert.NotNil(t, err, "Predicted error lost")
-	// 		}
-	// 	})
-	// }
+			if !tc.WantError {
+				assert.Nil(t, err, fmt.Sprintf("Unexpected error: %v", err))
+			} else {
+				assert.NotNil(t, err, "Predicted error lost")
+			}
+		})
+	}
 }
 
 func (ts *TestSuite) TestGetDB() {
+	dbConfig := map[string]string{}
+
+	ts.Cases = Cases{
+		{
+			Context: "ItShouldSucceedInGettingAPostgresDBInstance",
+			SetUp: func(t *testing.T) {
+				dbConfig = ts.PostgresDBConfig
+			},
+			WantError: false,
+		},
+		{
+			Context: "ItShouldFailInGettingDBInstanceIfTheSQLDatabaseDriverIsNotRecognized",
+			SetUp: func(t *testing.T) {
+				dbConfig = map[string]string{
+					"DRIVER": "testing",
+				}
+			},
+			WantError: true,
+		},
+	}
+
+	for _, tc := range ts.Cases {
+		ts.T().Run(tc.Context, func(t *testing.T) {
+			tc.SetUp(t)
+
+			driver, err := datastorepkg.New(dbConfig)
+
+			if !tc.WantError {
+				assert.NotEmpty(t, driver)
+				db := driver.GetDB()
+				assert.NotNil(t, db, "Database is nil")
+				assert.Nil(t, err, fmt.Sprintf("Unexpected error: %v", err))
+			} else {
+				assert.Empty(t, driver)
+				assert.NotNil(t, err, "Predicted error lost")
+			}
+		})
+	}
 }
 
 func (ts *TestSuite) TestClose() {
@@ -81,6 +119,7 @@ func (ts *TestSuite) TestClose() {
 			tc.SetUp(t)
 
 			provider := datastorepkg.Provider{DB: db}
+
 			err := provider.Close()
 
 			if !tc.WantError {

@@ -2,7 +2,6 @@ package datastore
 
 import (
 	"fmt"
-	"log"
 
 	"github.com/icaroribeiro/new-go-code-challenge-template/pkg/customerror"
 	"gorm.io/driver/postgres"
@@ -29,8 +28,6 @@ func NewPostgresDriver(dbConfig map[string]string) (IDatastore, error) {
 		)
 	}
 
-	log.Println(dsn)
-
 	dialector := postgres.Open(dsn)
 
 	db, err := gorm.Open(dialector, &gorm.Config{})
@@ -45,7 +42,7 @@ func NewPostgresDriver(dbConfig map[string]string) (IDatastore, error) {
 	}, nil
 }
 
-// Close is the function that closes the database connection, releasing any open resources.
+// GetDB is the function that gets the database instance.
 func (d *PostgresDriver) GetDB() *gorm.DB {
 	return d.Provider.GetDB()
 }

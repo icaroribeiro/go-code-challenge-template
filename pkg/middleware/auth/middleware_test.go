@@ -22,7 +22,7 @@ import (
 	authmiddlewarepkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/middleware/auth"
 	domainmodelfactory "github.com/icaroribeiro/new-go-code-challenge-template/tests/factory/core/domain/model"
 	datastoremodelfactory "github.com/icaroribeiro/new-go-code-challenge-template/tests/factory/infrastructure/storage/datastore/model"
-	mockauthpkg "github.com/icaroribeiro/new-go-code-challenge-template/tests/pkg/mockauth"
+	mockauthpkg "github.com/icaroribeiro/new-go-code-challenge-template/tests/mocks/pkg/mockauth"
 	uuid "github.com/satori/go.uuid"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/suite"
@@ -281,7 +281,7 @@ func (ts *TestSuite) TestAuth() {
 		ts.T().Run(tc.Context, func(t *testing.T) {
 			tc.SetUp(t)
 
-			authN := new(mockauthpkg.MockAuth)
+			authN := new(mockauthpkg.Auth)
 			authN.On("DecodeToken", bearerToken[1]).Return(returnArgs[0]...)
 			authN.On("FetchAuthFromToken", token).Return(returnArgs[1]...)
 

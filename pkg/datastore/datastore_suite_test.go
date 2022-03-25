@@ -1,10 +1,12 @@
 package datastore_test
 
 import (
+	"fmt"
 	"log"
 	"testing"
 
 	"github.com/DATA-DOG/go-sqlmock"
+	envpkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/env"
 	"github.com/stretchr/testify/suite"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
@@ -21,7 +23,9 @@ type Cases []Case
 
 type TestSuite struct {
 	suite.Suite
-	Cases Cases
+	Cases               Cases
+	PostgresDBConfig    map[string]string
+	PostgresDBConfigURL string
 }
 
 func NewMock() (*gorm.DB, sqlmock.Sqlmock) {
@@ -58,4 +62,30 @@ func NewMock() (*gorm.DB, sqlmock.Sqlmock) {
 	}
 
 	return db, mock
+}
+
+func (ts *TestSuite) SetupSuite() {
+	postgresDBDriver := "postgres"
+	postresDBUser := envpkg.GetEnvWithDefaultValue("DB_USER", "postgres")
+	postresDBPassword := envpkg.GetEnvWithDefaultValue("DB_PASSWORD", "postgres")
+	postresDBHost := envpkg.GetEnvWithDefaultValue("DB_HOST", "localhost")
+	postresDBPort := envpkg.GetEnvWithDefaultValue("DB_PORT", "5432")
+	postresDBName := envpkg.GetEnvWithDefaultValue("DB_NAME", "db")
+
+	ts.PostgresDBConfig = map[string]string{
+		"DRIVER":   postgresDBDriver,
+		"USER":     postresDBUser,
+		"PASSWORD": postresDBPassword,
+		"HOST":     postresDBHost,
+		"PORT":     postresDBPort,
+		"NAME":     postresDBName,
+	}
+
+	ts.PostgresDBConfigURL = fmt.Sprintf("user=%s password=%s host=%s port=%s dbname=%s sslmode=disable",
+		ts.PostgresDBConfig["USER"],
+		ts.PostgresDBConfig["PASSWORD"],
+		ts.PostgresDBConfig["HOST"],
+		ts.PostgresDBConfig["PORT"],
+		ts.PostgresDBConfig["NAME"],
+	)
 }

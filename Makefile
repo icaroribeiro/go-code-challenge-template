@@ -1,4 +1,6 @@
+#
 # API-related tasks.
+#
 setup/api:
 	go mod download
 
@@ -6,21 +8,21 @@ audit/api:
 	go mod tidy
 
 format/api:
-	gofmt -w .
+	gofmt -w .;
 	golint ./...
 
 check/api:
 	go run cmd/api/main.go version
 
 run/api:
-	. ./scripts/setup_env_vars.sh; \
+	. ./scripts/setup_env_vars.sh;
 	go run cmd/api/main.go run
 
 doc/api:
 	swag init -g ./cmd/api/main.go -o ./docs/api/swagger
 
 test/api:
-	. ./scripts/setup_env_vars.test.sh; \
+	. ./scripts/setup_env_vars.sh;
 	go test ./... -v -coverprofile=./docs/api/tests/unit/coverage.out
 
 analyze/api:
@@ -29,20 +31,24 @@ analyze/api:
 build/mocks:
 	. ./scripts/build_mocks.sh
 
+#
 # Container-related tasks.
-startup/docker:
-	docker-compose --env-file ./.env up -d
+#
+startup/app:
+	docker-compose --env-file ./.env up -d;
 
-test/docker:
-	docker exec --env-file ./.env.test api_container go test ./... -v -coverprofile=./docs/tests/api/coverage.out
+test/app:
+	docker exec api_container go test ./... -v -coverprofile=./docs/api/tests/unit/coverage.out
 
-analyze/docker:
-	docker-compose exec api go tool cover -func=./docs/tests/api/coverage.out
+analyze/app:
+	docker exec api_container go tool cover -func=./docs/api/tests/unit/coverage.out
 
-shutdown/docker:
+shutdown/app:
 	docker-compose down -v --rmi all
 
+#
 # Deployment-related tasks.
+#
 init/deploy:
 	cd deployments/heroku/terraform; \
 	terraform init

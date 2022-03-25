@@ -21,7 +21,7 @@ func New(dbConfig map[string]string) (IDatastore, error) {
 	return nil, customerror.Newf("sql database driver %s is not recognized", driver)
 }
 
-// Close is the function that closes the database connection, releasing any open resources.
+// GetDB is the function that gets the database instance.
 func (p *Provider) GetDB() *gorm.DB {
 	return p.DB
 }

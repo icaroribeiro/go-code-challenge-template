@@ -36,7 +36,6 @@ var RunCmd = &cobra.Command{
 var (
 	deploy = envpkg.GetEnvWithDefaultValue("DEPLOY", "NO")
 
-	httpHost = envpkg.GetEnvWithDefaultValue("HTTP_HOST", "localhost")
 	httpPort = envpkg.GetEnvWithDefaultValue("HTTP_PORT", "8080")
 
 	dbDriver   = envpkg.GetEnvWithDefaultValue("DB_DRIVER", "postgres")
@@ -62,8 +61,6 @@ func execRunCmd(cmd *cobra.Command, args []string) {
 	defer datastore.Close()
 
 	db := datastore.GetDB()
-
-	log.Println("Funcionou!")
 
 	// validationFuncs := map[string]validatorv2.ValidationFunc{
 	// 	"uuid": uuidvalidator.Validate,
@@ -111,11 +108,9 @@ func setupTcpAddress() string {
 		if httpPort = os.Getenv("PORT"); httpPort == "" {
 			log.Panicf("failed to read the PORT env variable to the application deployment")
 		}
-
-		return fmt.Sprintf(":%s", httpPort)
 	}
 
-	return fmt.Sprintf("%s:%s", httpHost, httpPort)
+	return fmt.Sprintf(":%s", httpPort)
 }
 
 // setupDBConfig is the function that configures a map of parameters used to connect to the database.
