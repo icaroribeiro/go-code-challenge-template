@@ -1,7 +1,7 @@
-github.com/icaroribeiro/new-go-code-challenge-template/internal/application/service/healthcheck/service.go:13:			New				0.0%
-github.com/icaroribeiro/new-go-code-challenge-template/internal/application/service/healthcheck/service.go:21:			GetStatus			0.0%
-github.com/icaroribeiro/new-go-code-challenge-template/internal/transport/http/presentation/handler/healthcheck/handler.go:16:	New				0.0%
-github.com/icaroribeiro/new-go-code-challenge-template/internal/transport/http/presentation/handler/healthcheck/handler.go:31:	GetStatus			0.0%
+github.com/icaroribeiro/new-go-code-challenge-template/internal/application/service/healthcheck/service.go:13:			New				100.0%
+github.com/icaroribeiro/new-go-code-challenge-template/internal/application/service/healthcheck/service.go:21:			GetStatus			100.0%
+github.com/icaroribeiro/new-go-code-challenge-template/internal/transport/http/presentation/handler/healthcheck/handler.go:16:	New				100.0%
+github.com/icaroribeiro/new-go-code-challenge-template/internal/transport/http/presentation/handler/healthcheck/handler.go:31:	GetStatus			100.0%
 github.com/icaroribeiro/new-go-code-challenge-template/internal/transport/http/router/healthcheck/router.go:13:			ConfigureRoutes			100.0%
 github.com/icaroribeiro/new-go-code-challenge-template/internal/transport/http/router/swagger/router.go:13:			ConfigureRoutes			100.0%
 github.com/icaroribeiro/new-go-code-challenge-template/pkg/auth/auth.go:23:							New				100.0%
@@ -44,4 +44,4 @@ github.com/icaroribeiro/new-go-code-challenge-template/pkg/validator/uuid/valida
 github.com/icaroribeiro/new-go-code-challenge-template/pkg/validator/validator.go:14:						New				100.0%
 github.com/icaroribeiro/new-go-code-challenge-template/pkg/validator/validator.go:31:						Validate			100.0%
 github.com/icaroribeiro/new-go-code-challenge-template/pkg/validator/validator.go:36:						ValidateWithTags		100.0%
-total:																(statements)			94.5%
+total:																(statements)			100.0%

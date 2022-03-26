@@ -1,80 +1,78 @@
 package healthcheck_test
 
-// import (
-// 	"errors"
-// 	"fmt"
-// 	"testing"
+import (
+	"fmt"
+	"testing"
 
-// 	healthcheckservice "github.com/icaroribeiro/go-code-challenge-template/internal/application/service/healthcheck"
-// 	"github.com/icaroribeiro/go-code-challenge-template/pkg/customerror"
-// 	"github.com/stretchr/testify/assert"
-// 	"github.com/stretchr/testify/suite"
-// )
+	healthcheckservice "github.com/icaroribeiro/new-go-code-challenge-template/internal/application/service/healthcheck"
+	"github.com/icaroribeiro/new-go-code-challenge-template/pkg/customerror"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/suite"
+)
 
-// func TestService(t *testing.T) {
-// 	suite.Run(t, new(TestSuite))
-// }
+func TestService(t *testing.T) {
+	suite.Run(t, new(TestSuite))
+}
 
-// func (ts *TestSuite) TestGetStatus() {
-// 	connPool := ts.DB.ConnPool
+func (ts *TestSuite) TestGetStatus() {
+	db, mock := NewMock()
+	connPool := db.ConnPool
 
-// 	errorType := customerror.NoType
+	errorType := customerror.NoType
 
-// 	ts.Cases = Cases{
-// 		{
-// 			Context: "ItShouldSucceedInGettingTheStatus",
-// 			SetUp: func(t *testing.T) {
-// 				ts.SQLMock.ExpectPing()
-// 			},
-// 			WantError: false,
-// 			TearDown:  func() {},
-// 		},
-// 		{
-// 			Context: "ItShouldFailIfTheDBFunctionEvaluatesToAnError",
-// 			SetUp: func(t *testing.T) {
-// 				ts.DB.ConnPool = nil
+	ts.Cases = Cases{
+		{
+			Context: "ItShouldSucceedInGettingTheStatus",
+			SetUp: func(t *testing.T) {
+				mock.ExpectPing()
+			},
+			WantError: false,
+			TearDown:  func(t *testing.T) {},
+		},
+		{
+			Context: "ItShouldFailIfTheDBFunctionEvaluatesToAnError",
+			SetUp: func(t *testing.T) {
+				db.ConnPool = nil
 
-// 				errorType = customerror.NoType
-// 			},
-// 			WantError: true,
-// 			TearDown: func(t *testing.T) {
-// 				ts.DB.ConnPool = connPool
-// 			},
-// 		},
-// 		{
-// 			Context: "ItShouldFailIfThePingCommandEvaluatesToAnError",
-// 			SetUp: func(t *testing.T) {
-// 				ts.SQLMock.ExpectPing().
-// 					WillReturnError(errors.New("failed"))
+				errorType = customerror.NoType
+			},
+			WantError: true,
+			TearDown: func(t *testing.T) {
+				db.ConnPool = connPool
+			},
+		},
+		{
+			Context: "ItShouldFailIfThePingCommandEvaluatesToAnError",
+			SetUp: func(t *testing.T) {
+				mock.ExpectPing().
+					WillReturnError(customerror.New("failed"))
 
-// 				errorType = customerror.NoType
-// 			},
-// 			WantError: true,
-// 			TearDown:  func(t *testing.T) {},
-// 		},
-// 	}
+				errorType = customerror.NoType
+			},
+			WantError: true,
+			TearDown:  func(t *testing.T) {},
+		},
+	}
 
-// 	for _, tc := range ts.Cases {
-// 		ts.T().Run(tc.Context, func(t *testing.T) {
-// 			tc.SetUp(t)
+	for _, tc := range ts.Cases {
+		ts.T().Run(tc.Context, func(t *testing.T) {
+			tc.SetUp(t)
 
-// 			healthCheckService := healthcheckservice.New(ts.DB)
+			healthCheckService := healthcheckservice.New(db)
 
-// 			err := healthCheckService.GetStatus()
+			err := healthCheckService.GetStatus()
 
-// 			if !tc.WantError {
-// 				assert.Nil(t, err, fmt.Sprintf("Unexpected error %v.", err))
-// 			} else {
-// 				assert.NotNil(t, err, "Predicted error lost.")
-// 				assert.Equal(t, errorType, customerror.GetType(err))
-// 			}
+			if !tc.WantError {
+				assert.Nil(t, err, fmt.Sprintf("Unexpected error %v.", err))
+			} else {
+				assert.NotNil(t, err, "Predicted error lost.")
+				assert.Equal(t, errorType, customerror.GetType(err))
+			}
 
-// 			tc.TearDown(t)
-// 		})
-// 	}
-// }
+			err = mock.ExpectationsWereMet()
+			assert.Nil(ts.T(), err, fmt.Sprintf("There were unfulfilled expectations: %v.", err))
 
-// func (ts *TestSuite) AfterTest(_, _ string) {
-// 	err := ts.SQLMock.ExpectationsWereMet()
-// 	assert.Nil(ts.T(), err, fmt.Sprintf("There were unfulfilled expectations: %v.", err))
-// }
+			tc.TearDown(t)
+		})
+	}
+}

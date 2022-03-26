@@ -1,65 +1,63 @@
 package healthcheck_test
 
-// import (
-// 	"database/sql"
-// 	"log"
-// 	"testing"
+import (
+	"log"
+	"testing"
 
-// 	"github.com/DATA-DOG/go-sqlmock"
-// 	"github.com/stretchr/testify/suite"
-// 	"gorm.io/driver/postgres"
-// 	"gorm.io/gorm"
-// )
+	"github.com/DATA-DOG/go-sqlmock"
+	"github.com/stretchr/testify/suite"
+	"gorm.io/driver/postgres"
+	"gorm.io/gorm"
+)
 
-// type Case struct {
-// 	Context   string
-// 	SetUp     func(t *testing.T)
-// 	WantError bool
-// 	TearDown  func(t *testing.T)
-// }
+type Case struct {
+	Context   string
+	SetUp     func(t *testing.T)
+	WantError bool
+	TearDown  func(t *testing.T)
+}
 
-// type Cases []Case
+type Cases []Case
 
-// type ReturnArgs [][]interface{}
+type TestSuite struct {
+	suite.Suite
+	Cases Cases
+}
 
-// type TestSuite struct {
-// 	suite.Suite
-// 	SQLMock sqlmock.Sqlmock
-// 	DB      *gorm.DB
-// 	Cases   Cases
-// }
+func NewMock() (*gorm.DB, sqlmock.Sqlmock) {
+	errorMsg := "failed to open a stub database connection"
 
-// func (ts *TestSuite) SetupSuite() {
-// 	var sqlDB *sql.DB
-// 	var err error
+	sqlDB, mock, err := sqlmock.New(sqlmock.MonitorPingsOption(true))
+	if err != nil {
+		log.Panicf("%s: %s", errorMsg, err.Error())
+	}
 
-// 	sqlDB, ts.SQLMock, err = sqlmock.New(sqlmock.MonitorPingsOption(true))
-// 	if err != nil {
-// 		log.Panicf("failed to create a sqlmock database connection and a mock to manage expectations: %s", err.Error())
-// 	}
+	if sqlDB == nil {
+		log.Panicf("%s: the sqlDB is null", errorMsg)
+	}
 
-// 	if sqlDB == nil {
-// 		log.Panicf("The sqlDB is null")
-// 	}
+	if mock == nil {
+		log.Panicf("%s: the mock is null", errorMsg)
+	}
 
-// 	if ts.SQLMock == nil {
-// 		log.Panicf("The mock is null")
-// 	}
+	mock.ExpectPing()
 
-// 	ts.SQLMock.ExpectPing()
+	errorMsg = "failed to initialize db session"
 
-// 	ts.DB, err = gorm.Open(postgres.New(postgres.Config{
-// 		Conn: sqlDB,
-// 	}), &gorm.Config{})
-// 	if err != nil {
-// 		log.Panicf("failed to open gorm db: %s", err.Error())
-// 	}
+	db, err := gorm.Open(postgres.New(postgres.Config{
+		Conn: sqlDB,
+	}), &gorm.Config{})
+	if err != nil {
+		log.Panicf("%s: %s", errorMsg, err.Error())
+	}
 
-// 	if ts.DB == nil {
-// 		log.Panicf("The database is null")
-// 	}
+	if db == nil {
+		log.Panicf("%s: the database is null", errorMsg)
+	}
 
-// 	if err = ts.DB.Error; err != nil {
-// 		log.Panicf("%s", err.Error())
-// 	}
-// }
+	if err = db.Error; err != nil {
+		log.Panicf("%s: %s", errorMsg, err.Error())
+	}
+
+	return db, mock
+}
