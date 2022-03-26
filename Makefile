@@ -35,7 +35,7 @@ build/mocks:
 # Container-related tasks.
 #
 startup/app:
-	docker-compose --env-file ./.env up -d;
+	docker-compose up -d
 
 test/app:
 	docker exec api_container go test ./... -v -coverprofile=./docs/api/tests/unit/coverage.out
