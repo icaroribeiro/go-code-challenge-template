@@ -60,7 +60,7 @@ func execRunCmd(cmd *cobra.Command, args []string) {
 	}
 	defer datastore.Close()
 
-	db := datastore.GetDB()
+	db := datastore.GetInstance()
 
 	// validationFuncs := map[string]validatorv2.ValidationFunc{
 	// 	"uuid": uuidvalidator.Validate,

@@ -42,9 +42,9 @@ func NewPostgresDriver(dbConfig map[string]string) (IDatastore, error) {
 	}, nil
 }
 
-// GetDB is the function that gets the database instance.
-func (d *PostgresDriver) GetDB() *gorm.DB {
-	return d.Provider.GetDB()
+// GetInstance is the function that gets the database instance.
+func (d *PostgresDriver) GetInstance() *gorm.DB {
+	return d.Provider.GetInstance()
 }
 
 // Close is the function that closes the database connection, releasing any open resources.

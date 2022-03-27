@@ -48,7 +48,7 @@ func (ts *TestSuite) TestNew() {
 	}
 }
 
-func (ts *TestSuite) TestGetDB() {
+func (ts *TestSuite) TestGetInstance() {
 	dbConfig := map[string]string{}
 
 	ts.Cases = Cases{
@@ -78,7 +78,7 @@ func (ts *TestSuite) TestGetDB() {
 
 			if !tc.WantError {
 				assert.NotEmpty(t, driver)
-				db := driver.GetDB()
+				db := driver.GetInstance()
 				assert.NotNil(t, db, "Database is nil")
 				assert.Nil(t, err, fmt.Sprintf("Unexpected error: %v", err))
 			} else {

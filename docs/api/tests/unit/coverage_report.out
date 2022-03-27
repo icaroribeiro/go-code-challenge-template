@@ -22,10 +22,10 @@ github.com/icaroribeiro/new-go-code-challenge-template/pkg/customerror/customerr
 github.com/icaroribeiro/new-go-code-challenge-template/pkg/customerror/customerror.go:52:						Newf				100.0%
 github.com/icaroribeiro/new-go-code-challenge-template/pkg/customerror/customerror.go:57:						GetType				100.0%
 github.com/icaroribeiro/new-go-code-challenge-template/pkg/datastore/datastore.go:13:							New				100.0%
-github.com/icaroribeiro/new-go-code-challenge-template/pkg/datastore/datastore.go:25:							GetDB				100.0%
+github.com/icaroribeiro/new-go-code-challenge-template/pkg/datastore/datastore.go:25:							GetInstance				100.0%
 github.com/icaroribeiro/new-go-code-challenge-template/pkg/datastore/datastore.go:30:							Close				100.0%
 github.com/icaroribeiro/new-go-code-challenge-template/pkg/datastore/postgres_driver.go:16:						NewPostgresDriver		100.0%
-github.com/icaroribeiro/new-go-code-challenge-template/pkg/datastore/postgres_driver.go:46:						GetDB				100.0%
+github.com/icaroribeiro/new-go-code-challenge-template/pkg/datastore/postgres_driver.go:46:						GetInstance				100.0%
 github.com/icaroribeiro/new-go-code-challenge-template/pkg/datastore/postgres_driver.go:51:						Close				100.0%
 github.com/icaroribeiro/new-go-code-challenge-template/pkg/env/env.go:9:								GetEnvWithDefaultValue		100.0%
 github.com/icaroribeiro/new-go-code-challenge-template/pkg/httputil/adapter/adapter.go:16:						AdaptFunc			100.0%

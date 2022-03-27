@@ -21,8 +21,8 @@ func New(dbConfig map[string]string) (IDatastore, error) {
 	return nil, customerror.Newf("sql database driver %s is not recognized", driver)
 }
 
-// GetDB is the function that gets the database instance.
-func (p *Provider) GetDB() *gorm.DB {
+// GetInstance is the function that gets the database instance.
+func (p *Provider) GetInstance() *gorm.DB {
 	return p.DB
 }
 

@@ -67,7 +67,7 @@ func (ts *TestSuite) TestNewPostgresDriver() {
 
 }
 
-func (ts *TestSuite) TestGetDBPostgresDriver() {
+func (ts *TestSuite) TestGetInstancePostgresDriver() {
 	dbConfig := map[string]string{}
 
 	ts.Cases = Cases{
@@ -97,7 +97,7 @@ func (ts *TestSuite) TestGetDBPostgresDriver() {
 
 			if !tc.WantError {
 				assert.NotEmpty(t, driver)
-				db := driver.GetDB()
+				db := driver.GetInstance()
 				assert.NotNil(t, db, "Database is nil")
 				assert.Nil(t, err, fmt.Sprintf("Unexpected error: %v", err))
 			} else {
