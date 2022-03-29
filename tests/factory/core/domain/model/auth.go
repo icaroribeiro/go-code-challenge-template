@@ -12,6 +12,7 @@ func NewAuth(args map[string]interface{}) domainmodel.Auth {
 		domainmodel.Auth{},
 	).Attr("ID", func(fArgs factory.Args) (interface{}, error) {
 		id := uuid.NewV4()
+
 		if val, ok := args["id"]; ok {
 			id = val.(uuid.UUID)
 		}
@@ -19,6 +20,7 @@ func NewAuth(args map[string]interface{}) domainmodel.Auth {
 		return id, nil
 	}).Attr("UserID", func(fArgs factory.Args) (interface{}, error) {
 		userID := uuid.NewV4()
+
 		if val, ok := args["userID"]; ok {
 			userID = val.(uuid.UUID)
 		}

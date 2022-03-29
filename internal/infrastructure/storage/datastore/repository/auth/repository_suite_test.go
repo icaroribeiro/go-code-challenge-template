@@ -1,7 +1,6 @@
 package auth_test
 
 import (
-	"database/sql"
 	"log"
 	"testing"
 
@@ -16,46 +15,53 @@ type Case struct {
 	Context   string
 	SetUp     func(t *testing.T)
 	WantError bool
+	TearDown  func(t *testing.T)
 }
 
 type Cases []Case
 
 type TestSuite struct {
 	suite.Suite
-	SQLMock sqlmock.Sqlmock
-	DB      *gorm.DB
-	Cases   Cases
+	Cases Cases
 }
 
-func (ts *TestSuite) SetupSuite() {
-	var sqlDB *sql.DB
-	var err error
+func NewMock(driver string) (*gorm.DB, sqlmock.Sqlmock) {
+	errorMsg := "failed to open a stub database connection"
 
-	sqlDB, ts.SQLMock, err = sqlmock.New()
+	sqlDB, mock, err := sqlmock.New()
 	if err != nil {
-		log.Panicf("failed to create a sqlmock database connection and a mock to manage expectations: %s", err.Error())
+		log.Panicf("%s: %s", errorMsg, err.Error())
 	}
 
 	if sqlDB == nil {
-		log.Panicf("The sqlDB is null")
+		log.Panicf("%s: the sqlDB is null", errorMsg)
 	}
 
-	if ts.SQLMock == nil {
-		log.Panicf("The mock is null")
+	if mock == nil {
+		log.Panicf("%s: the mock is null", errorMsg)
 	}
 
-	ts.DB, err = gorm.Open(postgres.New(postgres.Config{
-		Conn: sqlDB,
-	}), &gorm.Config{})
-	if err != nil {
-		log.Panicf("failed to open gorm db: %s", err.Error())
+	errorMsg = "failed to initialize db session"
+
+	var db *gorm.DB
+
+	switch driver {
+	case "postgres":
+		db, err = gorm.Open(postgres.New(postgres.Config{
+			Conn: sqlDB,
+		}), &gorm.Config{})
+		if err != nil {
+			log.Panicf("%s: %s", errorMsg, err.Error())
+		}
 	}
 
-	if ts.DB == nil {
-		log.Panicf("The database is null")
+	if db == nil {
+		log.Panicf("%s: the database is null", errorMsg)
 	}
 
-	if err = ts.DB.Error; err != nil {
-		log.Panicf("%s", err.Error())
+	if err = db.Error; err != nil {
+		log.Panicf("%s: %s", errorMsg, err.Error())
 	}
+
+	return db, mock
 }

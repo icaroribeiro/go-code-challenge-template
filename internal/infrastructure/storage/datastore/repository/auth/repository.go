@@ -5,7 +5,7 @@ import (
 
 	domainmodel "github.com/icaroribeiro/new-go-code-challenge-template/internal/core/domain/model"
 	authdsrepository "github.com/icaroribeiro/new-go-code-challenge-template/internal/core/ports/infrastructure/storage/datastore/repository/auth"
-	dsstgmodel "github.com/icaroribeiro/new-go-code-challenge-template/internal/infrastructure/storage/datastore/model"
+	datastoremodel "github.com/icaroribeiro/new-go-code-challenge-template/internal/infrastructure/storage/datastore/model"
 	"github.com/icaroribeiro/new-go-code-challenge-template/pkg/customerror"
 	"gorm.io/gorm"
 )
@@ -16,7 +16,7 @@ type Repository struct {
 
 var initDB *gorm.DB
 
-// New is the factory function that encapsulates the implementation related to auth
+// New is the factory function that encapsulates the implementation related to auth.
 func New(db *gorm.DB) authdsrepository.IRepository {
 	initDB = db
 	return &Repository{
@@ -24,15 +24,15 @@ func New(db *gorm.DB) authdsrepository.IRepository {
 	}
 }
 
-// Create is the function that creates an auth in the database.
+// Create is the function that creates an auth in the datastore.
 func (r *Repository) Create(auth domainmodel.Auth) (domainmodel.Auth, error) {
-	authDB := dsstgmodel.Auth{}
+	authDB := datastoremodel.Auth{}
 	authDB.FromDomain(auth)
 
 	result := r.DB.Create(&authDB)
 	if result.Error != nil {
 		if strings.Contains(result.Error.Error(), "auths_user_id_key") {
-			loginDB := dsstgmodel.Login{}
+			loginDB := datastoremodel.Login{}
 
 			if result := r.DB.Find(&loginDB, "user_id=?", authDB.UserID); result.Error != nil {
 				return domainmodel.Auth{}, result.Error
@@ -51,9 +51,9 @@ func (r *Repository) Create(auth domainmodel.Auth) (domainmodel.Auth, error) {
 	return authDB.ToDomain(), nil
 }
 
-// GetByUserID is the function that gets an auth by user id from the database.
+// GetByUserID is the function that gets an auth by user id from the datastore.
 func (r *Repository) GetByUserID(userID string) (domainmodel.Auth, error) {
-	authDB := dsstgmodel.Auth{}
+	authDB := datastoremodel.Auth{}
 
 	if result := r.DB.Find(&authDB, "user_id=?", userID); result.Error != nil {
 		return domainmodel.Auth{}, result.Error
@@ -62,9 +62,9 @@ func (r *Repository) GetByUserID(userID string) (domainmodel.Auth, error) {
 	return authDB.ToDomain(), nil
 }
 
-// Delete is the function that deletes an auth by id from the database.
+// Delete is the function that deletes an auth by id from the datastore.
 func (r *Repository) Delete(id string) (domainmodel.Auth, error) {
-	authDB := dsstgmodel.Auth{}
+	authDB := datastoremodel.Auth{}
 
 	result := r.DB.Find(&authDB, "id=?", id)
 	if result.Error != nil {
@@ -86,7 +86,7 @@ func (r *Repository) Delete(id string) (domainmodel.Auth, error) {
 	return authDB.ToDomain(), nil
 }
 
-// WithDBTrx is the function that enables the repository with database transaction.
+// WithDBTrx is the function that enables the repository with datastore transaction.
 func (r *Repository) WithDBTrx(dbTrx *gorm.DB) authdsrepository.IRepository {
 	if dbTrx == nil {
 		r.DB = initDB

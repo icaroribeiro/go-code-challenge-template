@@ -8,7 +8,7 @@ import (
 	"gorm.io/gorm"
 )
 
-// Auth is the representation of the auth's database model.
+// Auth is the representation of the auth's datastore model.
 type Auth struct {
 	ID        uuid.UUID `gorm:"type:uuid;primary_key"`
 	UserID    uuid.UUID `gorm:"type:uuid;not null;unique"`

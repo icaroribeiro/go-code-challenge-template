@@ -33,7 +33,7 @@ func (ts *TestSuite) TestNew() {
 
 			returnedError := customerror.New(msg)
 
-			assert.Equal(t, returnedError, err)
+			assert.Equal(t, err, returnedError)
 		})
 	}
 }
@@ -58,7 +58,7 @@ func (ts *TestSuite) TestNewf() {
 
 			returnedError := customerror.Newf("%s", msg)
 
-			assert.Equal(t, returnedError, err)
+			assert.Equal(t, err, returnedError)
 		})
 	}
 }
@@ -82,7 +82,7 @@ func (ts *TestSuite) TestError() {
 
 			returnedMsg := err.Error()
 
-			assert.Equal(t, returnedMsg, msg)
+			assert.Equal(t, msg, returnedMsg)
 		})
 	}
 }
@@ -109,7 +109,7 @@ func (ts *TestSuite) TestNewTypedError() {
 
 			returnedError := errorType.New(msg)
 
-			assert.Equal(t, returnedError, err)
+			assert.Equal(t, err, returnedError)
 		})
 	}
 }
@@ -136,7 +136,7 @@ func (ts *TestSuite) TestNewfTypedError() {
 
 			returnedError := errorType.Newf("%s", msg)
 
-			assert.Equal(t, returnedError, err)
+			assert.Equal(t, err, returnedError)
 		})
 	}
 }
@@ -168,7 +168,7 @@ func (ts *TestSuite) TestGetType() {
 
 			returnedErrorType := customerror.GetType(err)
 
-			assert.Equal(t, returnedErrorType, errorType)
+			assert.Equal(t, errorType, returnedErrorType)
 		})
 	}
 }

@@ -18,6 +18,11 @@ USER_DATASTORE_REPOSITORY_PATH="internal/core/ports/infrastructure/storage/datas
 MOCK_USER_DATASTORE_REPOSITORY_PATH="internal/core/ports/infrastructure/storage/datastore/mockrepository/user"
 mockery --dir "$USER_DATASTORE_REPOSITORY_PATH" --name IRepository --outpkg user --structname Repository --output "$MOCK_USER_DATASTORE_REPOSITORY_PATH" --filename mock_repository.go
 
+# Generate a mock object related to healthcheck's service.
+HEALTHCHECK_SERVICE_PATH="internal/core/ports/application/service/healthcheck"
+MOCK_HEALTHCHECK_SERVICE_PATH="internal/core/ports/application/mockservice/healthcheck"
+mockery --dir "$HEALTHCHECK_SERVICE_PATH" --name IService --outpkg healthcheck --structname Service --output "$MOCK_HEALTHCHECK_SERVICE_PATH" --filename mock_service.go
+
 #
 # PKG
 #

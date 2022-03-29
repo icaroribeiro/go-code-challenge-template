@@ -90,7 +90,7 @@ func (ts *TestSuite) TestGetInstance() {
 }
 
 func (ts *TestSuite) TestClose() {
-	driver := "postgres"
+	driver := ts.PostgresDBConfig["DRIVER"]
 	db, mock := NewMock(driver)
 	connPool := db.ConnPool
 

@@ -20,7 +20,7 @@ import (
 	requesthttputilpkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/httputil/request"
 	responsehttputilpkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/httputil/response"
 	authmiddlewarepkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/middleware/auth"
-	domainmodelfactory "github.com/icaroribeiro/new-go-code-challenge-template/tests/factory/core/domain/model"
+	domainfactorymodel "github.com/icaroribeiro/new-go-code-challenge-template/tests/factory/core/domain/model"
 	datastoremodelfactory "github.com/icaroribeiro/new-go-code-challenge-template/tests/factory/infrastructure/storage/datastore/model"
 	mockauthpkg "github.com/icaroribeiro/new-go-code-challenge-template/tests/mocks/pkg/mockauth"
 	uuid "github.com/satori/go.uuid"
@@ -74,7 +74,7 @@ func (ts *TestSuite) TestAuth() {
 
 				returnArgs = ReturnArgs{
 					{token, nil},
-					{domainmodelfactory.NewAuth(args), nil},
+					{domainfactorymodel.NewAuth(args), nil},
 				}
 
 				sqlQuery := `SELECT * FROM "auths" WHERE id=$1`
@@ -191,7 +191,7 @@ func (ts *TestSuite) TestAuth() {
 
 				returnArgs = ReturnArgs{
 					{token, nil},
-					{domainmodelfactory.NewAuth(args), nil},
+					{domainfactorymodel.NewAuth(args), nil},
 				}
 
 				sqlQuery := `SELECT * FROM "auths" WHERE id=$1`
@@ -225,7 +225,7 @@ func (ts *TestSuite) TestAuth() {
 
 				returnArgs = ReturnArgs{
 					{token, nil},
-					{domainmodelfactory.NewAuth(args), nil},
+					{domainfactorymodel.NewAuth(args), nil},
 				}
 
 				sqlQuery := `SELECT * FROM "auths" WHERE id=$1`
@@ -259,7 +259,7 @@ func (ts *TestSuite) TestAuth() {
 
 				returnArgs = ReturnArgs{
 					{token, nil},
-					{domainmodelfactory.NewAuth(args), nil},
+					{domainfactorymodel.NewAuth(args), nil},
 				}
 
 				sqlQuery := `SELECT * FROM "auths" WHERE id=$1`
