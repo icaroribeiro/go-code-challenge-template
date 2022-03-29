@@ -90,7 +90,8 @@ func (ts *TestSuite) TestGetInstance() {
 }
 
 func (ts *TestSuite) TestClose() {
-	db, mock := NewMock()
+	driver := "postgres"
+	db, mock := NewMock(driver)
 	connPool := db.ConnPool
 
 	ts.Cases = Cases{

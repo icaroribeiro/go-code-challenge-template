@@ -33,7 +33,8 @@ func TestMiddlewareUnit(t *testing.T) {
 }
 
 func (ts *TestSuite) TestAuth() {
-	db, mock := NewMock()
+	driver := "postgres"
+	db, mock := NewMock(driver)
 	bearerToken := []string{"", ""}
 
 	var token *jwt.Token

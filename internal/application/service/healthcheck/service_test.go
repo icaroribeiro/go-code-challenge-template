@@ -15,7 +15,8 @@ func TestService(t *testing.T) {
 }
 
 func (ts *TestSuite) TestGetStatus() {
-	db, mock := NewMock()
+	driver := "postgres"
+	db, mock := NewMock(driver)
 	connPool := db.ConnPool
 
 	errorType := customerror.NoType

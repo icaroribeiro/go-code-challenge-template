@@ -26,7 +26,7 @@ type TestSuite struct {
 	Cases Cases
 }
 
-func NewMock() (*gorm.DB, sqlmock.Sqlmock) {
+func NewMock(driver string) (*gorm.DB, sqlmock.Sqlmock) {
 	errorMsg := "failed to open a stub database connection"
 
 	sqlDB, mock, err := sqlmock.New()
@@ -44,11 +44,16 @@ func NewMock() (*gorm.DB, sqlmock.Sqlmock) {
 
 	errorMsg = "failed to initialize db session"
 
-	db, err := gorm.Open(postgres.New(postgres.Config{
-		Conn: sqlDB,
-	}), &gorm.Config{})
-	if err != nil {
-		log.Panicf("%s: %s", errorMsg, err.Error())
+	var db *gorm.DB
+
+	switch driver {
+	case "postgres":
+		db, err = gorm.Open(postgres.New(postgres.Config{
+			Conn: sqlDB,
+		}), &gorm.Config{})
+		if err != nil {
+			log.Panicf("%s: %s", errorMsg, err.Error())
+		}
 	}
 
 	if db == nil {
