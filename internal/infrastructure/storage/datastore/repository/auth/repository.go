@@ -39,7 +39,7 @@ func (r *Repository) Create(auth domainmodel.Auth) (domainmodel.Auth, error) {
 			}
 
 			if result.RowsAffected == 0 && loginDB.IsEmpty() {
-				return domainmodel.Auth{}, customerror.NotFound.Newf("the login with user_id %s was not found", authDB.UserID)
+				return domainmodel.Auth{}, customerror.NotFound.Newf("the user with id %s was not found", authDB.UserID)
 			}
 
 			return domainmodel.Auth{}, customerror.Conflict.Newf("The user with id %s is already logged in", authDB.UserID)
