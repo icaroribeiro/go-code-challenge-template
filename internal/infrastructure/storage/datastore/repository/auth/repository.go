@@ -4,7 +4,7 @@ import (
 	"strings"
 
 	domainmodel "github.com/icaroribeiro/new-go-code-challenge-template/internal/core/domain/model"
-	authdsrepository "github.com/icaroribeiro/new-go-code-challenge-template/internal/core/ports/infrastructure/storage/datastore/repository/auth"
+	authdatastorerepository "github.com/icaroribeiro/new-go-code-challenge-template/internal/core/ports/infrastructure/storage/datastore/repository/auth"
 	datastoremodel "github.com/icaroribeiro/new-go-code-challenge-template/internal/infrastructure/storage/datastore/model"
 	"github.com/icaroribeiro/new-go-code-challenge-template/pkg/customerror"
 	"gorm.io/gorm"
@@ -17,7 +17,7 @@ type Repository struct {
 var initDB *gorm.DB
 
 // New is the factory function that encapsulates the implementation related to auth.
-func New(db *gorm.DB) authdsrepository.IRepository {
+func New(db *gorm.DB) authdatastorerepository.IRepository {
 	initDB = db
 	return &Repository{
 		DB: db,
@@ -87,7 +87,7 @@ func (r *Repository) Delete(id string) (domainmodel.Auth, error) {
 }
 
 // WithDBTrx is the function that enables the repository with datastore transaction.
-func (r *Repository) WithDBTrx(dbTrx *gorm.DB) authdsrepository.IRepository {
+func (r *Repository) WithDBTrx(dbTrx *gorm.DB) authdatastorerepository.IRepository {
 	if dbTrx == nil {
 		r.DB = initDB
 		return r

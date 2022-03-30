@@ -3,10 +3,10 @@ package user
 // import (
 // 	"strings"
 
-// 	usermodel "github.com/icaroribeiro/go-code-challenge-template/internal/core/domain/model/user"
-// 	userdsrepository "github.com/icaroribeiro/go-code-challenge-template/internal/core/ports/infrastructure/persistence/datastore/repository/user"
-// 	userdsmodel "github.com/icaroribeiro/go-code-challenge-template/internal/infrastructure/persistence/datastore/model/user"
-// 	"github.com/icaroribeiro/go-code-challenge-template/pkg/customerror"
+// 	usermodel "github.com/icaroribeiro/new-go-code-challenge-template/internal/core/domain/model/user"
+// 	userdatastorerepository "github.com/icaroribeiro/new-go-code-challenge-template/internal/core/ports/infrastructure/persistence/datastore/repository/user"
+// 	userdsmodel "github.com/icaroribeiro/new-go-code-challenge-template/internal/infrastructure/persistence/datastore/model/user"
+// 	"github.com/icaroribeiro/new-go-code-challenge-template/pkg/customerror"
 // 	"gorm.io/gorm"
 // )
 
@@ -17,7 +17,7 @@ package user
 // var initDB *gorm.DB
 
 // // New is the factory function that encapsulates the implementation related to user repository.
-// func New(db *gorm.DB) userdsrepository.IRepository {
+// func New(db *gorm.DB) userdatastorerepository.IRepository {
 // 	initDB = db
 // 	return &Repository{
 // 		DB: db,
@@ -52,7 +52,7 @@ package user
 // }
 
 // // WithDBTrx is the function that enables the repository with database transaction.
-// func (r *Repository) WithDBTrx(dbTrx *gorm.DB) userdsrepository.IRepository {
+// func (r *Repository) WithDBTrx(dbTrx *gorm.DB) userdatastorerepository.IRepository {
 // 	if dbTrx == nil {
 // 		r.DB = initDB
 // 		return r

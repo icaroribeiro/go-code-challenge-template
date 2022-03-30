@@ -8,10 +8,10 @@ package user_test
 // 	"time"
 
 // 	"github.com/DATA-DOG/go-sqlmock"
-// 	"github.com/icaroribeiro/go-code-challenge-template/pkg/customerror"
-// 	userdbmodel "github.com/icaroribeiro/go-code-challenge-template/internal/infrastructure/persistence/datastore/model/user"
-// 	userdsrepository "github.com/icaroribeiro/go-code-challenge-template/internal/infrastructure/persistence/datastore/postgres/repository/user"
-// 	userdbmodelfactory "github.com/icaroribeiro/go-code-challenge-template/tests/factory/infrastructure/persistence/datastore/model/user"
+// 	"github.com/icaroribeiro/new-go-code-challenge-template/pkg/customerror"
+// 	userdbmodel "github.com/icaroribeiro/new-go-code-challenge-template/internal/infrastructure/persistence/datastore/model/user"
+// 	userdatastorerepository "github.com/icaroribeiro/new-go-code-challenge-template/internal/infrastructure/persistence/datastore/postgres/repository/user"
+// 	userdbmodelfactory "github.com/icaroribeiro/new-go-code-challenge-template/tests/factory/infrastructure/persistence/datastore/model/user"
 // 	uuid "github.com/satori/go.uuid"
 // 	"github.com/stretchr/testify/assert"
 // 	"github.com/stretchr/testify/suite"
@@ -114,9 +114,9 @@ package user_test
 // 		ts.T().Run(tc.Context, func(t *testing.T) {
 // 			tc.SetUp(t)
 
-// 			userDSRepository := userdsrepository.New(ts.DB)
+// 			userdatastorerepository := userdatastorerepository.New(ts.DB)
 
-// 			returnedUser, err := userDSRepository.Create(user)
+// 			returnedUser, err := userdatastorerepository.Create(user)
 
 // 			if !tc.WantError {
 // 				assert.Nil(t, err, fmt.Sprintf("Unexpected error %v.", err))
@@ -168,9 +168,9 @@ package user_test
 // 		ts.T().Run(tc.Context, func(t *testing.T) {
 // 			tc.SetUp(t)
 
-// 			userDSRepository := userdsrepository.New(ts.DB)
+// 			userdatastorerepository := userdatastorerepository.New(ts.DB)
 
-// 			returnedUsers, err := userDSRepository.GetAll()
+// 			returnedUsers, err := userdatastorerepository.GetAll()
 
 // 			if !tc.WantError {
 // 				assert.Nil(t, err, fmt.Sprintf("Unexpected error %v.", err))
@@ -211,13 +211,13 @@ package user_test
 // 		ts.T().Run(tc.Context, func(t *testing.T) {
 // 			tc.SetUp(t)
 
-// 			userDSRepository := userdsrepository.New(ts.DB)
+// 			userdatastorerepository := userdatastorerepository.New(ts.DB)
 
-// 			returnedUserDSRepository := userDSRepository.WithDBTrx(dbTrx)
+// 			returnedUserdatastorerepository := userdatastorerepository.WithDBTrx(dbTrx)
 
 // 			if !tc.WantError {
-// 				assert.NotEmpty(t, returnedUserDSRepository, "Repository interface is empty.")
-// 				assert.Equal(t, userDSRepository, returnedUserDSRepository, "Repository interfaces are not the same.")
+// 				assert.NotEmpty(t, returnedUserdatastorerepository, "Repository interface is empty.")
+// 				assert.Equal(t, userdatastorerepository, returnedUserdatastorerepository, "Repository interfaces are not the same.")
 // 			}
 // 		})
 // 	}

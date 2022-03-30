@@ -10,6 +10,13 @@ github.com/icaroribeiro/new-go-code-challenge-template/internal/infrastructure/s
 github.com/icaroribeiro/new-go-code-challenge-template/internal/infrastructure/storage/datastore/repository/auth/repository.go:55:	GetByUserID			100.0%
 github.com/icaroribeiro/new-go-code-challenge-template/internal/infrastructure/storage/datastore/repository/auth/repository.go:66:	Delete				100.0%
 github.com/icaroribeiro/new-go-code-challenge-template/internal/infrastructure/storage/datastore/repository/auth/repository.go:90:	WithDBTrx			100.0%
+github.com/icaroribeiro/new-go-code-challenge-template/internal/infrastructure/storage/datastore/repository/login/repository.go:20:	New				100.0%
+github.com/icaroribeiro/new-go-code-challenge-template/internal/infrastructure/storage/datastore/repository/login/repository.go:28:	Create				100.0%
+github.com/icaroribeiro/new-go-code-challenge-template/internal/infrastructure/storage/datastore/repository/login/repository.go:44:	GetByUsername			0.0%
+github.com/icaroribeiro/new-go-code-challenge-template/internal/infrastructure/storage/datastore/repository/login/repository.go:55:	GetByUserID			0.0%
+github.com/icaroribeiro/new-go-code-challenge-template/internal/infrastructure/storage/datastore/repository/login/repository.go:66:	Update				0.0%
+github.com/icaroribeiro/new-go-code-challenge-template/internal/infrastructure/storage/datastore/repository/login/repository.go:91:	Delete				0.0%
+github.com/icaroribeiro/new-go-code-challenge-template/internal/infrastructure/storage/datastore/repository/login/repository.go:115:	WithDBTrx			100.0%
 github.com/icaroribeiro/new-go-code-challenge-template/internal/transport/http/presentation/handler/healthcheck/handler.go:16:		New				100.0%
 github.com/icaroribeiro/new-go-code-challenge-template/internal/transport/http/presentation/handler/healthcheck/handler.go:31:		GetStatus			100.0%
 github.com/icaroribeiro/new-go-code-challenge-template/internal/transport/http/router/healthcheck/router.go:13:				ConfigureRoutes			100.0%
@@ -56,4 +63,4 @@ github.com/icaroribeiro/new-go-code-challenge-template/pkg/validator/uuid/valida
 github.com/icaroribeiro/new-go-code-challenge-template/pkg/validator/validator.go:14:							New				100.0%
 github.com/icaroribeiro/new-go-code-challenge-template/pkg/validator/validator.go:31:							Validate			100.0%
 github.com/icaroribeiro/new-go-code-challenge-template/pkg/validator/validator.go:36:							ValidateWithTags		100.0%
-total:																	(statements)			89.6%
+total:																	(statements)			82.1%
