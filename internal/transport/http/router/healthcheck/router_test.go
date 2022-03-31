@@ -23,10 +23,14 @@ func TestRouterUnit(t *testing.T) {
 func (ts *TestSuite) TestConfigureRoutes() {
 	routes := routehttputilpkg.Routes{}
 
-	loggingMiddleware := loggingmiddlewarepkg.Logging()
-
 	healthCheckService := new(healthcheckmockservice.Service)
 	healthCheckHandler := healthcheckhandler.New(healthCheckService)
+
+	adapters := []adapterhttputilpkg.Adapter{}
+
+	loggingMiddleware := loggingmiddlewarepkg.Logging()
+
+	adapters = append(adapters, loggingMiddleware)
 
 	ts.Cases = Cases{
 		{
@@ -38,7 +42,7 @@ func (ts *TestSuite) TestConfigureRoutes() {
 						Method: http.MethodGet,
 						Path:   "/status",
 						HandlerFunc: adapterhttputilpkg.AdaptFunc(healthCheckHandler.GetStatus).
-							With(loggingMiddleware),
+							With(adapters...),
 					},
 				}
 			},
@@ -49,7 +53,7 @@ func (ts *TestSuite) TestConfigureRoutes() {
 		ts.T().Run(tc.Context, func(t *testing.T) {
 			tc.SetUp(t)
 
-			returnedRoutes := healthcheckrouter.ConfigureRoutes(healthCheckHandler)
+			returnedRoutes := healthcheckrouter.ConfigureRoutes(healthCheckHandler, adapters)
 
 			assert.Equal(t, len(routes), len(returnedRoutes))
 

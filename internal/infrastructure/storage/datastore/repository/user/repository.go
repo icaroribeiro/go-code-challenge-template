@@ -1,63 +1,63 @@
 package user
 
-// import (
-// 	"strings"
+import (
+	"strings"
 
-// 	usermodel "github.com/icaroribeiro/new-go-code-challenge-template/internal/core/domain/model/user"
-// 	userdatastorerepository "github.com/icaroribeiro/new-go-code-challenge-template/internal/core/ports/infrastructure/persistence/datastore/repository/user"
-// 	userdsmodel "github.com/icaroribeiro/new-go-code-challenge-template/internal/infrastructure/persistence/datastore/model/user"
-// 	"github.com/icaroribeiro/new-go-code-challenge-template/pkg/customerror"
-// 	"gorm.io/gorm"
-// )
+	domainmodel "github.com/icaroribeiro/new-go-code-challenge-template/internal/core/domain/model"
+	userdatastorerepository "github.com/icaroribeiro/new-go-code-challenge-template/internal/core/ports/infrastructure/storage/datastore/repository/user"
+	datastoremodel "github.com/icaroribeiro/new-go-code-challenge-template/internal/infrastructure/storage/datastore/model"
+	"github.com/icaroribeiro/new-go-code-challenge-template/pkg/customerror"
+	"gorm.io/gorm"
+)
 
-// type Repository struct {
-// 	DB *gorm.DB
-// }
+type Repository struct {
+	DB *gorm.DB
+}
 
-// var initDB *gorm.DB
+var initDB *gorm.DB
 
-// // New is the factory function that encapsulates the implementation related to user repository.
-// func New(db *gorm.DB) userdatastorerepository.IRepository {
-// 	initDB = db
-// 	return &Repository{
-// 		DB: db,
-// 	}
-// }
+// New is the factory function that encapsulates the implementation related to user repository.
+func New(db *gorm.DB) userdatastorerepository.IRepository {
+	initDB = db
+	return &Repository{
+		DB: db,
+	}
+}
 
-// // Create is the function that creates a user in the database.
-// func (r *Repository) Create(user usermodel.User) (usermodel.User, error) {
-// 	userDB := userdsmodel.User{}
-// 	userDB.FromDomain(user)
+// Create is the function that creates a user in the database.
+func (r *Repository) Create(user domainmodel.User) (domainmodel.User, error) {
+	userDS := datastoremodel.User{}
+	userDS.FromDomain(user)
 
-// 	if result := r.DB.Create(&userDB); result.Error != nil {
-// 		if strings.Contains(result.Error.Error(), "duplicate key value") {
-// 			return usermodel.User{}, customerror.Conflict.New(result.Error.Error())
-// 		}
+	if result := r.DB.Create(&userDS); result.Error != nil {
+		if strings.Contains(result.Error.Error(), "duplicate key value") {
+			return domainmodel.User{}, customerror.Conflict.New(result.Error.Error())
+		}
 
-// 		return usermodel.User{}, result.Error
-// 	}
+		return domainmodel.User{}, result.Error
+	}
 
-// 	return userDB.ToDomain(), nil
-// }
+	return userDS.ToDomain(), nil
+}
 
-// // GetAll is the function that gets the list of all users from the database.
-// func (r *Repository) GetAll() (usermodel.Users, error) {
-// 	usersDB := userdsmodel.Users{}
+// GetAll is the function that gets the list of all users from the database.
+func (r *Repository) GetAll() (domainmodel.Users, error) {
+	usersDS := datastoremodel.Users{}
 
-// 	if result := r.DB.Find(&usersDB); result.Error != nil {
-// 		return usermodel.Users{}, result.Error
-// 	}
+	if result := r.DB.Find(&usersDS); result.Error != nil {
+		return domainmodel.Users{}, result.Error
+	}
 
-// 	return usersDB.ToDomain(), nil
-// }
+	return usersDS.ToDomain(), nil
+}
 
-// // WithDBTrx is the function that enables the repository with database transaction.
-// func (r *Repository) WithDBTrx(dbTrx *gorm.DB) userdatastorerepository.IRepository {
-// 	if dbTrx == nil {
-// 		r.DB = initDB
-// 		return r
-// 	}
+// WithDBTrx is the function that enables the repository with database transaction.
+func (r *Repository) WithDBTrx(dbTrx *gorm.DB) userdatastorerepository.IRepository {
+	if dbTrx == nil {
+		r.DB = initDB
+		return r
+	}
 
-// 	r.DB = dbTrx
-// 	return r
-// }
+	r.DB = dbTrx
+	return r
+}

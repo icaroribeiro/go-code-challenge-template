@@ -664,6 +664,9 @@ func (ts *TestSuite) TestDelete() {
 				assert.Equal(t, errorType, customerror.GetType(err))
 				assert.Empty(t, returnedLogin)
 			}
+
+			err = mock.ExpectationsWereMet()
+			assert.Nil(ts.T(), err, fmt.Sprintf("There were unfulfilled expectations: %v.", err))
 		})
 	}
 }
@@ -706,8 +709,3 @@ func (ts *TestSuite) TestWithDBTrx() {
 		})
 	}
 }
-
-// func (ts *TestSuite) AfterTest(_, _ string) {
-// 	err := mock.ExpectationsWereMet()
-// 	assert.Nil(ts.T(), err, fmt.Sprintf("There were unfulfilled expectations: %v.", err))
-// }

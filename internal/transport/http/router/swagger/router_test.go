@@ -24,7 +24,11 @@ func (ts *TestSuite) TestConfigureRoutes() {
 
 	swaggerHandler := httpswaggerpkg.WrapHandler
 
+	adapters := []adapterhttputilpkg.Adapter{}
+
 	loggingMiddleware := loggingmiddlewarepkg.Logging()
+
+	adapters = append(adapters, loggingMiddleware)
 
 	ts.Cases = Cases{
 		{
@@ -36,7 +40,7 @@ func (ts *TestSuite) TestConfigureRoutes() {
 						Method:     http.MethodGet,
 						PathPrefix: "/swagger",
 						HandlerFunc: adapterhttputilpkg.AdaptFunc(swaggerHandler).
-							With(loggingMiddleware),
+							With(adapters...),
 					},
 				}
 			},
@@ -47,7 +51,7 @@ func (ts *TestSuite) TestConfigureRoutes() {
 		ts.T().Run(tc.Context, func(t *testing.T) {
 			tc.SetUp(t)
 
-			returnedRoutes := swaggerrouter.ConfigureRoutes()
+			returnedRoutes := swaggerrouter.ConfigureRoutes(swaggerHandler, adapters)
 
 			assert.Equal(t, len(routes), len(returnedRoutes))
 

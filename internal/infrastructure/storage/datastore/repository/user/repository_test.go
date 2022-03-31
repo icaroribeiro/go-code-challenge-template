@@ -1,229 +1,223 @@
 package user_test
 
-// import (
-// 	"errors"
-// 	"fmt"
-// 	"regexp"
-// 	"testing"
-// 	"time"
+import (
+	"errors"
+	"fmt"
+	"regexp"
+	"testing"
 
-// 	"github.com/DATA-DOG/go-sqlmock"
-// 	"github.com/icaroribeiro/new-go-code-challenge-template/pkg/customerror"
-// 	userdbmodel "github.com/icaroribeiro/new-go-code-challenge-template/internal/infrastructure/persistence/datastore/model/user"
-// 	userdatastorerepository "github.com/icaroribeiro/new-go-code-challenge-template/internal/infrastructure/persistence/datastore/postgres/repository/user"
-// 	userdbmodelfactory "github.com/icaroribeiro/new-go-code-challenge-template/tests/factory/infrastructure/persistence/datastore/model/user"
-// 	uuid "github.com/satori/go.uuid"
-// 	"github.com/stretchr/testify/assert"
-// 	"github.com/stretchr/testify/suite"
-// 	"gorm.io/gorm"
-// )
+	"github.com/DATA-DOG/go-sqlmock"
+	domainmodel "github.com/icaroribeiro/new-go-code-challenge-template/internal/core/domain/model"
+	userdatastorerepository "github.com/icaroribeiro/new-go-code-challenge-template/internal/infrastructure/storage/datastore/repository/user"
+	"github.com/icaroribeiro/new-go-code-challenge-template/pkg/customerror"
+	domainfactorymodel "github.com/icaroribeiro/new-go-code-challenge-template/tests/factory/core/domain/model"
+	datastorefactorymodel "github.com/icaroribeiro/new-go-code-challenge-template/tests/factory/infrastructure/storage/datastore/model"
+	uuid "github.com/satori/go.uuid"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/suite"
+	"gorm.io/gorm"
+)
 
-// func TestRepository(t *testing.T) {
-// 	suite.Run(t, new(TestSuite))
-// }
+func TestRepository(t *testing.T) {
+	suite.Run(t, new(TestSuite))
+}
 
-// func (ts *TestSuite) TestCreate() {
-// 	var user userdbmodel.User
+func (ts *TestSuite) TestCreate() {
+	driver := "postgres"
+	db, mock := NewMock(driver)
 
-// 	var newUser userdbmodel.User
+	user := domainmodel.User{}
 
-// 	errorType := customerror.NoType
+	newUser := domainmodel.User{}
 
-// 	sqlQuery := `INSERT INTO "users" ("id","username","created_at","updated_at") VALUES ($1,$2,$3,$4)`
+	errorType := customerror.NoType
 
-// 	ts.Cases = Cases{
-// 		{
-// 			Context: "ItShouldSucceedInCreatingTheUser",
-// 			SetUp: func(t *testing.T) {
-// 				args := map[string]interface{}{
-// 					"id":        uuid.Nil,
-// 					"createdAt": time.Time{},
-// 					"updatedAt": time.Time{},
-// 				}
+	sqlQuery := `INSERT INTO "users" ("id","username","created_at","updated_at") VALUES ($1,$2,$3,$4)`
 
-// 				user = userdbmodelfactory.New(args)
+	ts.Cases = Cases{
+		{
+			Context: "ItShouldSucceedInCreatingTheUser",
+			SetUp: func(t *testing.T) {
+				args := map[string]interface{}{
+					"id": uuid.Nil,
+				}
 
-// 				args = map[string]interface{}{
-// 					"id":        uuid.Nil,
-// 					"username":  user.Username,
-// 					"createdAt": time.Time{},
-// 					"updatedAt": time.Time{},
-// 				}
+				user = domainfactorymodel.NewUser(args)
 
-// 				newUser = userdbmodelfactory.New(args)
+				args = map[string]interface{}{
+					"id":       uuid.Nil,
+					"username": user.Username,
+				}
 
-// 				ts.SQLMock.ExpectBegin()
+				newUser = domainfactorymodel.NewUser(args)
 
-// 				ts.SQLMock.ExpectExec(regexp.QuoteMeta(sqlQuery)).
-// 					WithArgs(sqlmock.AnyArg(), user.Username, sqlmock.AnyArg(), sqlmock.AnyArg()).
-// 					WillReturnResult(sqlmock.NewResult(1, 1))
+				mock.ExpectBegin()
 
-// 				ts.SQLMock.ExpectCommit()
-// 			},
-// 			WantError: false,
-// 		},
-// 		{
-// 			Context: "ItShouldFailIfAnErrorOccursWhenCreatingTheUser",
-// 			SetUp: func(t *testing.T) {
-// 				args := map[string]interface{}{
-// 					"id":        uuid.Nil,
-// 					"createdAt": time.Time{},
-// 					"updatedAt": time.Time{},
-// 				}
+				mock.ExpectExec(regexp.QuoteMeta(sqlQuery)).
+					WithArgs(sqlmock.AnyArg(), user.Username, sqlmock.AnyArg(), sqlmock.AnyArg()).
+					WillReturnResult(sqlmock.NewResult(1, 1))
 
-// 				user = userdbmodelfactory.New(args)
+				mock.ExpectCommit()
+			},
+			WantError: false,
+		},
+		{
+			Context: "ItShouldFailIfAnErrorOccursWhenCreatingTheUser",
+			SetUp: func(t *testing.T) {
+				args := map[string]interface{}{
+					"id": uuid.Nil,
+				}
 
-// 				ts.SQLMock.ExpectBegin()
+				user = domainfactorymodel.NewUser(args)
 
-// 				ts.SQLMock.ExpectExec(regexp.QuoteMeta(sqlQuery)).
-// 					WithArgs(sqlmock.AnyArg(), user.Username, sqlmock.AnyArg(), sqlmock.AnyArg()).
-// 					WillReturnError(errors.New("failed"))
+				mock.ExpectBegin()
 
-// 				ts.SQLMock.ExpectRollback()
+				mock.ExpectExec(regexp.QuoteMeta(sqlQuery)).
+					WithArgs(sqlmock.AnyArg(), user.Username, sqlmock.AnyArg(), sqlmock.AnyArg()).
+					WillReturnError(errors.New("failed"))
 
-// 				errorType = customerror.NoType
-// 			},
-// 			WantError: true,
-// 		},
-// 		{
-// 			Context: "ItShouldFailIfAnErrorOccursWhenCreatingTheUserBecauseTheUserIsAlreadyRegistered",
-// 			SetUp: func(t *testing.T) {
-// 				args := map[string]interface{}{
-// 					"id":        uuid.Nil,
-// 					"createdAt": time.Time{},
-// 					"updatedAt": time.Time{},
-// 				}
+				mock.ExpectRollback()
 
-// 				user = userdbmodelfactory.New(args)
+				errorType = customerror.NoType
+			},
+			WantError: true,
+		},
+		{
+			Context: "ItShouldFailIfAnErrorOccursWhenCreatingTheUserBecauseTheUserIsAlreadyRegistered",
+			SetUp: func(t *testing.T) {
+				user = domainfactorymodel.NewUser(nil)
 
-// 				ts.SQLMock.ExpectBegin()
+				mock.ExpectBegin()
 
-// 				ts.SQLMock.ExpectExec(regexp.QuoteMeta(sqlQuery)).
-// 					WithArgs(sqlmock.AnyArg(), user.Username, sqlmock.AnyArg(), sqlmock.AnyArg()).
-// 					WillReturnError(customerror.Conflict.New("duplicate key value"))
+				mock.ExpectExec(regexp.QuoteMeta(sqlQuery)).
+					WithArgs(sqlmock.AnyArg(), user.Username, sqlmock.AnyArg(), sqlmock.AnyArg()).
+					WillReturnError(customerror.Conflict.New("duplicate key value"))
 
-// 				ts.SQLMock.ExpectRollback()
+				mock.ExpectRollback()
 
-// 				errorType = customerror.Conflict
-// 			},
-// 			WantError: true,
-// 		},
-// 	}
+				errorType = customerror.Conflict
+			},
+			WantError: true,
+		},
+	}
 
-// 	for _, tc := range ts.Cases {
-// 		ts.T().Run(tc.Context, func(t *testing.T) {
-// 			tc.SetUp(t)
+	for _, tc := range ts.Cases {
+		ts.T().Run(tc.Context, func(t *testing.T) {
+			tc.SetUp(t)
 
-// 			userdatastorerepository := userdatastorerepository.New(ts.DB)
+			userDatastoreRepository := userdatastorerepository.New(db)
 
-// 			returnedUser, err := userdatastorerepository.Create(user)
+			returnedUser, err := userDatastoreRepository.Create(user)
 
-// 			if !tc.WantError {
-// 				assert.Nil(t, err, fmt.Sprintf("Unexpected error %v.", err))
-// 				assert.Equal(t, newUser.Username, returnedUser.Username)
-// 			} else {
-// 				assert.NotNil(t, err, "Predicted error lost.")
-// 				assert.Equal(t, errorType, customerror.GetType(err))
-// 				assert.Empty(t, returnedUser)
-// 			}
-// 		})
-// 	}
-// }
+			if !tc.WantError {
+				assert.Nil(t, err, fmt.Sprintf("Unexpected error %v.", err))
+				assert.Equal(t, newUser.Username, returnedUser.Username)
+			} else {
+				assert.NotNil(t, err, "Predicted error lost.")
+				assert.Equal(t, errorType, customerror.GetType(err))
+				assert.Empty(t, returnedUser)
+			}
 
-// func (ts *TestSuite) TestGetAll() {
-// 	var user userdbmodel.User
+			err = mock.ExpectationsWereMet()
+			assert.Nil(ts.T(), err, fmt.Sprintf("There were unfulfilled expectations: %v.", err))
+		})
+	}
+}
 
-// 	errorType := customerror.NoType
+func (ts *TestSuite) TestGetAll() {
+	driver := "postgres"
+	db, mock := NewMock(driver)
 
-// 	sqlQuery := `SELECT * FROM "users"`
+	user := domainmodel.User{}
 
-// 	ts.Cases = Cases{
-// 		{
-// 			Context: "ItShouldSucceedInGettingAllUsers",
-// 			SetUp: func(t *testing.T) {
-// 				user = userdbmodelfactory.New(nil)
+	errorType := customerror.NoType
 
-// 				rows := sqlmock.
-// 					NewRows([]string{"id", "username", "created_at", "updated_at"}).
-// 					AddRow(user.ID, user.Username, user.CreatedAt, user.UpdatedAt)
+	sqlQuery := `SELECT * FROM "users"`
 
-// 				ts.SQLMock.ExpectQuery(regexp.QuoteMeta(sqlQuery)).
-// 					WillReturnRows(rows)
-// 			},
-// 			WantError: false,
-// 		},
-// 		{
-// 			Context: "ItShouldFailIfAnErrorOccursWhenFindingAllUser",
-// 			SetUp: func(t *testing.T) {
-// 				ts.SQLMock.ExpectQuery(regexp.QuoteMeta(sqlQuery)).
-// 					WillReturnError(errors.New("failed"))
+	ts.Cases = Cases{
+		{
+			Context: "ItShouldSucceedInGettingAllUsers",
+			SetUp: func(t *testing.T) {
+				datastoreUser := datastorefactorymodel.NewUser(nil)
+				user = datastoreUser.ToDomain()
 
-// 				errorType = customerror.NoType
-// 			},
-// 			WantError: true,
-// 		},
-// 	}
+				rows := sqlmock.
+					NewRows([]string{"id", "username", "created_at", "updated_at"}).
+					AddRow(datastoreUser.ID, datastoreUser.Username, datastoreUser.CreatedAt, datastoreUser.UpdatedAt)
 
-// 	for _, tc := range ts.Cases {
-// 		ts.T().Run(tc.Context, func(t *testing.T) {
-// 			tc.SetUp(t)
+				mock.ExpectQuery(regexp.QuoteMeta(sqlQuery)).
+					WillReturnRows(rows)
+			},
+			WantError: false,
+		},
+		{
+			Context: "ItShouldFailIfAnErrorOccursWhenFindingAllUser",
+			SetUp: func(t *testing.T) {
+				mock.ExpectQuery(regexp.QuoteMeta(sqlQuery)).
+					WillReturnError(errors.New("failed"))
 
-// 			userdatastorerepository := userdatastorerepository.New(ts.DB)
+				errorType = customerror.NoType
+			},
+			WantError: true,
+		},
+	}
 
-// 			returnedUsers, err := userdatastorerepository.GetAll()
+	for _, tc := range ts.Cases {
+		ts.T().Run(tc.Context, func(t *testing.T) {
+			tc.SetUp(t)
 
-// 			if !tc.WantError {
-// 				assert.Nil(t, err, fmt.Sprintf("Unexpected error %v.", err))
-// 				assert.Equal(t, user.ID, returnedUsers[0].ID)
-// 				assert.Equal(t, user.Username, returnedUsers[0].Username)
-// 				assert.Equal(t, user.CreatedAt, returnedUsers[0].CreatedAt)
-// 				assert.Equal(t, user.UpdatedAt, returnedUsers[0].UpdatedAt)
-// 			} else {
-// 				assert.NotNil(t, err, "Predicted error lost.")
-// 				assert.Equal(t, errorType, customerror.GetType(err))
-// 				assert.Empty(t, returnedUsers)
-// 			}
-// 		})
-// 	}
-// }
+			userDatastoreRepository := userdatastorerepository.New(db)
 
-// func (ts *TestSuite) TestWithDBTrx() {
-// 	dbTrx := &gorm.DB{}
+			returnedUsers, err := userDatastoreRepository.GetAll()
 
-// 	ts.Cases = Cases{
-// 		{
-// 			Context: "ItShouldSucceedInSettingTheRepositoryWithDatabaseTransaction",
-// 			SetUp: func(t *testing.T) {
-// 				dbTrx = ts.DB.Begin()
-// 			},
-// 			WantError: false,
-// 		},
-// 		{
-// 			Context: "ItShouldSucceedInSettingTheRepositoryWithoutDatabaseTransaction",
-// 			SetUp: func(t *testing.T) {
-// 				dbTrx = nil
-// 			},
-// 			WantError: false,
-// 		},
-// 	}
+			if !tc.WantError {
+				assert.Nil(t, err, fmt.Sprintf("Unexpected error %v.", err))
+				assert.Equal(t, user.ID, returnedUsers[0].ID)
+				assert.Equal(t, user.Username, returnedUsers[0].Username)
+			} else {
+				assert.NotNil(t, err, "Predicted error lost.")
+				assert.Equal(t, errorType, customerror.GetType(err))
+				assert.Empty(t, returnedUsers)
+			}
+		})
+	}
+}
 
-// 	for _, tc := range ts.Cases {
-// 		ts.T().Run(tc.Context, func(t *testing.T) {
-// 			tc.SetUp(t)
+func (ts *TestSuite) TestWithDBTrx() {
+	driver := "postgres"
+	db, _ := NewMock(driver)
 
-// 			userdatastorerepository := userdatastorerepository.New(ts.DB)
+	dbTrx := &gorm.DB{}
 
-// 			returnedUserdatastorerepository := userdatastorerepository.WithDBTrx(dbTrx)
+	ts.Cases = Cases{
+		{
+			Context: "ItShouldSucceedInSettingTheRepositoryWithDatabaseTransaction",
+			SetUp: func(t *testing.T) {
+				dbTrx = db.Begin()
+			},
+			WantError: false,
+		},
+		{
+			Context: "ItShouldSucceedInSettingTheRepositoryWithoutDatabaseTransaction",
+			SetUp: func(t *testing.T) {
+				dbTrx = nil
+			},
+			WantError: false,
+		},
+	}
 
-// 			if !tc.WantError {
-// 				assert.NotEmpty(t, returnedUserdatastorerepository, "Repository interface is empty.")
-// 				assert.Equal(t, userdatastorerepository, returnedUserdatastorerepository, "Repository interfaces are not the same.")
-// 			}
-// 		})
-// 	}
-// }
+	for _, tc := range ts.Cases {
+		ts.T().Run(tc.Context, func(t *testing.T) {
+			tc.SetUp(t)
 
-// func (ts *TestSuite) AfterTest(_, _ string) {
-// 	err := ts.SQLMock.ExpectationsWereMet()
-// 	assert.Nil(ts.T(), err, fmt.Sprintf("There were unfulfilled expectations: %v.", err))
-// }
+			userDatastoreRepository := userdatastorerepository.New(db)
+
+			returnedUserDatastoreRepository := userDatastoreRepository.WithDBTrx(dbTrx)
+
+			if !tc.WantError {
+				assert.NotEmpty(t, returnedUserDatastoreRepository, "Repository interface is empty.")
+				assert.Equal(t, userDatastoreRepository, returnedUserDatastoreRepository, "Repository interfaces are not the same.")
+			}
+		})
+	}
+}

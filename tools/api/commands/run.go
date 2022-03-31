@@ -22,9 +22,13 @@ import (
 	routehttputilpkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/httputil/route"
 	serverpkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/server"
 	"github.com/spf13/cobra"
+
 	//validatorpkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/validator"
 	//uuidvalidator "github.com/icaroribeiro/new-go-code-challenge-template/pkg/validator/uuid"
 	//validatorv2 "gopkg.in/validator.v2"
+	adapterhttputilpkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/httputil/adapter"
+	loggingmiddlewarepkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/middleware/logging"
+	httpswaggerpkg "github.com/swaggo/http-swagger"
 )
 
 var RunCmd = &cobra.Command{
@@ -71,18 +75,26 @@ func execRunCmd(cmd *cobra.Command, args []string) {
 	// 	log.Panic(err.Error())
 	// }
 
+	loggingMiddleware := loggingmiddlewarepkg.Logging()
+	//dbTrxMiddleware := dbtrxmiddleware.DBTrx(db)
+	//authMiddleware := authmiddlewarepkg.Auth(db, authInfra, timeBeforeTokenExpTimeInSec)
+
 	routes := make(routehttputilpkg.Routes, 0)
 
-	routes = append(routes, swaggerrouter.ConfigureRoutes()...)
+	swaggerHandler := httpswaggerpkg.WrapHandler
+	swaggerHandlerAdapters := []adapterhttputilpkg.Adapter{loggingMiddleware}
+	routes = append(routes, swaggerrouter.ConfigureRoutes(swaggerHandler, swaggerHandlerAdapters)...)
+
+	// auth
+	// -----
 
 	healthCheckService := healthcheckservice.New(db)
 	healthCheckHandler := healthcheckhandler.New(healthCheckService)
-	routes = append(routes, healthcheckrouter.ConfigureRoutes(healthCheckHandler)...)
+	healthCheckHandlerAdapters := []adapterhttputilpkg.Adapter{loggingMiddleware}
+	routes = append(routes, healthcheckrouter.ConfigureRoutes(healthCheckHandler, healthCheckHandlerAdapters)...)
 
-	// fileHddStorageRepository := filehddstoragerepository.New(storage)
-	// fileService := fileservice.New(fileHddStorageRepository, validator)
-	// fileHandler := filehandler.New(fileService)
-	// routes = append(routes, filerouter.ConfigureRoutes(fileHandler)...)
+	// user
+	// -----
 
 	router := setupRouter(routes)
 

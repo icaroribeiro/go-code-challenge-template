@@ -6,8 +6,8 @@ import (
 
 // User is the representation of the user's domain model.
 type User struct {
-	ID       uuid.UUID `json:"id"`
-	Username string    `json:"username"`
+	ID       uuid.UUID
+	Username string
 }
 
 // Users is a slice of User.

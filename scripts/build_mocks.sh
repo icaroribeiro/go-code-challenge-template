@@ -18,10 +18,20 @@ USER_DATASTORE_REPOSITORY_PATH="internal/core/ports/infrastructure/storage/datas
 MOCK_USER_DATASTORE_REPOSITORY_PATH="internal/core/ports/infrastructure/storage/datastore/mockrepository/user"
 mockery --dir "$USER_DATASTORE_REPOSITORY_PATH" --name IRepository --outpkg user --structname Repository --output "$MOCK_USER_DATASTORE_REPOSITORY_PATH" --filename mock_repository.go
 
+# Generate a mock object related to auth's service.
+AUTH_SERVICE_PATH="internal/core/ports/application/service/auth"
+MOCK_AUTH_SERVICE_PATH="internal/core/ports/application/mockservice/auth"
+mockery --dir "$AUTH_SERVICE_PATH" --name IService --outpkg auth --structname Service --output "$MOCK_AUTH_SERVICE_PATH" --filename mock_service.go
+
 # Generate a mock object related to healthcheck's service.
 HEALTHCHECK_SERVICE_PATH="internal/core/ports/application/service/healthcheck"
 MOCK_HEALTHCHECK_SERVICE_PATH="internal/core/ports/application/mockservice/healthcheck"
 mockery --dir "$HEALTHCHECK_SERVICE_PATH" --name IService --outpkg healthcheck --structname Service --output "$MOCK_HEALTHCHECK_SERVICE_PATH" --filename mock_service.go
+
+# Generate a mock object related to user service.
+USER_SERVICE_PATH="internal/core/ports/application/service/user"
+MOCK_USER_SERVICE_PATH="internal/core/ports/application/mockservice/user"
+mockery --dir "$USER_SERVICE_PATH" --name IService --outpkg user --structname Service --output "$MOCK_USER_SERVICE_PATH" --filename mock_service.go
 
 #
 # PKG
