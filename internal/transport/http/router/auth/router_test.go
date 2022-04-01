@@ -1,103 +1,85 @@
 package auth_test
 
 import (
-	"net/http"
 	"reflect"
 	"runtime"
 	"testing"
 
-	fake "github.com/brianvoe/gofakeit/v5"
-	"github.com/gorilla/mux"
-	"github.com/icaroribeiro/go-code-challenge-template/internal/interfaces/httputil"
-	routerpkg "github.com/icaroribeiro/go-code-challenge-template/internal/interfaces/router"
+	authmockservice "github.com/icaroribeiro/new-go-code-challenge-template/internal/core/ports/application/mockservice/auth"
+	dbtrxmiddleware "github.com/icaroribeiro/new-go-code-challenge-template/internal/infrastructure/storage/datastore/middleware/dbtrx"
+	authhandler "github.com/icaroribeiro/new-go-code-challenge-template/internal/transport/http/presentation/handler/auth"
+	authrouter "github.com/icaroribeiro/new-go-code-challenge-template/internal/transport/http/router/auth"
+	authpkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/auth"
+	adapterhttputilpkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/httputil/adapter"
+	routehttputilpkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/httputil/route"
+	authmiddlewarepkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/middleware/auth"
+	loggingmiddlewarepkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/middleware/logging"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/suite"
+	"gorm.io/gorm"
 )
 
-func TestRouter(t *testing.T) {
+func TestRouterUnit(t *testing.T) {
 	suite.Run(t, new(TestSuite))
 }
 
-func (ts *TestSuite) TestGetInstance() {
-	r := &mux.Router{}
+func (ts *TestSuite) TestConfigureRoutes() {
+	routes := routehttputilpkg.Routes{}
+
+	db := &gorm.DB{}
+	timeBeforeTokenExpTimeInSec := 10
+	authInfra := authpkg.New(authpkg.RSAKeys{})
+
+	authService := new(authmockservice.Service)
+	authHandler := authhandler.New(authService)
+
+	adapters := map[string]adapterhttputilpkg.Adapter{
+		"loggingMiddleware": loggingmiddlewarepkg.Logging(),
+		"authMiddleware":    authmiddlewarepkg.Auth(db, authInfra, timeBeforeTokenExpTimeInSec),
+		"dbTrxMiddleware":   dbtrxmiddleware.DBTrx(db),
+	}
 
 	ts.Cases = Cases{
 		{
-			Context: "ItShouldSucceedInGettingTheRouterInstance",
+			Context: "ItShouldSucceedInConfiguringTheRoutes",
 			SetUp: func(t *testing.T) {
-				r = mux.NewRouter()
-			},
-			WantError: false,
-		},
-	}
-
-	for _, tc := range ts.Cases {
-		ts.T().Run(tc.Context, func(t *testing.T) {
-			tc.SetUp(t)
-
-			router := routerpkg.New()
-
-			returnedRouter := router.GetInstance()
-
-			if !tc.WantError {
-				assert.Equal(t, r, returnedRouter)
-			}
-		})
-	}
-}
-
-func (ts *TestSuite) TestSetRoutes() {
-	route := httputil.Route{}
-
-	handlerFunc := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.WriteHeader(http.StatusOK)
-	})
-
-	routes := make(httputil.Routes, 0)
-
-	r := &mux.Router{}
-
-	ts.Cases = Cases{
-		{
-			Context: "ItShouldSucceedInSettingTheSwaggerRoute",
-			SetUp: func(t *testing.T) {
-				route = httputil.Route{
-					Name:        "Swagger",
-					Method:      fake.RandomString([]string{"GET", "POST", "PUT", "DELETE"}),
-					PathPrefix:  fake.Word(),
-					HandlerFunc: handlerFunc,
+				routes = routehttputilpkg.Routes{
+					routehttputilpkg.Route{
+						Name:   "SignUp",
+						Method: "POST",
+						Path:   "/sign_up",
+						HandlerFunc: adapterhttputilpkg.AdaptFunc(authHandler.SignUp).
+							With(adapters["loggingMiddleware"], adapters["dbTrxMiddleware"]),
+					},
+					routehttputilpkg.Route{
+						Name:   "SignIn",
+						Method: "POST",
+						Path:   "/sign_in",
+						HandlerFunc: adapterhttputilpkg.AdaptFunc(authHandler.SignIn).
+							With(adapters["loggingMiddleware"], adapters["dbTrxMiddleware"]),
+					},
+					routehttputilpkg.Route{
+						Name:   "RefreshToken",
+						Method: "POST",
+						Path:   "/refresh_token",
+						HandlerFunc: adapterhttputilpkg.AdaptFunc(authHandler.RefreshToken).
+							With(adapters["loggingMiddleware"], adapters["authMiddleware"]),
+					},
+					routehttputilpkg.Route{
+						Name:   "ChangePassword",
+						Method: "POST",
+						Path:   "/change_password",
+						HandlerFunc: adapterhttputilpkg.AdaptFunc(authHandler.ChangePassword).
+							With(adapters["loggingMiddleware"], adapters["authMiddleware"]),
+					},
+					routehttputilpkg.Route{
+						Name:   "SignOut",
+						Method: "POST",
+						Path:   "/sign_out",
+						HandlerFunc: adapterhttputilpkg.AdaptFunc(authHandler.SignOut).
+							With(adapters["loggingMiddleware"], adapters["authMiddleware"]),
+					},
 				}
-				r = mux.NewRouter()
-				r.Name(route.Name).
-					Methods(route.Method).
-					PathPrefix(route.PathPrefix).
-					HandlerFunc(route.HandlerFunc)
-				routes = append(routes, route)
-			},
-			WantError: false,
-			TearDown: func(t *testing.T) {
-				routes = make(httputil.Routes, 0)
-			},
-		},
-		{
-			Context: "ItShouldSucceedInSettingAnyOtherRoute",
-			SetUp: func(t *testing.T) {
-				route = httputil.Route{
-					Name:        "AnyOtherRoute",
-					Method:      fake.RandomString([]string{"GET", "POST", "PUT", "DELETE"}),
-					Path:        fake.Word(),
-					HandlerFunc: handlerFunc,
-				}
-				r = mux.NewRouter()
-				r.Name(route.Name).
-					Methods(route.Method).
-					Path(route.Path).
-					HandlerFunc(route.HandlerFunc)
-				routes = append(routes, route)
-			},
-			WantError: false,
-			TearDown: func(t *testing.T) {
-				routes = make(httputil.Routes, 0)
 			},
 		},
 	}
@@ -106,94 +88,17 @@ func (ts *TestSuite) TestSetRoutes() {
 		ts.T().Run(tc.Context, func(t *testing.T) {
 			tc.SetUp(t)
 
-			router := routerpkg.New()
+			returnedRoutes := authrouter.ConfigureRoutes(authHandler, adapters)
 
-			router.SetRoutes(routes)
+			assert.Equal(t, len(routes), len(returnedRoutes))
 
-			returnedRouter := router.GetInstance()
-
-			if !tc.WantError {
-				assert.Equal(t, r.GetRoute(route.Name), returnedRouter.GetRoute(route.Name))
-			}
-
-			tc.TearDown(t)
-		})
-	}
-}
-
-func (ts *TestSuite) TestSetNotFoundHandler() {
-	r := &mux.Router{}
-
-	handlerFunc := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.WriteHeader(http.StatusNotFound)
-	})
-
-	ts.Cases = Cases{
-		{
-			Context: "ItShouldSucceedInSettingTheNotFoundHandler",
-			SetUp: func(t *testing.T) {
-				r = mux.NewRouter()
-				r.NotFoundHandler = handlerFunc
-			},
-			WantError: false,
-		},
-	}
-
-	for _, tc := range ts.Cases {
-		ts.T().Run(tc.Context, func(t *testing.T) {
-			tc.SetUp(t)
-
-			router := routerpkg.New()
-
-			router.SetNotFoundHandler(handlerFunc)
-
-			returnedRouter := router.GetInstance()
-
-			// It is necessary to compare function "equality".
-			handler1 := runtime.FuncForPC(reflect.ValueOf(r.NotFoundHandler).Pointer()).Name()
-			handler2 := runtime.FuncForPC(reflect.ValueOf(returnedRouter.NotFoundHandler).Pointer()).Name()
-
-			if !tc.WantError {
-				assert.Equal(t, handler1, handler2)
-			}
-		})
-	}
-}
-
-func (ts *TestSuite) TestSetMethodNotAllowedHandler() {
-	r := &mux.Router{}
-
-	handlerFunc := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.WriteHeader(http.StatusMethodNotAllowed)
-	})
-
-	ts.Cases = Cases{
-		{
-			Context: "ItShouldSucceedInSettingTheMethodNotAllowedHandler",
-			SetUp: func(t *testing.T) {
-				r = mux.NewRouter()
-				r.MethodNotAllowedHandler = handlerFunc
-			},
-			WantError: false,
-		},
-	}
-
-	for _, tc := range ts.Cases {
-		ts.T().Run(tc.Context, func(t *testing.T) {
-			tc.SetUp(t)
-
-			router := routerpkg.New()
-
-			router.SetMethodNotAllowedHandler(handlerFunc)
-
-			returnedRouter := router.GetInstance()
-
-			// It is necessary to compare function "equality".
-			handler1 := runtime.FuncForPC(reflect.ValueOf(r.MethodNotAllowedHandler).Pointer()).Name()
-			handler2 := runtime.FuncForPC(reflect.ValueOf(returnedRouter.MethodNotAllowedHandler).Pointer()).Name()
-
-			if !tc.WantError {
-				assert.Equal(t, handler1, handler2)
+			for i := range routes {
+				assert.Equal(t, routes[i].Name, returnedRoutes[i].Name)
+				assert.Equal(t, routes[i].Method, returnedRoutes[i].Method)
+				assert.Equal(t, routes[i].Path, returnedRoutes[i].Path)
+				handlerFunc1 := runtime.FuncForPC(reflect.ValueOf(routes[i].HandlerFunc).Pointer()).Name()
+				handlerFunc2 := runtime.FuncForPC(reflect.ValueOf(returnedRoutes[i].HandlerFunc).Pointer()).Name()
+				assert.Equal(t, handlerFunc1, handlerFunc2)
 			}
 		})
 	}
