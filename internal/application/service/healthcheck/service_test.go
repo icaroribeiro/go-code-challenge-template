@@ -10,7 +10,7 @@ import (
 	"github.com/stretchr/testify/suite"
 )
 
-func TestService(t *testing.T) {
+func TestServiceUnit(t *testing.T) {
 	suite.Run(t, new(TestSuite))
 }
 

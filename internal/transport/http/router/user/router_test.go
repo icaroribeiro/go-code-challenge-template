@@ -1,200 +1,75 @@
 package user_test
 
-// import (
-// 	"net/http"
-// 	"reflect"
-// 	"runtime"
-// 	"testing"
+import (
+	"reflect"
+	"runtime"
+	"testing"
 
-// 	fake "github.com/brianvoe/gofakeit/v5"
-// 	"github.com/gorilla/mux"
-// 	"github.com/icaroribeiro/go-code-challenge-template/internal/interfaces/httputil"
-// 	routerpkg "github.com/icaroribeiro/go-code-challenge-template/internal/interfaces/router"
-// 	"github.com/stretchr/testify/assert"
-// 	"github.com/stretchr/testify/suite"
-// )
+	usermockservice "github.com/icaroribeiro/new-go-code-challenge-template/internal/core/ports/application/mockservice/user"
+	userhandler "github.com/icaroribeiro/new-go-code-challenge-template/internal/transport/http/presentation/handler/user"
+	userrouter "github.com/icaroribeiro/new-go-code-challenge-template/internal/transport/http/router/user"
+	authpkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/auth"
+	adapterhttputilpkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/httputil/adapter"
+	routehttputilpkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/httputil/route"
+	authmiddlewarepkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/middleware/auth"
+	loggingmiddlewarepkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/middleware/logging"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/suite"
+	"gorm.io/gorm"
+)
 
-// func TestRouter(t *testing.T) {
-// 	suite.Run(t, new(TestSuite))
-// }
+func TestRouterUnit(t *testing.T) {
+	suite.Run(t, new(TestSuite))
+}
 
-// func (ts *TestSuite) TestGetInstance() {
-// 	r := &mux.Router{}
+func (ts *TestSuite) TestConfigureRoutes() {
+	routes := routehttputilpkg.Routes{}
 
-// 	ts.Cases = Cases{
-// 		{
-// 			Context: "ItShouldSucceedInGettingTheRouterInstance",
-// 			SetUp: func(t *testing.T) {
-// 				r = mux.NewRouter()
-// 			},
-// 			WantError: false,
-// 		},
-// 	}
+	db := &gorm.DB{}
+	timeBeforeTokenExpTimeInSec := 10
+	userInfra := authpkg.New(authpkg.RSAKeys{})
 
-// 	for _, tc := range ts.Cases {
-// 		ts.T().Run(tc.Context, func(t *testing.T) {
-// 			tc.SetUp(t)
+	userService := new(usermockservice.Service)
+	userHandler := userhandler.New(userService)
 
-// 			router := routerpkg.New()
+	adapters := map[string]adapterhttputilpkg.Adapter{
+		"loggingMiddleware": loggingmiddlewarepkg.Logging(),
+		"authMiddleware":    authmiddlewarepkg.Auth(db, userInfra, timeBeforeTokenExpTimeInSec),
+	}
 
-// 			returnedRouter := router.GetInstance()
+	ts.Cases = Cases{
+		{
+			Context: "ItShouldSucceedInConfiguringTheRoutes",
+			SetUp: func(t *testing.T) {
+				routes = routehttputilpkg.Routes{
+					routehttputilpkg.Route{
+						Name:   "GetAllUsers",
+						Method: "GET",
+						Path:   "/users",
+						HandlerFunc: adapterhttputilpkg.AdaptFunc(userHandler.GetAll).
+							With(adapters["loggingMiddleware"], adapters["authMiddleware"]),
+					},
+				}
+			},
+		},
+	}
 
-// 			if !tc.WantError {
-// 				assert.Equal(t, r, returnedRouter)
-// 			}
-// 		})
-// 	}
-// }
+	for _, tc := range ts.Cases {
+		ts.T().Run(tc.Context, func(t *testing.T) {
+			tc.SetUp(t)
 
-// func (ts *TestSuite) TestSetRoutes() {
-// 	route := httputil.Route{}
+			returnedRoutes := userrouter.ConfigureRoutes(userHandler, adapters)
 
-// 	handlerFunc := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-// 		w.WriteHeader(http.StatusOK)
-// 	})
+			assert.Equal(t, len(routes), len(returnedRoutes))
 
-// 	routes := make(httputil.Routes, 0)
-
-// 	r := &mux.Router{}
-
-// 	ts.Cases = Cases{
-// 		{
-// 			Context: "ItShouldSucceedInSettingTheSwaggerRoute",
-// 			SetUp: func(t *testing.T) {
-// 				route = httputil.Route{
-// 					Name:        "Swagger",
-// 					Method:      fake.RandomString([]string{"GET", "POST", "PUT", "DELETE"}),
-// 					PathPrefix:  fake.Word(),
-// 					HandlerFunc: handlerFunc,
-// 				}
-// 				r = mux.NewRouter()
-// 				r.Name(route.Name).
-// 					Methods(route.Method).
-// 					PathPrefix(route.PathPrefix).
-// 					HandlerFunc(route.HandlerFunc)
-// 				routes = append(routes, route)
-// 			},
-// 			WantError: false,
-// 			TearDown: func(t *testing.T) {
-// 				routes = make(httputil.Routes, 0)
-// 			},
-// 		},
-// 		{
-// 			Context: "ItShouldSucceedInSettingAnyOtherRoute",
-// 			SetUp: func(t *testing.T) {
-// 				route = httputil.Route{
-// 					Name:        "AnyOtherRoute",
-// 					Method:      fake.RandomString([]string{"GET", "POST", "PUT", "DELETE"}),
-// 					Path:        fake.Word(),
-// 					HandlerFunc: handlerFunc,
-// 				}
-// 				r = mux.NewRouter()
-// 				r.Name(route.Name).
-// 					Methods(route.Method).
-// 					Path(route.Path).
-// 					HandlerFunc(route.HandlerFunc)
-// 				routes = append(routes, route)
-// 			},
-// 			WantError: false,
-// 			TearDown: func(t *testing.T) {
-// 				routes = make(httputil.Routes, 0)
-// 			},
-// 		},
-// 	}
-
-// 	for _, tc := range ts.Cases {
-// 		ts.T().Run(tc.Context, func(t *testing.T) {
-// 			tc.SetUp(t)
-
-// 			router := routerpkg.New()
-
-// 			router.SetRoutes(routes)
-
-// 			returnedRouter := router.GetInstance()
-
-// 			if !tc.WantError {
-// 				assert.Equal(t, r.GetRoute(route.Name), returnedRouter.GetRoute(route.Name))
-// 			}
-
-// 			tc.TearDown(t)
-// 		})
-// 	}
-// }
-
-// func (ts *TestSuite) TestSetNotFoundHandler() {
-// 	r := &mux.Router{}
-
-// 	handlerFunc := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-// 		w.WriteHeader(http.StatusNotFound)
-// 	})
-
-// 	ts.Cases = Cases{
-// 		{
-// 			Context: "ItShouldSucceedInSettingTheNotFoundHandler",
-// 			SetUp: func(t *testing.T) {
-// 				r = mux.NewRouter()
-// 				r.NotFoundHandler = handlerFunc
-// 			},
-// 			WantError: false,
-// 		},
-// 	}
-
-// 	for _, tc := range ts.Cases {
-// 		ts.T().Run(tc.Context, func(t *testing.T) {
-// 			tc.SetUp(t)
-
-// 			router := routerpkg.New()
-
-// 			router.SetNotFoundHandler(handlerFunc)
-
-// 			returnedRouter := router.GetInstance()
-
-// 			// It is necessary to compare function "equality".
-// 			handler1 := runtime.FuncForPC(reflect.ValueOf(r.NotFoundHandler).Pointer()).Name()
-// 			handler2 := runtime.FuncForPC(reflect.ValueOf(returnedRouter.NotFoundHandler).Pointer()).Name()
-
-// 			if !tc.WantError {
-// 				assert.Equal(t, handler1, handler2)
-// 			}
-// 		})
-// 	}
-// }
-
-// func (ts *TestSuite) TestSetMethodNotAllowedHandler() {
-// 	r := &mux.Router{}
-
-// 	handlerFunc := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-// 		w.WriteHeader(http.StatusMethodNotAllowed)
-// 	})
-
-// 	ts.Cases = Cases{
-// 		{
-// 			Context: "ItShouldSucceedInSettingTheMethodNotAllowedHandler",
-// 			SetUp: func(t *testing.T) {
-// 				r = mux.NewRouter()
-// 				r.MethodNotAllowedHandler = handlerFunc
-// 			},
-// 			WantError: false,
-// 		},
-// 	}
-
-// 	for _, tc := range ts.Cases {
-// 		ts.T().Run(tc.Context, func(t *testing.T) {
-// 			tc.SetUp(t)
-
-// 			router := routerpkg.New()
-
-// 			router.SetMethodNotAllowedHandler(handlerFunc)
-
-// 			returnedRouter := router.GetInstance()
-
-// 			// It is necessary to compare function "equality".
-// 			handler1 := runtime.FuncForPC(reflect.ValueOf(r.MethodNotAllowedHandler).Pointer()).Name()
-// 			handler2 := runtime.FuncForPC(reflect.ValueOf(returnedRouter.MethodNotAllowedHandler).Pointer()).Name()
-
-// 			if !tc.WantError {
-// 				assert.Equal(t, handler1, handler2)
-// 			}
-// 		})
-// 	}
-// }
+			for i := range routes {
+				assert.Equal(t, routes[i].Name, returnedRoutes[i].Name)
+				assert.Equal(t, routes[i].Method, returnedRoutes[i].Method)
+				assert.Equal(t, routes[i].Path, returnedRoutes[i].Path)
+				handlerFunc1 := runtime.FuncForPC(reflect.ValueOf(routes[i].HandlerFunc).Pointer()).Name()
+				handlerFunc2 := runtime.FuncForPC(reflect.ValueOf(returnedRoutes[i].HandlerFunc).Pointer()).Name()
+				assert.Equal(t, handlerFunc1, handlerFunc2)
+			}
+		})
+	}
+}

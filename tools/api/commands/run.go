@@ -93,6 +93,13 @@ func execRunCmd(cmd *cobra.Command, args []string) {
 	defer datastore.Close()
 
 	db := datastore.GetInstance()
+	if db == nil {
+		log.Panicf("The database instance is null")
+	}
+
+	if err = db.Error; err != nil {
+		log.Panicf("Got error when acessing the database instance: %s", err.Error())
+	}
 
 	// validationFuncs := map[string]validatorv2.ValidationFunc{
 	// 	"uuid": uuidvalidator.Validate,

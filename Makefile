@@ -22,7 +22,7 @@ doc/api:
 	swag init -g ./cmd/api/main.go -o ./docs/api/swagger
 
 test/api:
-	. ./scripts/setup_env_vars.sh;
+	. ./scripts/setup_env_vars.test.sh;
 	go test ./... -v -coverprofile=./docs/api/tests/unit/coverage.out
 
 analyze/api:

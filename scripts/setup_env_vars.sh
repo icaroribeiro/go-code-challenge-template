@@ -1,18 +1,25 @@
 #!/bin/bash
 
-# HTTP server settings.
-export HTTP_HOST="localhost"
+#
+# HTTP server settings
+#
 export HTTP_PORT="8080"
 
-# RSA Keys.
-export RSA_PUBLIC_KEY_PATH="./configs/auth/rsa_keys/rsa.public"
-export RSA_PRIVATE_KEY_PATH="./configs/auth/rsa_keys/rsa.private"
+#
+# RSA Keys
+#
+export RSA_PUBLIC_KEY_PATH="./tests/configs/auth/rsa_keys/rsa.public"
+export RSA_PRIVATE_KEY_PATH="./tests/configs/auth/rsa_keys/rsa.private"
 
-# JWT settings.
+#
+# JWT settings
+#
 export TOKEN_EXP_TIME_IN_SEC="600"
 export TIME_BEFORE_TOKEN_EXP_TIME_IN_SEC="60"
 
-# Database settings.
+#
+# Database settings
+#
 export DB_DRIVER="postgres"
 export DB_USER="postgres"
 export DB_PASSWORD="postgres"
