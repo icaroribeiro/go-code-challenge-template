@@ -26,11 +26,9 @@ func (ts *TestSuite) TestConfigureRoutes() {
 	healthCheckService := new(healthcheckmockservice.Service)
 	healthCheckHandler := healthcheckhandler.New(healthCheckService)
 
-	adapters := []adapterhttputilpkg.Adapter{}
-
-	loggingMiddleware := loggingmiddlewarepkg.Logging()
-
-	adapters = append(adapters, loggingMiddleware)
+	adapters := map[string]adapterhttputilpkg.Adapter{
+		"loggingMiddleware": loggingmiddlewarepkg.Logging(),
+	}
 
 	ts.Cases = Cases{
 		{
@@ -42,7 +40,7 @@ func (ts *TestSuite) TestConfigureRoutes() {
 						Method: http.MethodGet,
 						Path:   "/status",
 						HandlerFunc: adapterhttputilpkg.AdaptFunc(healthCheckHandler.GetStatus).
-							With(adapters...),
+							With(adapters["loggingMiddleware"]),
 					},
 				}
 			},

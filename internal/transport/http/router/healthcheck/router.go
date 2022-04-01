@@ -9,14 +9,14 @@ import (
 )
 
 // ConfigureRoutes is the function that arranges the healthcheck's routes.
-func ConfigureRoutes(healthCheckHandler healthcheckhandler.IHandler, adapters []adapterhttputilpkg.Adapter) routehttputilpkg.Routes {
+func ConfigureRoutes(healthCheckHandler healthcheckhandler.IHandler, adapters map[string]adapterhttputilpkg.Adapter) routehttputilpkg.Routes {
 	return routehttputilpkg.Routes{
 		routehttputilpkg.Route{
 			Name:   "GetStatus",
 			Method: http.MethodGet,
 			Path:   "/status",
 			HandlerFunc: adapterhttputilpkg.AdaptFunc(healthCheckHandler.GetStatus).
-				With(adapters...),
+				With(adapters["loggingMiddleware"]),
 		},
 	}
 }

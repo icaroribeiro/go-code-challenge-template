@@ -8,14 +8,14 @@ import (
 )
 
 // ConfigureRoutes is the function that arranges the swagger's routes.
-func ConfigureRoutes(swaggerHandler http.HandlerFunc, adapters []adapterhttputilpkg.Adapter) routehttputilpkg.Routes {
+func ConfigureRoutes(swaggerHandler http.HandlerFunc, adapters map[string]adapterhttputilpkg.Adapter) routehttputilpkg.Routes {
 	return routehttputilpkg.Routes{
 		routehttputilpkg.Route{
 			Name:       "Swagger",
 			Method:     http.MethodGet,
 			PathPrefix: "/swagger",
 			HandlerFunc: adapterhttputilpkg.AdaptFunc(swaggerHandler).
-				With(adapters...),
+				With(adapters["loggingMiddleware"]),
 		},
 	}
 }

@@ -24,11 +24,9 @@ func (ts *TestSuite) TestConfigureRoutes() {
 
 	swaggerHandler := httpswaggerpkg.WrapHandler
 
-	adapters := []adapterhttputilpkg.Adapter{}
-
-	loggingMiddleware := loggingmiddlewarepkg.Logging()
-
-	adapters = append(adapters, loggingMiddleware)
+	adapters := map[string]adapterhttputilpkg.Adapter{
+		"loggingMiddleware": loggingmiddlewarepkg.Logging(),
+	}
 
 	ts.Cases = Cases{
 		{
@@ -40,7 +38,7 @@ func (ts *TestSuite) TestConfigureRoutes() {
 						Method:     http.MethodGet,
 						PathPrefix: "/swagger",
 						HandlerFunc: adapterhttputilpkg.AdaptFunc(swaggerHandler).
-							With(adapters...),
+							With(adapters["loggingMiddleware"]),
 					},
 				}
 			},

@@ -3,19 +3,24 @@ package commands
 import (
 	"context"
 	"fmt"
+	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
 	"os/signal"
+	"strconv"
 	"syscall"
 	"time"
 
+	"github.com/dgrijalva/jwt-go"
 	"github.com/gorilla/mux"
 	_ "github.com/icaroribeiro/new-go-code-challenge-template/docs/api/swagger"
 	healthcheckservice "github.com/icaroribeiro/new-go-code-challenge-template/internal/application/service/healthcheck"
+	dbtrxmiddleware "github.com/icaroribeiro/new-go-code-challenge-template/internal/infrastructure/storage/datastore/middleware/dbtrx"
 	healthcheckhandler "github.com/icaroribeiro/new-go-code-challenge-template/internal/transport/http/presentation/handler/healthcheck"
 	healthcheckrouter "github.com/icaroribeiro/new-go-code-challenge-template/internal/transport/http/router/healthcheck"
 	swaggerrouter "github.com/icaroribeiro/new-go-code-challenge-template/internal/transport/http/router/swagger"
+	authpkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/auth"
 	datastorepkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/datastore"
 	envpkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/env"
 	handlerhttputilpkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/httputil/handler"
@@ -27,6 +32,7 @@ import (
 	//uuidvalidator "github.com/icaroribeiro/new-go-code-challenge-template/pkg/validator/uuid"
 	//validatorv2 "gopkg.in/validator.v2"
 	adapterhttputilpkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/httputil/adapter"
+	authmiddlewarepkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/middleware/auth"
 	loggingmiddlewarepkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/middleware/logging"
 	httpswaggerpkg "github.com/swaggo/http-swagger"
 )
@@ -42,6 +48,11 @@ var (
 
 	httpPort = envpkg.GetEnvWithDefaultValue("HTTP_PORT", "8080")
 
+	publicKeyPath                  = envpkg.GetEnvWithDefaultValue("RSA_PUBLIC_KEY_PATH", "./configs/auth/rsa_keys/rsa.public")
+	privateKeyPath                 = envpkg.GetEnvWithDefaultValue("RSA_PRIVATE_KEY_PATH", "./configs/auth/rsa_keys/rsa.private")
+	tokenExpTimeInSecStr           = envpkg.GetEnvWithDefaultValue("TOKEN_EXP_TIME_IN_SEC", "600")
+	timeBeforeTokenExpTimeInSecStr = envpkg.GetEnvWithDefaultValue("TIME_BEFORE_TOKEN_EXP_TIME_IN_SEC", "60")
+
 	dbDriver   = envpkg.GetEnvWithDefaultValue("DB_DRIVER", "postgres")
 	dbUser     = envpkg.GetEnvWithDefaultValue("DB_USER", "postgres")
 	dbPassword = envpkg.GetEnvWithDefaultValue("DB_PASSWORD", "postgres")
@@ -52,6 +63,23 @@ var (
 
 func execRunCmd(cmd *cobra.Command, args []string) {
 	tcpAddress := setupTcpAddress()
+
+	rsaKeys, err := setupRSAKeys()
+	if err != nil {
+		log.Panic(err.Error())
+	}
+
+	authInfra := authpkg.New(rsaKeys)
+
+	tokenExpTimeInSec, err := strconv.Atoi(tokenExpTimeInSecStr)
+	if err != nil {
+		log.Panic(err.Error())
+	}
+
+	timeBeforeTokenExpTimeInSec, err := strconv.Atoi(timeBeforeTokenExpTimeInSecStr)
+	if err != nil {
+		log.Panic(err.Error())
+	}
 
 	dbConfig, err := setupDBConfig()
 	if err != nil {
@@ -75,23 +103,24 @@ func execRunCmd(cmd *cobra.Command, args []string) {
 	// 	log.Panic(err.Error())
 	// }
 
-	loggingMiddleware := loggingmiddlewarepkg.Logging()
-	//dbTrxMiddleware := dbtrxmiddleware.DBTrx(db)
-	//authMiddleware := authmiddlewarepkg.Auth(db, authInfra, timeBeforeTokenExpTimeInSec)
+	adapters := map[string]adapterhttputilpkg.Adapter{
+		"loggingMiddleware": loggingmiddlewarepkg.Logging(),
+		"authMiddleware":    authmiddlewarepkg.Auth(db, authInfra, timeBeforeTokenExpTimeInSec),
+		"dbTrxMiddleware":   dbtrxmiddleware.DBTrx(db),
+	}
 
 	routes := make(routehttputilpkg.Routes, 0)
 
 	swaggerHandler := httpswaggerpkg.WrapHandler
-	swaggerHandlerAdapters := []adapterhttputilpkg.Adapter{loggingMiddleware}
-	routes = append(routes, swaggerrouter.ConfigureRoutes(swaggerHandler, swaggerHandlerAdapters)...)
+	routes = append(routes, swaggerrouter.ConfigureRoutes(swaggerHandler, adapters)...)
 
 	// auth
 	// -----
+	log.Println(tokenExpTimeInSec)
 
 	healthCheckService := healthcheckservice.New(db)
 	healthCheckHandler := healthcheckhandler.New(healthCheckService)
-	healthCheckHandlerAdapters := []adapterhttputilpkg.Adapter{loggingMiddleware}
-	routes = append(routes, healthcheckrouter.ConfigureRoutes(healthCheckHandler, healthCheckHandlerAdapters)...)
+	routes = append(routes, healthcheckrouter.ConfigureRoutes(healthCheckHandler, adapters)...)
 
 	// user
 	// -----
@@ -123,6 +152,34 @@ func setupTcpAddress() string {
 	}
 
 	return fmt.Sprintf(":%s", httpPort)
+}
+
+// setupRSAKeys is the function that configures the RSA keys.
+func setupRSAKeys() (authpkg.RSAKeys, error) {
+	publicKey, err := ioutil.ReadFile(publicKeyPath)
+	if err != nil {
+		return authpkg.RSAKeys{}, fmt.Errorf("failed to read the RSA public key file: %s", err.Error())
+	}
+
+	rsaPublicKey, err := jwt.ParseRSAPublicKeyFromPEM(publicKey)
+	if err != nil {
+		return authpkg.RSAKeys{}, fmt.Errorf("failed to parse the RSA public key: %s", err.Error())
+	}
+
+	privateKey, err := ioutil.ReadFile(privateKeyPath)
+	if err != nil {
+		return authpkg.RSAKeys{}, fmt.Errorf("failed to read the RSA private key file: %s", err.Error())
+	}
+
+	rsaPrivateKey, err := jwt.ParseRSAPrivateKeyFromPEM(privateKey)
+	if err != nil {
+		return authpkg.RSAKeys{}, fmt.Errorf("failed to parse the RSA private key: %s", err.Error())
+	}
+
+	return authpkg.RSAKeys{
+		PublicKey:  rsaPublicKey,
+		PrivateKey: rsaPrivateKey,
+	}, nil
 }
 
 // setupDBConfig is the function that configures a map of parameters used to connect to the database.
