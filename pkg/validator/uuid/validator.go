@@ -24,7 +24,7 @@ func Validate(i interface{}, param string) error {
 
 	_, err := _uuid.FromString(id)
 	if err != nil {
-		return customerror.New("ID: it must contain an identifier following the UUID standard")
+		return customerror.New("The id must contain an identifier following the UUID standard")
 	}
 
 	return nil

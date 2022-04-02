@@ -24,7 +24,7 @@ func Validate(i interface{}, param string) error {
 	usernameRegex := regexp.MustCompile("[a-zA-Z0-9]{5,}")
 
 	if !usernameRegex.MatchString(username) {
-		return customerror.New("it must contain only letters and digit with at least 5 characters")
+		return customerror.New("The username must contain only letters and digit with at least 5 characters")
 	}
 
 	return nil

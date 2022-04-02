@@ -24,7 +24,7 @@ func Validate(i interface{}, param string) error {
 	passwordRegex := regexp.MustCompile("[a-zA-Z0-9]{8,}")
 
 	if !passwordRegex.MatchString(password) {
-		return customerror.New("it must contain only letters and digit with at least 8 characters")
+		return customerror.New("The password must contain only letters and digit with at least 8 characters")
 	}
 
 	return nil

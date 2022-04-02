@@ -4,6 +4,7 @@ import (
 	"log"
 	"testing"
 
+	datastoremodel "github.com/icaroribeiro/new-go-code-challenge-template/internal/infrastructure/storage/datastore/model"
 	datastorepkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/datastore"
 	envpkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/env"
 	validatorpkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/validator"
@@ -52,6 +53,12 @@ func setupDBConfig() (map[string]string, error) {
 	return dbConfig, nil
 }
 
+func deleteRecordsFromAllTables(ts *TestSuite) {
+	ts.DB.Delete(&datastoremodel.Auth{})
+	ts.DB.Delete(&datastoremodel.Login{})
+	ts.DB.Delete(&datastoremodel.User{})
+}
+
 func (ts *TestSuite) SetupSuite() {
 	dbConfig, err := setupDBConfig()
 	if err != nil {
@@ -71,6 +78,8 @@ func (ts *TestSuite) SetupSuite() {
 	if err = ts.DB.Error; err != nil {
 		log.Panicf("Got error when acessing the database instance: %s", err.Error())
 	}
+
+	deleteRecordsFromAllTables(ts)
 
 	validationFuncs := map[string]validatorv2.ValidationFunc{
 		"uuid": uuidvalidator.Validate,

@@ -19,10 +19,10 @@ package auth
 // 	AuthDatastoreRepository  authdsrepository.IRepository
 // 	UserDatastoreRepository  userdsrepository.IRepository
 // 	LoginDatastoreRepository logindsrepository.IRepository
-// 	AuthInfra         authinfra.IAuth
-// 	TokenExpTimeInSec int
-// 	Security          securitypkg.ISecurity
-// 	Validator         validatorpkg.IValidator
+// 	AuthInfra                authinfra.IAuth
+// 	TokenExpTimeInSec        int
+// 	Security                 securitypkg.ISecurity
+// 	Validator                validatorpkg.IValidator
 // }
 
 // // New is the factory function that encapsulates the implementation related to auth.
@@ -32,10 +32,10 @@ package auth
 // 		AuthDatastoreRepository:  authDatastoreRepository,
 // 		UserDatastoreRepository:  userDatastoreRepository,
 // 		LoginDatastoreRepository: loginDatastoreRepository,
-// 		AuthInfra:         authInfra,
-// 		TokenExpTimeInSec: tokenExpTimeInSec,
-// 		Security:          security,
-// 		Validator:         validator,
+// 		AuthInfra:                authInfra,
+// 		TokenExpTimeInSec:        tokenExpTimeInSec,
+// 		Security:                 security,
+// 		Validator:                validator,
 // 	}
 // }
 
@@ -185,9 +185,9 @@ package auth
 
 // // LogOut is the function that concludes the user access to the system.
 // func (a *Service) LogOut(id string) error {
-// 	// if err := a.Validator.Valid(id, "nonzero, uuid"); err != nil {
-// 	// 	return customerror.BadRequest.Newf("ID: %s", err.Error())
-// 	// }
+// 	if err := a.Validator.Valid(id, "nonzero, uuid"); err != nil {
+// 		return customerror.BadRequest.New(err.Error())
+// 	}
 
 // 	_, err := a.AuthDatastoreRepository.Delete(id)
 
