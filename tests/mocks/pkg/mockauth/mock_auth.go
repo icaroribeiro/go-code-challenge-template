@@ -79,13 +79,13 @@ func (_m *Auth) FetchAuthFromToken(token *jwt.Token) (model.Auth, error) {
 	return r0, r1
 }
 
-// ValidateTokenRenewal provides a mock function with given fields: tokenString, timeBeforeExpTimeInSec
-func (_m *Auth) ValidateTokenRenewal(tokenString string, timeBeforeExpTimeInSec int) (*jwt.Token, error) {
-	ret := _m.Called(tokenString, timeBeforeExpTimeInSec)
+// ValidateTokenRenewal provides a mock function with given fields: tokenString, timeBeforeTokenExpTimeInSec
+func (_m *Auth) ValidateTokenRenewal(tokenString string, timeBeforeTokenExpTimeInSec int) (*jwt.Token, error) {
+	ret := _m.Called(tokenString, timeBeforeTokenExpTimeInSec)
 
 	var r0 *jwt.Token
 	if rf, ok := ret.Get(0).(func(string, int) *jwt.Token); ok {
-		r0 = rf(tokenString, timeBeforeExpTimeInSec)
+		r0 = rf(tokenString, timeBeforeTokenExpTimeInSec)
 	} else {
 		if ret.Get(0) != nil {
 			r0 = ret.Get(0).(*jwt.Token)
@@ -94,7 +94,7 @@ func (_m *Auth) ValidateTokenRenewal(tokenString string, timeBeforeExpTimeInSec 
 
 	var r1 error
 	if rf, ok := ret.Get(1).(func(string, int) error); ok {
-		r1 = rf(tokenString, timeBeforeExpTimeInSec)
+		r1 = rf(tokenString, timeBeforeTokenExpTimeInSec)
 	} else {
 		r1 = ret.Error(1)
 	}

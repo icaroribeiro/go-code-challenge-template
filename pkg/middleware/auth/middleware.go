@@ -96,7 +96,7 @@ func Auth(db *gorm.DB, authN authpkg.IAuth) func(http.HandlerFunc) http.HandlerF
 }
 
 // AuthRenewal is the function that wraps a http.Handler to evaluate the authentication renewal of API based on a JWT token.
-func AuthRenewal(db *gorm.DB, authN authpkg.IAuth, timeBeforeExpTimeInSec int) func(http.HandlerFunc) http.HandlerFunc {
+func AuthRenewal(db *gorm.DB, authN authpkg.IAuth, timeBeforeTokenExpTimeInSec int) func(http.HandlerFunc) http.HandlerFunc {
 	return func(next http.HandlerFunc) http.HandlerFunc {
 		return func(w http.ResponseWriter, r *http.Request) {
 			tokenString, err := extractTokenString(w, r)
@@ -105,7 +105,7 @@ func AuthRenewal(db *gorm.DB, authN authpkg.IAuth, timeBeforeExpTimeInSec int) f
 				return
 			}
 
-			token, err := authN.ValidateTokenRenewal(tokenString, timeBeforeExpTimeInSec)
+			token, err := authN.ValidateTokenRenewal(tokenString, timeBeforeTokenExpTimeInSec)
 			if err != nil {
 				responsehttputilpkg.RespondErrorWithJson(w, customerror.Unauthorized.New(err.Error()))
 				return

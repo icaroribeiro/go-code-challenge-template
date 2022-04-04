@@ -196,7 +196,7 @@ func (ts *TestSuite) TestValidateTokenRenewal() {
 	authpkg := authpkg.New(rsaKeys)
 
 	tokenString := ""
-	timeBeforeExpTimeInSec := 60
+	timeBeforeTokenExpTimeInSec := 60
 
 	err := errors.New("")
 
@@ -291,7 +291,7 @@ func (ts *TestSuite) TestValidateTokenRenewal() {
 		ts.T().Run(tc.Context, func(t *testing.T) {
 			tc.SetUp(t)
 
-			token, err := authpkg.ValidateTokenRenewal(tokenString, timeBeforeExpTimeInSec)
+			token, err := authpkg.ValidateTokenRenewal(tokenString, timeBeforeTokenExpTimeInSec)
 
 			if !tc.WantError {
 				assert.Nil(t, err, fmt.Sprintf("Unexpected error: %v", err))

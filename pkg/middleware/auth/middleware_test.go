@@ -332,7 +332,7 @@ func (ts *TestSuite) TestAuth() {
 	bearerToken := []string{"", ""}
 
 	var token *jwt.Token
-	timeBeforeExpTimeInSec := 0
+	timeBeforeTokenExpTimeInSec := 0
 
 	headers := make(map[string][]string)
 
@@ -580,7 +580,7 @@ func (ts *TestSuite) TestAuth() {
 			authN.On("DecodeToken", bearerToken[1]).Return(returnArgs[0]...)
 			authN.On("FetchAuthFromToken", token).Return(returnArgs[1]...)
 
-			authMiddleware := authmiddlewarepkg.Auth(db, authN, timeBeforeExpTimeInSec)
+			authMiddleware := authmiddlewarepkg.Auth(db, authN, timeBeforeTokenExpTimeInSec)
 
 			handlerFunc := func(w http.ResponseWriter, r *http.Request) {
 				responsehttputilpkg.RespondWithJson(w, http.StatusOK, messagehttputilpkg.Message{Text: "OK"})
