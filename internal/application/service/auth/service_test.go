@@ -443,13 +443,13 @@ package auth_test
 // 			authDatastoreRepository := new(authdbrepositorymock.RepositoryMock)
 // 			authDatastoreRepository.On("Create", authdb).Return(returnArgs[4]...)
 
-// 			authInfra := new(authmock.AuthMock)
-// 			authInfra.On("CreateToken", newAuth, tokenExpTimeInSec).Return(returnArgs[5]...)
+// 			authN := new(authmock.AuthMock)
+// 			authN.On("CreateToken", newAuth, tokenExpTimeInSec).Return(returnArgs[5]...)
 
 // 			security := new(securitymock.SecurityMock)
 
 // 			authService := authservice.New(authDatastoreRepository, userDatastoreRepository, loginDatastoreRepository,
-// 				authInfra, tokenExpTimeInSec, security, validator)
+// 				authN, tokenExpTimeInSec, security, validator)
 
 // 			returnedToken, err := authService.Register(credentials)
 
@@ -747,13 +747,13 @@ package auth_test
 // 			authDatastoreRepository := new(authdbrepositorymock.RepositoryMock)
 // 			authDatastoreRepository.On("Create", authdb).Return(returnArgs[3]...)
 
-// 			authInfra := new(authmock.AuthMock)
-// 			authInfra.On("CreateToken", newAuth, tokenExpTimeInSec).Return(returnArgs[4]...)
+// 			authN := new(authmock.AuthMock)
+// 			authN.On("CreateToken", newAuth, tokenExpTimeInSec).Return(returnArgs[4]...)
 
 // 			userDatastoreRepository := new(userdbrepositorymock.RepositoryMock)
 
 // 			authService := authservice.New(authDatastoreRepository, userDatastoreRepository, loginDatastoreRepository,
-// 				authInfra, tokenExpTimeInSec, security, validator)
+// 				authN, tokenExpTimeInSec, security, validator)
 
 // 			returnedToken, err := authService.LogIn(credentials)
 
@@ -834,8 +834,8 @@ package auth_test
 // 			validator := new(validatormock.ValidatorMock)
 // 			validator.On("Validate", auth, "").Return(returnArgs[0]...)
 
-// 			authInfra := new(authmock.AuthMock)
-// 			authInfra.On("CreateToken", auth, tokenExpTimeInSec).Return(returnArgs[1]...)
+// 			authN := new(authmock.AuthMock)
+// 			authN.On("CreateToken", auth, tokenExpTimeInSec).Return(returnArgs[1]...)
 
 // 			authDatastoreRepository := new(authdbrepositorymock.RepositoryMock)
 // 			userDatastoreRepository := new(userdbrepositorymock.RepositoryMock)
@@ -843,7 +843,7 @@ package auth_test
 // 			security := new(securitymock.SecurityMock)
 
 // 			authService := authservice.New(authDatastoreRepository, userDatastoreRepository, loginDatastoreRepository,
-// 				authInfra, tokenExpTimeInSec, security, validator)
+// 				authN, tokenExpTimeInSec, security, validator)
 
 // 			returnedToken, err := authService.RenewToken(auth)
 
@@ -1172,10 +1172,10 @@ package auth_test
 
 // 			authDatastoreRepository := new(authdbrepositorymock.RepositoryMock)
 // 			userDatastoreRepository := new(userdbrepositorymock.RepositoryMock)
-// 			authInfra := new(authmock.AuthMock)
+// 			authN := new(authmock.AuthMock)
 
 // 			authService := authservice.New(authDatastoreRepository, userDatastoreRepository, loginDatastoreRepository,
-// 				authInfra, tokenExpTimeInSec, security, validator)
+// 				authN, tokenExpTimeInSec, security, validator)
 
 // 			err := authService.ModifyPassword(id, passwords)
 
@@ -1264,11 +1264,11 @@ package auth_test
 
 // 			userDatastoreRepository := new(userdbrepositorymock.RepositoryMock)
 // 			loginDatastoreRepository := new(logindbrepositorymock.RepositoryMock)
-// 			authInfra := new(authmock.AuthMock)
+// 			authN := new(authmock.AuthMock)
 // 			security := new(securitymock.SecurityMock)
 
 // 			authService := authservice.New(authDatastoreRepository, userDatastoreRepository, loginDatastoreRepository,
-// 				authInfra, tokenExpTimeInSec, security, validator)
+// 				authN, tokenExpTimeInSec, security, validator)
 
 // 			err := authService.LogOut(id)
 
@@ -1326,12 +1326,12 @@ package auth_test
 // 			loginDatastoreRepository := new(logindbrepositorymock.RepositoryMock)
 // 			loginDatastoreRepository.On("WithDBTrx", dbTrx).Return(returnArgs[2]...)
 
-// 			authInfra := new(authmock.AuthMock)
+// 			authN := new(authmock.AuthMock)
 // 			security := new(securitymock.SecurityMock)
 // 			validator := new(validatormock.ValidatorMock)
 
 // 			authService := authservice.New(authDatastoreRepository, userDatastoreRepository, loginDatastoreRepository,
-// 				authInfra, tokenExpTimeInSec, security, validator)
+// 				authN, tokenExpTimeInSec, security, validator)
 
 // 			returnedAuthService := authService.WithDBTrx(dbTrx)
 

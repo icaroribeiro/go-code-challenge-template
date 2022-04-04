@@ -6,8 +6,8 @@ import (
 	"testing"
 
 	usermockservice "github.com/icaroribeiro/new-go-code-challenge-template/internal/core/ports/application/mockservice/user"
-	userhandler "github.com/icaroribeiro/new-go-code-challenge-template/internal/transport/http/presentation/handler/user"
-	userrouter "github.com/icaroribeiro/new-go-code-challenge-template/internal/transport/http/router/user"
+	userhandler "github.com/icaroribeiro/new-go-code-challenge-template/internal/transport/presentation/handler/user"
+	userrouter "github.com/icaroribeiro/new-go-code-challenge-template/internal/transport/router/user"
 	authpkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/auth"
 	adapterhttputilpkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/httputil/adapter"
 	routehttputilpkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/httputil/route"
@@ -26,15 +26,14 @@ func (ts *TestSuite) TestConfigureRoutes() {
 	routes := routehttputilpkg.Routes{}
 
 	db := &gorm.DB{}
-	timeBeforeTokenExpTimeInSec := 10
-	userInfra := authpkg.New(authpkg.RSAKeys{})
+	authN := authpkg.New(authpkg.RSAKeys{})
 
 	userService := new(usermockservice.Service)
 	userHandler := userhandler.New(userService)
 
 	adapters := map[string]adapterhttputilpkg.Adapter{
 		"loggingMiddleware": loggingmiddlewarepkg.Logging(),
-		"authMiddleware":    authmiddlewarepkg.Auth(db, userInfra, timeBeforeTokenExpTimeInSec),
+		"authMiddleware":    authmiddlewarepkg.Auth(db, authN),
 	}
 
 	ts.Cases = Cases{

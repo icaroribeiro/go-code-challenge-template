@@ -23,7 +23,7 @@ func TestRepository(t *testing.T) {
 
 func (ts *TestSuite) TestCreate() {
 	driver := "postgres"
-	db, mock := NewMock(driver)
+	db, mock := NewMockDB(driver)
 
 	auth := domainmodel.Auth{}
 
@@ -210,7 +210,7 @@ func (ts *TestSuite) TestCreate() {
 
 func (ts *TestSuite) TestGetByUserID() {
 	driver := "postgres"
-	db, mock := NewMock(driver)
+	db, mock := NewMockDB(driver)
 
 	var userID uuid.UUID
 
@@ -284,7 +284,7 @@ func (ts *TestSuite) TestGetByUserID() {
 
 func (ts *TestSuite) TestDelete() {
 	driver := "postgres"
-	db, mock := NewMock(driver)
+	db, mock := NewMockDB(driver)
 
 	var id uuid.UUID
 
@@ -445,7 +445,7 @@ func (ts *TestSuite) TestDelete() {
 
 func (ts *TestSuite) TestWithDBTrx() {
 	driver := "postgres"
-	db, _ := NewMock(driver)
+	db, _ := NewMockDB(driver)
 
 	dbTrx := &gorm.DB{}
 

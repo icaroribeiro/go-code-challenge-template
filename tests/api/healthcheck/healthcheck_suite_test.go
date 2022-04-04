@@ -32,7 +32,7 @@ var (
 	dbPassword = envpkg.GetEnvWithDefaultValue("DB_PASSWORD", "postgres")
 	dbHost     = envpkg.GetEnvWithDefaultValue("DB_HOST", "localhost")
 	dbPort     = envpkg.GetEnvWithDefaultValue("DB_PORT", "5432")
-	dbName     = envpkg.GetEnvWithDefaultValue("DB_NAME", "db")
+	dbName     = envpkg.GetEnvWithDefaultValue("DB_NAME", "testdb")
 )
 
 func setupDBConfig() (map[string]string, error) {

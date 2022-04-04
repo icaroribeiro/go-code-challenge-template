@@ -17,9 +17,9 @@ import (
 	_ "github.com/icaroribeiro/new-go-code-challenge-template/docs/api/swagger"
 	healthcheckservice "github.com/icaroribeiro/new-go-code-challenge-template/internal/application/service/healthcheck"
 	dbtrxmiddleware "github.com/icaroribeiro/new-go-code-challenge-template/internal/infrastructure/storage/datastore/middleware/dbtrx"
-	healthcheckhandler "github.com/icaroribeiro/new-go-code-challenge-template/internal/transport/http/presentation/handler/healthcheck"
-	healthcheckrouter "github.com/icaroribeiro/new-go-code-challenge-template/internal/transport/http/router/healthcheck"
-	swaggerrouter "github.com/icaroribeiro/new-go-code-challenge-template/internal/transport/http/router/swagger"
+	healthcheckhandler "github.com/icaroribeiro/new-go-code-challenge-template/internal/transport/presentation/handler/healthcheck"
+	healthcheckrouter "github.com/icaroribeiro/new-go-code-challenge-template/internal/transport/router/healthcheck"
+	swaggerrouter "github.com/icaroribeiro/new-go-code-challenge-template/internal/transport/router/swagger"
 	authpkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/auth"
 	datastorepkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/datastore"
 	envpkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/env"
@@ -69,7 +69,7 @@ func execRunCmd(cmd *cobra.Command, args []string) {
 		log.Panic(err.Error())
 	}
 
-	authInfra := authpkg.New(rsaKeys)
+	authN := authpkg.New(rsaKeys)
 
 	tokenExpTimeInSec, err := strconv.Atoi(tokenExpTimeInSecStr)
 	if err != nil {
@@ -111,9 +111,10 @@ func execRunCmd(cmd *cobra.Command, args []string) {
 	// }
 
 	adapters := map[string]adapterhttputilpkg.Adapter{
-		"loggingMiddleware": loggingmiddlewarepkg.Logging(),
-		"authMiddleware":    authmiddlewarepkg.Auth(db, authInfra, timeBeforeTokenExpTimeInSec),
-		"dbTrxMiddleware":   dbtrxmiddleware.DBTrx(db),
+		"loggingMiddleware":     loggingmiddlewarepkg.Logging(),
+		"authMiddleware":        authmiddlewarepkg.Auth(db, authN),
+		"authRenewalMiddleware": authmiddlewarepkg.AuthRenewal(db, authN, timeBeforeTokenExpTimeInSec),
+		"dbTrxMiddleware":       dbtrxmiddleware.DBTrx(db),
 	}
 
 	routes := make(routehttputilpkg.Routes, 0)

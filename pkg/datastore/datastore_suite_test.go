@@ -28,7 +28,7 @@ type TestSuite struct {
 	PostgresDBConfigURL string
 }
 
-func NewMock(driver string) (*gorm.DB, sqlmock.Sqlmock) {
+func NewMockDB(driver string) (*gorm.DB, sqlmock.Sqlmock) {
 	errorMsg := "failed to open a stub database connection"
 
 	sqlDB, mock, err := sqlmock.New()

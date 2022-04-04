@@ -4,7 +4,7 @@ import (
 	"net/http"
 
 	userservice "github.com/icaroribeiro/new-go-code-challenge-template/internal/core/ports/application/service/user"
-	httppresentationmodel "github.com/icaroribeiro/new-go-code-challenge-template/internal/transport/http/presentation/model"
+	httppresentationmodel "github.com/icaroribeiro/new-go-code-challenge-template/internal/transport/presentation/model"
 	responsehttputilpkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/httputil/response"
 )
 

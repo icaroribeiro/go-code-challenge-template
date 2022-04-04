@@ -8,8 +8,8 @@ export HTTP_PORT="8080"
 #
 # RSA Keys
 #
-export RSA_PUBLIC_KEY_PATH="./configs/auth/rsa_keys/rsa.public"
-export RSA_PRIVATE_KEY_PATH="./configs/auth/rsa_keys/rsa.private"
+export RSA_PUBLIC_KEY_PATH="./tests/configs/auth/rsa_keys/rsa.public"
+export RSA_PRIVATE_KEY_PATH="./tests/configs/auth/rsa_keys/rsa.private"
 
 #
 # JWT settings
@@ -25,4 +25,4 @@ export DB_USER="postgres"
 export DB_PASSWORD="postgres"
 export DB_HOST="localhost"
 export DB_PORT="5432"
-export DB_NAME="db"
+export DB_NAME="testdb"

@@ -120,7 +120,7 @@ func (ts *TestSuite) TestClosePostgresDriver() {
 		{
 			Context: "ItShouldSucceedInClosingTheDatabase",
 			SetUp: func(t *testing.T) {
-				db, mock = NewMock(driver)
+				db, mock = NewMockDB(driver)
 				provider = datastorepkg.Provider{DB: db}
 				mock.ExpectClose()
 			},
@@ -130,7 +130,7 @@ func (ts *TestSuite) TestClosePostgresDriver() {
 		{
 			Context: "ItShouldFailIfAnErrorOccursWhenGettingTheSQLDatabase",
 			SetUp: func(t *testing.T) {
-				db, _ = NewMock(driver)
+				db, _ = NewMockDB(driver)
 				connPool = db.ConnPool
 				db.ConnPool = nil
 				provider = datastorepkg.Provider{DB: db}

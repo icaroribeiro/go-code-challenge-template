@@ -1,7 +1,7 @@
 package auth
 
 import (
-	authhandler "github.com/icaroribeiro/new-go-code-challenge-template/internal/transport/http/presentation/handler/auth"
+	authhandler "github.com/icaroribeiro/new-go-code-challenge-template/internal/transport/presentation/handler/auth"
 	adapterhttputilpkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/httputil/adapter"
 	routehttputilpkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/httputil/route"
 )
@@ -28,7 +28,7 @@ func ConfigureRoutes(authHandler authhandler.IHandler, adapters map[string]adapt
 			Method: "POST",
 			Path:   "/refresh_token",
 			HandlerFunc: adapterhttputilpkg.AdaptFunc(authHandler.RefreshToken).
-				With(adapters["loggingMiddleware"], adapters["authMiddleware"]),
+				With(adapters["loggingMiddleware"], adapters["authRenewalMiddleware"]),
 		},
 		routehttputilpkg.Route{
 			Name:   "ChangePassword",

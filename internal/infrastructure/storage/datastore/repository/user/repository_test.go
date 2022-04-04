@@ -24,7 +24,7 @@ func TestRepository(t *testing.T) {
 
 func (ts *TestSuite) TestCreate() {
 	driver := "postgres"
-	db, mock := NewMock(driver)
+	db, mock := NewMockDB(driver)
 
 	user := domainmodel.User{}
 
@@ -126,7 +126,7 @@ func (ts *TestSuite) TestCreate() {
 
 func (ts *TestSuite) TestGetAll() {
 	driver := "postgres"
-	db, mock := NewMock(driver)
+	db, mock := NewMockDB(driver)
 
 	user := domainmodel.User{}
 
@@ -185,7 +185,7 @@ func (ts *TestSuite) TestGetAll() {
 
 func (ts *TestSuite) TestWithDBTrx() {
 	driver := "postgres"
-	db, _ := NewMock(driver)
+	db, _ := NewMockDB(driver)
 
 	dbTrx := &gorm.DB{}
 

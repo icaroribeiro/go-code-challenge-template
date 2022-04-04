@@ -25,11 +25,27 @@ services:
       - ./database/postgres/.env
     restart: on-failure
     ports:
-      - "5432:5432"
+      - "5433:5432"
     expose:
-      - "5432"
+      - "5433"
     volumes:
       - postgresdb-data:/var/lib/postgresql/data
 
+  postgrestestdb:
+    container_name: postgrestestdb_container
+    build:
+      context: ./database/postgres
+      dockerfile: Dockerfile
+    env_file:
+      - ./database/postgres/.env.test
+    restart: on-failure
+    ports:
+      - "5434:5432"
+    expose:
+      - "5434"
+    volumes:
+      - postgrestestdb-data:/var/lib/postgresql/data
+
 volumes:
   postgresdb-data:
+  postgrestestdb-data:

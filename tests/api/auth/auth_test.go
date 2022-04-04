@@ -35,7 +35,7 @@ package auth_test
 // func (ts *TestSuite) TestSignUp() {
 // 	dbTrx := &gorm.DB{}
 
-// 	var authInfra authinfra.IAuth
+// 	var authN authinfra.IAuth
 
 // 	credentials := security.Credentials{}
 
@@ -50,7 +50,7 @@ package auth_test
 // 				dbTrx = ts.DB.Begin()
 // 				assert.Nil(t, dbTrx.Error, fmt.Sprintf("Unexpected error %v.", dbTrx.Error))
 
-// 				authInfra = authinfra.New(ts.RSAKeys)
+// 				authN = authinfra.New(ts.RSAKeys)
 
 // 				username := fake.Username()
 // 				password := fake.Password(true, true, true, false, false, 8)
@@ -80,7 +80,7 @@ package auth_test
 // 		{
 // 			Context: "ItShouldFailIfTheDatabaseTransactionFromTheRequestContextIsNull",
 // 			SetUp: func(t *testing.T) {
-// 				authInfra = authinfra.New(ts.RSAKeys)
+// 				authN = authinfra.New(ts.RSAKeys)
 
 // 				username := fake.Username()
 // 				password := fake.Password(true, true, true, false, false, 8)
@@ -105,7 +105,7 @@ package auth_test
 // 				dbTrx = ts.DB.Begin()
 // 				assert.Nil(t, dbTrx.Error, fmt.Sprintf("Unexpected error %v.", dbTrx.Error))
 
-// 				authInfra = authinfra.New(ts.RSAKeys)
+// 				authN = authinfra.New(ts.RSAKeys)
 
 // 				username := fake.Username()
 // 				password := fake.Password(true, true, true, false, false, 8)
@@ -137,7 +137,7 @@ package auth_test
 // 				result := dbTrx.Rollback()
 // 				assert.Nil(t, result.Error, fmt.Sprintf("Unexpected error %v.", result.Error))
 
-// 				authInfra = authinfra.New(ts.RSAKeys)
+// 				authN = authinfra.New(ts.RSAKeys)
 
 // 				username := fake.Username()
 // 				password := fake.Password(true, true, true, false, false, 8)
@@ -173,7 +173,7 @@ package auth_test
 
 // 			loginDSRepository := logindsrepository.New(dbTrx)
 
-// 			authService := authservice.New(authDSRepository, userDSRepository, loginDSRepository, authInfra,
+// 			authService := authservice.New(authDSRepository, userDSRepository, loginDSRepository, authN,
 // 				ts.TokenExpTimeInSec, ts.Security, ts.Validator)
 
 // 			authHandler := authhandler.New(authService)
@@ -210,7 +210,7 @@ package auth_test
 // func (ts *TestSuite) TestSignIn() {
 // 	dbTrx := &gorm.DB{}
 
-// 	var authInfra authinfra.IAuth
+// 	var authN authinfra.IAuth
 
 // 	userdb := userdbmodel.User{}
 
@@ -229,7 +229,7 @@ package auth_test
 // 				dbTrx = ts.DB.Begin()
 // 				assert.Nil(t, dbTrx.Error, fmt.Sprintf("Unexpected error %v.", dbTrx.Error))
 
-// 				authInfra = authinfra.New(ts.RSAKeys)
+// 				authN = authinfra.New(ts.RSAKeys)
 
 // 				username := fake.Username()
 // 				password := fake.Password(true, true, true, false, false, 8)
@@ -275,7 +275,7 @@ package auth_test
 // 		{
 // 			Context: "ItShouldFailIfTheDatabaseTransactionFromTheRequestContextIsNull",
 // 			SetUp: func(t *testing.T) {
-// 				authInfra = authinfra.New(ts.RSAKeys)
+// 				authN = authinfra.New(ts.RSAKeys)
 
 // 				username := fake.Username()
 // 				password := fake.Password(true, true, true, false, false, 8)
@@ -300,7 +300,7 @@ package auth_test
 // 				dbTrx = ts.DB.Begin()
 // 				assert.Nil(t, dbTrx.Error, fmt.Sprintf("Unexpected error %v.", dbTrx.Error))
 
-// 				authInfra = authinfra.New(ts.RSAKeys)
+// 				authN = authinfra.New(ts.RSAKeys)
 
 // 				username := fake.Username()
 // 				password := fake.Password(true, true, true, false, false, 8)
@@ -332,7 +332,7 @@ package auth_test
 // 				result := dbTrx.Rollback()
 // 				assert.Nil(t, result.Error, fmt.Sprintf("Unexpected error %v.", result.Error))
 
-// 				authInfra = authinfra.New(ts.RSAKeys)
+// 				authN = authinfra.New(ts.RSAKeys)
 
 // 				username := fake.Username()
 // 				password := fake.Password(true, true, true, false, false, 8)
@@ -369,7 +369,7 @@ package auth_test
 // 			loginDSRepository := logindsrepository.New(dbTrx)
 
 // 			authService := authservice.New(authDSRepository, userDSRepository, loginDSRepository,
-// 				authInfra, ts.TokenExpTimeInSec, ts.Security, ts.Validator)
+// 				authN, ts.TokenExpTimeInSec, ts.Security, ts.Validator)
 
 // 			authHandler := authhandler.New(authService)
 
@@ -405,7 +405,7 @@ package auth_test
 // func (ts *TestSuite) TestRefreshToken() {
 // 	dbTrx := &gorm.DB{}
 
-// 	var authInfra authinfra.IAuth
+// 	var authN authinfra.IAuth
 
 // 	user := usermodel.User{}
 
@@ -422,7 +422,7 @@ package auth_test
 // 				dbTrx = ts.DB.Begin()
 // 				assert.Nil(t, dbTrx.Error, fmt.Sprintf("Unexpected error %v.", dbTrx.Error))
 
-// 				authInfra = authinfra.New(ts.RSAKeys)
+// 				authN = authinfra.New(ts.RSAKeys)
 
 // 				username := fake.Username()
 // 				password := fake.Password(true, true, true, false, false, 8)
@@ -466,7 +466,7 @@ package auth_test
 // 				dbTrx = ts.DB.Begin()
 // 				assert.Nil(t, dbTrx.Error, fmt.Sprintf("Unexpected error %v.", dbTrx.Error))
 
-// 				authInfra = authinfra.New(ts.RSAKeys)
+// 				authN = authinfra.New(ts.RSAKeys)
 
 // 				var authDetailsKey httputil.ContextKeyType = "auth_details"
 // 				contextMap[authDetailsKey] = fake.Word()
@@ -488,7 +488,7 @@ package auth_test
 // 			loginDSRepository := logindsrepository.New(dbTrx)
 
 // 			authService := authservice.New(authDSRepository, userDSRepository, loginDSRepository,
-// 				authInfra, ts.TokenExpTimeInSec, ts.Security, ts.Validator)
+// 				authN, ts.TokenExpTimeInSec, ts.Security, ts.Validator)
 
 // 			authHandler := authhandler.New(authService)
 
@@ -523,7 +523,7 @@ package auth_test
 // func (ts *TestSuite) TestChangePassword() {
 // 	dbTrx := &gorm.DB{}
 
-// 	var authInfra authinfra.IAuth
+// 	var authN authinfra.IAuth
 
 // 	userdb := userdbmodel.User{}
 
@@ -548,7 +548,7 @@ package auth_test
 // 				dbTrx = ts.DB.Begin()
 // 				assert.Nil(t, dbTrx.Error, fmt.Sprintf("Unexpected error %v.", dbTrx.Error))
 
-// 				authInfra = authinfra.New(ts.RSAKeys)
+// 				authN = authinfra.New(ts.RSAKeys)
 
 // 				username := fake.Username()
 // 				password := fake.Password(true, true, true, false, false, 8)
@@ -611,7 +611,7 @@ package auth_test
 // 				dbTrx = ts.DB.Begin()
 // 				assert.Nil(t, dbTrx.Error, fmt.Sprintf("Unexpected error %v.", dbTrx.Error))
 
-// 				authInfra = authinfra.New(ts.RSAKeys)
+// 				authN = authinfra.New(ts.RSAKeys)
 
 // 				var authDetailsKey httputil.ContextKeyType = "auth_details"
 // 				contextMap[authDetailsKey] = fake.Word()
@@ -626,7 +626,7 @@ package auth_test
 // 				dbTrx = ts.DB.Begin()
 // 				assert.Nil(t, dbTrx.Error, fmt.Sprintf("Unexpected error %v.", dbTrx.Error))
 
-// 				authInfra = authinfra.New(ts.RSAKeys)
+// 				authN = authinfra.New(ts.RSAKeys)
 
 // 				auth = authmodel.Auth{}
 
@@ -660,7 +660,7 @@ package auth_test
 // 				result := dbTrx.Rollback()
 // 				assert.Nil(t, result.Error, fmt.Sprintf("Unexpected error %v.", result.Error))
 
-// 				authInfra = authinfra.New(ts.RSAKeys)
+// 				authN = authinfra.New(ts.RSAKeys)
 
 // 				auth = authmodel.Auth{}
 
@@ -699,7 +699,7 @@ package auth_test
 // 			loginDSRepository := logindsrepository.New(dbTrx)
 
 // 			authService := authservice.New(authDSRepository, userDSRepository, loginDSRepository,
-// 				authInfra, ts.TokenExpTimeInSec, ts.Security, ts.Validator)
+// 				authN, ts.TokenExpTimeInSec, ts.Security, ts.Validator)
 
 // 			authHandler := authhandler.New(authService)
 
@@ -735,7 +735,7 @@ package auth_test
 // func (ts *TestSuite) TestSignOut() {
 // 	dbTrx := &gorm.DB{}
 
-// 	var authInfra authinfra.IAuth
+// 	var authN authinfra.IAuth
 
 // 	userdb := userdbmodel.User{}
 
@@ -756,7 +756,7 @@ package auth_test
 // 				dbTrx = ts.DB.Begin()
 // 				assert.Nil(t, dbTrx.Error, fmt.Sprintf("Unexpected error %v.", dbTrx.Error))
 
-// 				authInfra = authinfra.New(ts.RSAKeys)
+// 				authN = authinfra.New(ts.RSAKeys)
 
 // 				username := fake.Username()
 // 				password := fake.Password(true, true, true, false, false, 8)
@@ -804,7 +804,7 @@ package auth_test
 // 				dbTrx = ts.DB.Begin()
 // 				assert.Nil(t, dbTrx.Error, fmt.Sprintf("Unexpected error %v.", dbTrx.Error))
 
-// 				authInfra = authinfra.New(ts.RSAKeys)
+// 				authN = authinfra.New(ts.RSAKeys)
 
 // 				var authDetailsKey httputil.ContextKeyType = "auth_details"
 // 				contextMap[authDetailsKey] = fake.Word()
@@ -822,7 +822,7 @@ package auth_test
 // 				result := dbTrx.Rollback()
 // 				assert.Nil(t, result.Error, fmt.Sprintf("Unexpected error %v.", result.Error))
 
-// 				authInfra = authinfra.New(ts.RSAKeys)
+// 				authN = authinfra.New(ts.RSAKeys)
 
 // 				auth = authmodel.Auth{}
 
@@ -846,7 +846,7 @@ package auth_test
 // 			loginDSRepository := logindsrepository.New(dbTrx)
 
 // 			authService := authservice.New(authDSRepository, userDSRepository, loginDSRepository,
-// 				authInfra, ts.TokenExpTimeInSec, ts.Security, ts.Validator)
+// 				authN, ts.TokenExpTimeInSec, ts.Security, ts.Validator)
 
 // 			authHandler := authhandler.New(authService)
 

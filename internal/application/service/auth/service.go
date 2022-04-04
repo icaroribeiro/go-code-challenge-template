@@ -1,206 +1,211 @@
 package auth
 
-// import (
-// 	authmodel "github.com/icaroribeiro/go-code-challenge-template/internal/core/domain/model/auth"
-// 	loginmodel "github.com/icaroribeiro/go-code-challenge-template/internal/core/domain/model/login"
-// 	usermodel "github.com/icaroribeiro/go-code-challenge-template/internal/core/domain/model/user"
-// 	authservice "github.com/icaroribeiro/go-code-challenge-template/internal/core/ports/application/service/auth"
-// 	authdsrepository "github.com/icaroribeiro/go-code-challenge-template/internal/core/ports/infrastructure/persistence/datastore/repository/auth"
-// 	logindsrepository "github.com/icaroribeiro/go-code-challenge-template/internal/core/ports/infrastructure/persistence/datastore/repository/login"
-// 	userdsrepository "github.com/icaroribeiro/go-code-challenge-template/internal/core/ports/infrastructure/persistence/datastore/repository/user"
-// 	authinfra "github.com/icaroribeiro/go-code-challenge-template/internal/infrastructure/auth"
-// 	"github.com/icaroribeiro/go-code-challenge-template/pkg/customerror"
-// 	securitypkg "github.com/icaroribeiro/go-code-challenge-template/pkg/security"
-// 	validatorpkg "github.com/icaroribeiro/go-code-challenge-template/pkg/validator"
-// 	"gorm.io/gorm"
-// )
+import (
+	domainmodel "github.com/icaroribeiro/new-go-code-challenge-template/internal/core/domain/model"
+	authservice "github.com/icaroribeiro/new-go-code-challenge-template/internal/core/ports/application/service/auth"
+	authdatastorerepository "github.com/icaroribeiro/new-go-code-challenge-template/internal/core/ports/infrastructure/storage/datastore/repository/auth"
+	logindatastorerepository "github.com/icaroribeiro/new-go-code-challenge-template/internal/core/ports/infrastructure/storage/datastore/repository/login"
+	userdatastorerepository "github.com/icaroribeiro/new-go-code-challenge-template/internal/core/ports/infrastructure/storage/datastore/repository/user"
+	authpkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/auth"
+	"github.com/icaroribeiro/new-go-code-challenge-template/pkg/customerror"
+	securitypkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/security"
+	validatorpkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/validator"
+	"gorm.io/gorm"
+)
 
-// type Service struct {
-// 	AuthDatastoreRepository  authdsrepository.IRepository
-// 	UserDatastoreRepository  userdsrepository.IRepository
-// 	LoginDatastoreRepository logindsrepository.IRepository
-// 	AuthInfra                authinfra.IAuth
-// 	TokenExpTimeInSec        int
-// 	Security                 securitypkg.ISecurity
-// 	Validator                validatorpkg.IValidator
-// }
+type Service struct {
+	AuthDatastoreRepository  authdatastorerepository.IRepository
+	LoginDatastoreRepository logindatastorerepository.IRepository
+	UserDatastoreRepository  userdatastorerepository.IRepository
+	Validator                validatorpkg.IValidator
+	AuthN                    authpkg.IAuth
+	Security                 securitypkg.ISecurity
+	TokenExpTimeInSec        int
+}
 
-// // New is the factory function that encapsulates the implementation related to auth.
-// func New(authDatastoreRepository authdsrepository.IRepository, userDatastoreRepository userdsrepository.IRepository, loginDatastoreRepository logindsrepository.IRepository,
-// 	authInfra authinfra.IAuth, tokenExpTimeInSec int, security securitypkg.ISecurity, validator validatorpkg.IValidator) authservice.IService {
-// 	return &Service{
-// 		AuthDatastoreRepository:  authDatastoreRepository,
-// 		UserDatastoreRepository:  userDatastoreRepository,
-// 		LoginDatastoreRepository: loginDatastoreRepository,
-// 		AuthInfra:                authInfra,
-// 		TokenExpTimeInSec:        tokenExpTimeInSec,
-// 		Security:                 security,
-// 		Validator:                validator,
-// 	}
-// }
+// New is the factory function that encapsulates the implementation related to auth.
+func New(authDatastoreRepository authdatastorerepository.IRepository,
+	loginDatastoreRepository logindatastorerepository.IRepository,
+	userDatastoreRepository userdatastorerepository.IRepository,
+	authN authpkg.IAuth,
+	validator validatorpkg.IValidator,
+	tokenExpTimeInSec int) authservice.IService {
 
-// // Register is the function that registers the user to the system.
-// func (a *Service) Register(credentials securitypkg.Credentials) (string, error) {
-// 	// if err := a.Validator.Validate(credentials, ""); err != nil {
-// 	// 	return "", customerror.BadRequest.New(err.Error())
-// 	// }
+	security := securitypkg.New()
 
-// 	login, err := a.LoginDatastoreRepository.GetByUsername(credentials.Username)
-// 	if err != nil {
-// 		return "", err
-// 	}
+	return &Service{
+		AuthDatastoreRepository:  authDatastoreRepository,
+		UserDatastoreRepository:  userDatastoreRepository,
+		LoginDatastoreRepository: loginDatastoreRepository,
+		AuthN:                    authN,
+		Validator:                validator,
+		Security:                 security,
+		TokenExpTimeInSec:        tokenExpTimeInSec,
+	}
+}
 
-// 	if !login.IsEmpty() {
-// 		return "", customerror.Conflict.Newf("the username %s already exists", credentials.Username)
-// 	}
+// Register is the function that registers the user to the system.
+func (a *Service) Register(credentials securitypkg.Credentials) (string, error) {
+	if err := a.Validator.Validate(credentials); err != nil {
+		return "", customerror.BadRequest.New(err.Error())
+	}
 
-// 	user := usermodel.User{
-// 		Username: credentials.Username,
-// 	}
+	login, err := a.LoginDatastoreRepository.GetByUsername(credentials.Username)
+	if err != nil {
+		return "", err
+	}
 
-// 	newUser, err := a.UserDatastoreRepository.Create(user)
-// 	if err != nil {
-// 		return "", err
-// 	}
+	if !login.IsEmpty() {
+		return "", customerror.Conflict.Newf("the username %s is already registered", credentials.Username)
+	}
 
-// 	login = loginmodel.Login{
-// 		UserID:   newUser.ID,
-// 		Username: credentials.Username,
-// 		Password: credentials.Password,
-// 	}
+	user := domainmodel.User{
+		Username: credentials.Username,
+	}
 
-// 	_, err = a.LoginDatastoreRepository.Create(login)
-// 	if err != nil {
-// 		return "", err
-// 	}
+	newUser, err := a.UserDatastoreRepository.Create(user)
+	if err != nil {
+		return "", err
+	}
 
-// 	auth := authmodel.Auth{
-// 		UserID: newUser.ID,
-// 	}
+	login = domainmodel.Login{
+		UserID:   newUser.ID,
+		Username: credentials.Username,
+		Password: credentials.Password,
+	}
 
-// 	newAuth, err := a.AuthDatastoreRepository.Create(auth)
-// 	if err != nil {
-// 		return "", err
-// 	}
+	_, err = a.LoginDatastoreRepository.Create(login)
+	if err != nil {
+		return "", err
+	}
 
-// 	auth = newAuth
+	auth := domainmodel.Auth{
+		UserID: newUser.ID,
+	}
 
-// 	token, err := a.AuthInfra.CreateToken(auth, a.TokenExpTimeInSec)
-// 	if err != nil {
-// 		return "", err
-// 	}
+	newAuth, err := a.AuthDatastoreRepository.Create(auth)
+	if err != nil {
+		return "", err
+	}
 
-// 	return token, nil
-// }
+	auth = newAuth
 
-// // LogIn is the function that initializes the user access to the system.
-// func (a *Service) LogIn(credentials securitypkg.Credentials) (string, error) {
-// 	// if err := a.Validator.Validate(credentials, ""); err != nil {
-// 	// 	return "", customerror.BadRequest.New(err.Error())
-// 	// }
+	token, err := a.AuthN.CreateToken(auth, a.TokenExpTimeInSec)
+	if err != nil {
+		return "", err
+	}
 
-// 	login, err := a.LoginDatastoreRepository.GetByUsername(credentials.Username)
-// 	if err != nil {
-// 		return "", err
-// 	}
+	return token, nil
+}
 
-// 	if login.IsEmpty() {
-// 		return "", customerror.NotFound.Newf("the username %s was not found", credentials.Username)
-// 	}
+// LogIn is the function that initializes the user access to the system.
+func (a *Service) LogIn(credentials securitypkg.Credentials) (string, error) {
+	if err := a.Validator.Validate(credentials); err != nil {
+		return "", customerror.BadRequest.New(err.Error())
+	}
 
-// 	if err = a.Security.VerifyPasswords(login.Password, credentials.Password); err != nil {
-// 		return "", err
-// 	}
+	login, err := a.LoginDatastoreRepository.GetByUsername(credentials.Username)
+	if err != nil {
+		return "", err
+	}
 
-// 	auth, err := a.AuthDatastoreRepository.GetByUserID(login.UserID.String())
-// 	if err != nil {
-// 		return "", err
-// 	}
+	if login.IsEmpty() {
+		return "", customerror.NotFound.Newf("the username %s is not registered", credentials.Username)
+	}
 
-// 	if !auth.IsEmpty() {
-// 		return "", customerror.New("you are already logged in")
-// 	}
+	if err = a.Security.VerifyPasswords(login.Password, credentials.Password); err != nil {
+		return "", err
+	}
 
-// 	auth = authmodel.Auth{
-// 		UserID: login.UserID,
-// 	}
+	auth, err := a.AuthDatastoreRepository.GetByUserID(login.UserID.String())
+	if err != nil {
+		return "", err
+	}
 
-// 	newAuth, err := a.AuthDatastoreRepository.Create(auth)
-// 	if err != nil {
-// 		return "", err
-// 	}
+	if !auth.IsEmpty() {
+		return "", customerror.New("the user with username %s is already logged in")
+	}
 
-// 	auth = newAuth
+	auth = domainmodel.Auth{
+		UserID: login.UserID,
+	}
 
-// 	token, err := a.AuthInfra.CreateToken(auth, a.TokenExpTimeInSec)
-// 	if err != nil {
-// 		return "", err
-// 	}
+	newAuth, err := a.AuthDatastoreRepository.Create(auth)
+	if err != nil {
+		return "", err
+	}
 
-// 	return token, nil
-// }
+	auth = newAuth
 
-// // RenewToken is the function that renews the token.
-// func (a *Service) RenewToken(auth authmodel.Auth) (string, error) {
-// 	return a.AuthInfra.CreateToken(auth, a.TokenExpTimeInSec)
-// }
+	token, err := a.AuthN.CreateToken(auth, a.TokenExpTimeInSec)
+	if err != nil {
+		return "", err
+	}
 
-// // ModifyPassword is the function that modifies the user's password.
-// func (a *Service) ModifyPassword(id string, passwords securitypkg.Passwords) error {
-// 	// if err := a.Validator.Valid(id, "nonzero, uuid"); err != nil {
-// 	// 	return customerror.BadRequest.Newf("UserID: %s", err.Error())
-// 	// }
+	return token, nil
+}
 
-// 	// if err := a.Validator.Validate(passwords, ""); err != nil {
-// 	// 	return customerror.BadRequest.New(err.Error())
-// 	// }
+// RenewToken is the function that renews the token.
+func (a *Service) RenewToken(auth domainmodel.Auth) (string, error) {
+	return a.AuthN.CreateToken(auth, a.TokenExpTimeInSec)
+}
 
-// 	login, err := a.LoginDatastoreRepository.GetByUserID(id)
-// 	if err != nil {
-// 		return err
-// 	}
+// ModifyPassword is the function that modifies the user's password.
+func (a *Service) ModifyPassword(id string, passwords securitypkg.Passwords) error {
+	if err := a.Validator.ValidateWithTags(id, "nonzero, uuid"); err != nil {
+		return customerror.BadRequest.Newf("UserID: %s", err.Error())
+	}
 
-// 	if login.IsEmpty() {
-// 		return customerror.NotFound.New("the user who owns this token was not found")
-// 	}
+	if err := a.Validator.Validate(passwords); err != nil {
+		return customerror.BadRequest.New(err.Error())
+	}
 
-// 	if err = a.Security.VerifyPasswords(login.Password, passwords.CurrentPassword); err != nil {
-// 		if err.Error() == "the password is invalid" {
-// 			return customerror.Unauthorized.New("the current password did not match the one already registered")
-// 		}
+	login, err := a.LoginDatastoreRepository.GetByUserID(id)
+	if err != nil {
+		return err
+	}
 
-// 		return err
-// 	}
+	if login.IsEmpty() {
+		return customerror.NotFound.New("the user who owns this token is not registered")
+	}
 
-// 	if passwords.NewPassword == passwords.CurrentPassword {
-// 		return customerror.BadRequest.New("the new password is the same as the one currently registered")
-// 	}
+	if err = a.Security.VerifyPasswords(login.Password, passwords.CurrentPassword); err != nil {
+		if err.Error() == "the password is invalid" {
+			return customerror.Unauthorized.New("the current password did not match the one already registered")
+		}
 
-// 	login.Password = passwords.NewPassword
+		return err
+	}
 
-// 	_, err = a.LoginDatastoreRepository.Update(login.ID.String(), login)
+	if passwords.NewPassword == passwords.CurrentPassword {
+		return customerror.BadRequest.New("the new password is the same as the one currently registered")
+	}
 
-// 	return err
-// }
+	login.Password = passwords.NewPassword
 
-// // LogOut is the function that concludes the user access to the system.
-// func (a *Service) LogOut(id string) error {
-// 	if err := a.Validator.Valid(id, "nonzero, uuid"); err != nil {
-// 		return customerror.BadRequest.New(err.Error())
-// 	}
+	_, err = a.LoginDatastoreRepository.Update(login.ID.String(), login)
 
-// 	_, err := a.AuthDatastoreRepository.Delete(id)
+	return err
+}
 
-// 	return err
-// }
+// LogOut is the function that concludes the user access to the system.
+func (a *Service) LogOut(id string) error {
+	if err := a.Validator.ValidateWithTags(id, "nonzero, uuid"); err != nil {
+		return customerror.BadRequest.New(err.Error())
+	}
 
-// // WithDBTrx is the function that enables the service with database transaction.
-// func (a *Service) WithDBTrx(dbTrx *gorm.DB) authservice.IService {
-// 	a.AuthDatastoreRepository = a.AuthDatastoreRepository.WithDBTrx(dbTrx)
+	_, err := a.AuthDatastoreRepository.Delete(id)
 
-// 	a.UserDatastoreRepository = a.UserDatastoreRepository.WithDBTrx(dbTrx)
+	return err
+}
 
-// 	a.LoginDatastoreRepository = a.LoginDatastoreRepository.WithDBTrx(dbTrx)
+// WithDBTrx is the function that enables the service with database transaction.
+func (a *Service) WithDBTrx(dbTrx *gorm.DB) authservice.IService {
+	a.AuthDatastoreRepository = a.AuthDatastoreRepository.WithDBTrx(dbTrx)
 
-// 	return a
-// }
+	a.UserDatastoreRepository = a.UserDatastoreRepository.WithDBTrx(dbTrx)
+
+	a.LoginDatastoreRepository = a.LoginDatastoreRepository.WithDBTrx(dbTrx)
+
+	return a
+}

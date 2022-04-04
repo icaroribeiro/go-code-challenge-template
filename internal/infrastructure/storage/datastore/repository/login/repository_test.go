@@ -25,7 +25,7 @@ func TestRepository(t *testing.T) {
 
 func (ts *TestSuite) TestCreate() {
 	driver := "postgres"
-	db, mock := NewMock(driver)
+	db, mock := NewMockDB(driver)
 
 	login := domainmodel.Login{}
 
@@ -136,7 +136,7 @@ func (ts *TestSuite) TestCreate() {
 
 func (ts *TestSuite) TestGetByUsername() {
 	driver := "postgres"
-	db, mock := NewMock(driver)
+	db, mock := NewMockDB(driver)
 
 	username := ""
 
@@ -232,7 +232,7 @@ func (ts *TestSuite) TestGetByUsername() {
 
 func (ts *TestSuite) TestGetByUserID() {
 	driver := "postgres"
-	db, mock := NewMock(driver)
+	db, mock := NewMockDB(driver)
 
 	var userID uuid.UUID
 
@@ -328,7 +328,7 @@ func (ts *TestSuite) TestGetByUserID() {
 
 func (ts *TestSuite) TestUpdate() {
 	driver := "postgres"
-	db, mock := NewMock(driver)
+	db, mock := NewMockDB(driver)
 
 	var id uuid.UUID
 
@@ -510,7 +510,7 @@ func (ts *TestSuite) TestUpdate() {
 
 func (ts *TestSuite) TestDelete() {
 	driver := "postgres"
-	db, mock := NewMock(driver)
+	db, mock := NewMockDB(driver)
 
 	var id uuid.UUID
 
@@ -673,7 +673,7 @@ func (ts *TestSuite) TestDelete() {
 
 func (ts *TestSuite) TestWithDBTrx() {
 	driver := "postgres"
-	db, _ := NewMock(driver)
+	db, _ := NewMockDB(driver)
 
 	dbTrx := &gorm.DB{}
 
