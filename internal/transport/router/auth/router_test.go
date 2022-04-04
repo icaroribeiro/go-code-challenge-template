@@ -64,7 +64,7 @@ func (ts *TestSuite) TestConfigureRoutes() {
 						Method: "POST",
 						Path:   "/refresh_token",
 						HandlerFunc: adapterhttputilpkg.AdaptFunc(authHandler.RefreshToken).
-							With(adapters["loggingMiddleware"], adapters["authMiddleware"]),
+							With(adapters["loggingMiddleware"], adapters["authRenewalMiddleware"]),
 					},
 					routehttputilpkg.Route{
 						Name:   "ChangePassword",
