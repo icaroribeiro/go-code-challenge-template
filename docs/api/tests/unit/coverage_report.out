@@ -1,3 +1,10 @@
+github.com/icaroribeiro/new-go-code-challenge-template/internal/application/service/auth/service.go:27:					New				0.0%
+github.com/icaroribeiro/new-go-code-challenge-template/internal/application/service/auth/service.go:48:					Register			0.0%
+github.com/icaroribeiro/new-go-code-challenge-template/internal/application/service/auth/service.go:102:				LogIn				0.0%
+github.com/icaroribeiro/new-go-code-challenge-template/internal/application/service/auth/service.go:149:				RenewToken			0.0%
+github.com/icaroribeiro/new-go-code-challenge-template/internal/application/service/auth/service.go:154:				ModifyPassword			0.0%
+github.com/icaroribeiro/new-go-code-challenge-template/internal/application/service/auth/service.go:192:				LogOut				0.0%
+github.com/icaroribeiro/new-go-code-challenge-template/internal/application/service/auth/service.go:203:				WithDBTrx			0.0%
 github.com/icaroribeiro/new-go-code-challenge-template/internal/application/service/healthcheck/service.go:13:				New				100.0%
 github.com/icaroribeiro/new-go-code-challenge-template/internal/application/service/healthcheck/service.go:21:				GetStatus			100.0%
 github.com/icaroribeiro/new-go-code-challenge-template/internal/application/service/user/service.go:16:					New				100.0%
@@ -65,7 +72,11 @@ github.com/icaroribeiro/new-go-code-challenge-template/pkg/httputil/request/requ
 github.com/icaroribeiro/new-go-code-challenge-template/pkg/httputil/request/request.go:60:						SetRequestContext		100.0%
 github.com/icaroribeiro/new-go-code-challenge-template/pkg/httputil/response/response.go:13:						RespondWithJson			100.0%
 github.com/icaroribeiro/new-go-code-challenge-template/pkg/httputil/response/response.go:28:						RespondErrorWithJson		100.0%
-github.com/icaroribeiro/new-go-code-challenge-template/pkg/middleware/auth/middleware.go:17:						Auth				100.0%
+github.com/icaroribeiro/new-go-code-challenge-template/pkg/middleware/auth/middleware.go:17:						extractTokenString		100.0%
+github.com/icaroribeiro/new-go-code-challenge-template/pkg/middleware/auth/middleware.go:33:						buildAuth			100.0%
+github.com/icaroribeiro/new-go-code-challenge-template/pkg/middleware/auth/middleware.go:61:						setupAuthDetails		100.0%
+github.com/icaroribeiro/new-go-code-challenge-template/pkg/middleware/auth/middleware.go:70:						Auth				100.0%
+github.com/icaroribeiro/new-go-code-challenge-template/pkg/middleware/auth/middleware.go:99:						AuthRenewal			0.0%
 github.com/icaroribeiro/new-go-code-challenge-template/pkg/middleware/logging/middleware.go:11:						Logging				100.0%
 github.com/icaroribeiro/new-go-code-challenge-template/pkg/security/security.go:11:							New				100.0%
 github.com/icaroribeiro/new-go-code-challenge-template/pkg/security/security.go:16:							HashPassword			100.0%
@@ -79,4 +90,4 @@ github.com/icaroribeiro/new-go-code-challenge-template/pkg/validator/uuid/valida
 github.com/icaroribeiro/new-go-code-challenge-template/pkg/validator/validator.go:14:							New				100.0%
 github.com/icaroribeiro/new-go-code-challenge-template/pkg/validator/validator.go:31:							Validate			100.0%
 github.com/icaroribeiro/new-go-code-challenge-template/pkg/validator/validator.go:36:							ValidateWithTags		100.0%
-total:																	(statements)			77.8%
+total:																	(statements)			64.9%
