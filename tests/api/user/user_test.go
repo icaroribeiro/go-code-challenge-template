@@ -28,7 +28,7 @@ func TestUserInteg(t *testing.T) {
 func (ts *TestSuite) TestGetAll() {
 	dbTrx := &gorm.DB{}
 
-	datastoreUser := datastoremodel.User{}
+	userDatastore := datastoremodel.User{}
 
 	user := presentationmodel.User{}
 
@@ -41,14 +41,14 @@ func (ts *TestSuite) TestGetAll() {
 
 				username := fake.Username()
 
-				datastoreUser = datastoremodel.User{
+				userDatastore = datastoremodel.User{
 					Username: username,
 				}
 
-				result := dbTrx.Create(&datastoreUser)
+				result := dbTrx.Create(&userDatastore)
 				assert.Nil(t, result.Error, fmt.Sprintf("Unexpected error %v.", result.Error))
 
-				domainUser := datastoreUser.ToDomain()
+				domainUser := userDatastore.ToDomain()
 				user.FromDomain(domainUser)
 			},
 			StatusCode: http.StatusOK,

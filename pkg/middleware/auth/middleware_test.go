@@ -21,7 +21,7 @@ import (
 	responsehttputilpkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/httputil/response"
 	authmiddlewarepkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/middleware/auth"
 	domainfactorymodel "github.com/icaroribeiro/new-go-code-challenge-template/tests/factory/core/domain/model"
-	datastoremodelfactory "github.com/icaroribeiro/new-go-code-challenge-template/tests/factory/infrastructure/storage/datastore/model"
+	datastorefactorymodel "github.com/icaroribeiro/new-go-code-challenge-template/tests/factory/infrastructure/storage/datastore/model"
 	mockauthpkg "github.com/icaroribeiro/new-go-code-challenge-template/tests/mocks/pkg/mockauth"
 	uuid "github.com/satori/go.uuid"
 	"github.com/stretchr/testify/assert"
@@ -78,11 +78,11 @@ func (ts *TestSuite) TestAuth() {
 
 				sqlQuery := `SELECT * FROM "auths" WHERE id=$1`
 
-				datastoreAuth := datastoremodelfactory.NewAuth(args)
+				authDatastore := datastorefactorymodel.NewAuth(args)
 
 				rows := sqlmock.
 					NewRows([]string{"id", "user_id", "created_at"}).
-					AddRow(datastoreAuth.ID, datastoreAuth.UserID, datastoreAuth.CreatedAt)
+					AddRow(authDatastore.ID, authDatastore.UserID, authDatastore.CreatedAt)
 
 				mock.ExpectQuery(regexp.QuoteMeta(sqlQuery)).
 					WithArgs(id).
@@ -263,11 +263,11 @@ func (ts *TestSuite) TestAuth() {
 
 				sqlQuery := `SELECT * FROM "auths" WHERE id=$1`
 
-				datastoreAuth := datastoremodelfactory.NewAuth(args)
+				authDatastore := datastorefactorymodel.NewAuth(args)
 
 				rows := sqlmock.
 					NewRows([]string{"id", "user_id", "created_at"}).
-					AddRow(datastoreAuth.ID, datastoreAuth.UserID, datastoreAuth.CreatedAt)
+					AddRow(authDatastore.ID, authDatastore.UserID, authDatastore.CreatedAt)
 
 				mock.ExpectQuery(regexp.QuoteMeta(sqlQuery)).
 					WithArgs(id).
@@ -373,11 +373,11 @@ func (ts *TestSuite) TestAuth() {
 
 				sqlQuery := `SELECT * FROM "auths" WHERE id=$1`
 
-				datastoreAuth := datastoremodelfactory.NewAuth(args)
+				authDatastore := datastorefactorymodel.NewAuth(args)
 
 				rows := sqlmock.
 					NewRows([]string{"id", "user_id", "created_at"}).
-					AddRow(datastoreAuth.ID, datastoreAuth.UserID, datastoreAuth.CreatedAt)
+					AddRow(authDatastore.ID, authDatastore.UserID, authDatastore.CreatedAt)
 
 				mock.ExpectQuery(regexp.QuoteMeta(sqlQuery)).
 					WithArgs(id).
@@ -558,11 +558,11 @@ func (ts *TestSuite) TestAuth() {
 
 				sqlQuery := `SELECT * FROM "auths" WHERE id=$1`
 
-				datastoreAuth := datastoremodelfactory.NewAuth(args)
+				authDatastore := datastorefactorymodel.NewAuth(args)
 
 				rows := sqlmock.
 					NewRows([]string{"id", "user_id", "created_at"}).
-					AddRow(datastoreAuth.ID, datastoreAuth.UserID, datastoreAuth.CreatedAt)
+					AddRow(authDatastore.ID, authDatastore.UserID, authDatastore.CreatedAt)
 
 				mock.ExpectQuery(regexp.QuoteMeta(sqlQuery)).
 					WithArgs(id).

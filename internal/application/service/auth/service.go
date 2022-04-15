@@ -28,10 +28,9 @@ func New(authDatastoreRepository authdatastorerepository.IRepository,
 	loginDatastoreRepository logindatastorerepository.IRepository,
 	userDatastoreRepository userdatastorerepository.IRepository,
 	authN authpkg.IAuth,
+	security securitypkg.ISecurity,
 	validator validatorpkg.IValidator,
 	tokenExpTimeInSec int) authservice.IService {
-
-	security := securitypkg.New()
 
 	return &Service{
 		AuthDatastoreRepository:  authDatastoreRepository,
@@ -88,9 +87,7 @@ func (a *Service) Register(credentials securitypkg.Credentials) (string, error) 
 		return "", err
 	}
 
-	auth = newAuth
-
-	token, err := a.AuthN.CreateToken(auth, a.TokenExpTimeInSec)
+	token, err := a.AuthN.CreateToken(newAuth, a.TokenExpTimeInSec)
 	if err != nil {
 		return "", err
 	}

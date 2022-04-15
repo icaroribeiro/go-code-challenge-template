@@ -138,12 +138,12 @@ func (ts *TestSuite) TestGetAll() {
 		{
 			Context: "ItShouldSucceedInGettingAllUsers",
 			SetUp: func(t *testing.T) {
-				datastoreUser := datastorefactorymodel.NewUser(nil)
-				user = datastoreUser.ToDomain()
+				userDatastore := datastorefactorymodel.NewUser(nil)
+				user = userDatastore.ToDomain()
 
 				rows := sqlmock.
 					NewRows([]string{"id", "username", "created_at", "updated_at"}).
-					AddRow(datastoreUser.ID, datastoreUser.Username, datastoreUser.CreatedAt, datastoreUser.UpdatedAt)
+					AddRow(userDatastore.ID, userDatastore.Username, userDatastore.CreatedAt, userDatastore.UpdatedAt)
 
 				mock.ExpectQuery(regexp.QuoteMeta(sqlQuery)).
 					WillReturnRows(rows)

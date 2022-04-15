@@ -230,12 +230,12 @@ func (ts *TestSuite) TestGetByUserID() {
 					"userID": userID,
 				}
 
-				datastoreAuth := datastorefactorymodel.NewAuth(args)
-				auth = datastoreAuth.ToDomain()
+				authDatastore := datastorefactorymodel.NewAuth(args)
+				auth = authDatastore.ToDomain()
 
 				rows := sqlmock.
 					NewRows([]string{"id", "user_id", "created_at"}).
-					AddRow(datastoreAuth.ID, datastoreAuth.UserID, datastoreAuth.CreatedAt)
+					AddRow(authDatastore.ID, authDatastore.UserID, authDatastore.CreatedAt)
 
 				mock.ExpectQuery(regexp.QuoteMeta(stmt)).
 					WithArgs(userID).
@@ -306,12 +306,12 @@ func (ts *TestSuite) TestDelete() {
 					"id": id,
 				}
 
-				datastoreAuth := datastorefactorymodel.NewAuth(args)
-				auth = datastoreAuth.ToDomain()
+				authDatastore := datastorefactorymodel.NewAuth(args)
+				auth = authDatastore.ToDomain()
 
 				rows := sqlmock.
 					NewRows([]string{"id", "user_id", "created_at"}).
-					AddRow(datastoreAuth.ID, datastoreAuth.UserID, datastoreAuth.CreatedAt)
+					AddRow(authDatastore.ID, authDatastore.UserID, authDatastore.CreatedAt)
 
 				mock.ExpectQuery(regexp.QuoteMeta(firstStmt)).
 					WithArgs(id).
@@ -362,12 +362,12 @@ func (ts *TestSuite) TestDelete() {
 					"id": id,
 				}
 
-				datastoreAuth := datastorefactorymodel.NewAuth(args)
-				auth = datastoreAuth.ToDomain()
+				authDatastore := datastorefactorymodel.NewAuth(args)
+				auth = authDatastore.ToDomain()
 
 				rows := sqlmock.
 					NewRows([]string{"id", "user_id", "created_at"}).
-					AddRow(datastoreAuth.ID, datastoreAuth.UserID, datastoreAuth.CreatedAt)
+					AddRow(authDatastore.ID, authDatastore.UserID, authDatastore.CreatedAt)
 
 				mock.ExpectQuery(regexp.QuoteMeta(firstStmt)).
 					WithArgs(id).
@@ -394,12 +394,12 @@ func (ts *TestSuite) TestDelete() {
 					"id": id,
 				}
 
-				datastoreAuth := datastorefactorymodel.NewAuth(args)
-				auth = datastoreAuth.ToDomain()
+				authDatastore := datastorefactorymodel.NewAuth(args)
+				auth = authDatastore.ToDomain()
 
 				rows := sqlmock.
 					NewRows([]string{"id", "user_id", "created_at"}).
-					AddRow(datastoreAuth.ID, datastoreAuth.UserID, datastoreAuth.CreatedAt)
+					AddRow(authDatastore.ID, authDatastore.UserID, authDatastore.CreatedAt)
 
 				mock.ExpectQuery(regexp.QuoteMeta(firstStmt)).
 					WithArgs(id).

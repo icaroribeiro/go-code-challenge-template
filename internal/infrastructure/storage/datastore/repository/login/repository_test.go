@@ -156,12 +156,12 @@ func (ts *TestSuite) TestGetByUsername() {
 					"username": username,
 				}
 
-				datastoreLogin := datastorefactorymodel.NewLogin(args)
-				login = datastoreLogin.ToDomain()
+				loginDatastore := datastorefactorymodel.NewLogin(args)
+				login = loginDatastore.ToDomain()
 
 				rows := sqlmock.
 					NewRows([]string{"id", "user_id", "username", "password", "created_at", "updated_at"}).
-					AddRow(datastoreLogin.ID, datastoreLogin.UserID, datastoreLogin.Username, datastoreLogin.Password, datastoreLogin.CreatedAt, datastoreLogin.UpdatedAt)
+					AddRow(loginDatastore.ID, loginDatastore.UserID, loginDatastore.Username, loginDatastore.Password, loginDatastore.CreatedAt, loginDatastore.UpdatedAt)
 
 				mock.ExpectQuery(regexp.QuoteMeta(stmt)).
 					WithArgs(username).
@@ -252,12 +252,12 @@ func (ts *TestSuite) TestGetByUserID() {
 					"userID": userID,
 				}
 
-				datastoreLogin := datastorefactorymodel.NewLogin(args)
-				login = datastoreLogin.ToDomain()
+				loginDatastore := datastorefactorymodel.NewLogin(args)
+				login = loginDatastore.ToDomain()
 
 				rows := sqlmock.
 					NewRows([]string{"id", "user_id", "username", "password", "created_at", "updated_at"}).
-					AddRow(datastoreLogin.ID, datastoreLogin.UserID, datastoreLogin.Username, datastoreLogin.Password, datastoreLogin.CreatedAt, datastoreLogin.UpdatedAt)
+					AddRow(loginDatastore.ID, loginDatastore.UserID, loginDatastore.Username, loginDatastore.Password, loginDatastore.CreatedAt, loginDatastore.UpdatedAt)
 
 				mock.ExpectQuery(regexp.QuoteMeta(stmt)).
 					WithArgs(userID).
@@ -532,12 +532,12 @@ func (ts *TestSuite) TestDelete() {
 					"id": id,
 				}
 
-				datastoreLogin := datastorefactorymodel.NewLogin(args)
-				login = datastoreLogin.ToDomain()
+				loginDatastore := datastorefactorymodel.NewLogin(args)
+				login = loginDatastore.ToDomain()
 
 				rows := sqlmock.
 					NewRows([]string{"id", "user_id", "username", "password", "created_at", "updated_at"}).
-					AddRow(datastoreLogin.ID, datastoreLogin.UserID, datastoreLogin.Username, datastoreLogin.Password, datastoreLogin.CreatedAt, datastoreLogin.UpdatedAt)
+					AddRow(loginDatastore.ID, loginDatastore.UserID, loginDatastore.Username, loginDatastore.Password, loginDatastore.CreatedAt, loginDatastore.UpdatedAt)
 
 				mock.ExpectQuery(regexp.QuoteMeta(firstStmt)).
 					WithArgs(id).
@@ -588,12 +588,12 @@ func (ts *TestSuite) TestDelete() {
 					"id": id,
 				}
 
-				datastoreLogin := datastorefactorymodel.NewLogin(args)
-				login = datastoreLogin.ToDomain()
+				loginDatastore := datastorefactorymodel.NewLogin(args)
+				login = loginDatastore.ToDomain()
 
 				rows := sqlmock.
 					NewRows([]string{"id", "user_id", "username", "password", "created_at", "updated_at"}).
-					AddRow(datastoreLogin.ID, datastoreLogin.UserID, datastoreLogin.Username, datastoreLogin.Password, datastoreLogin.CreatedAt, datastoreLogin.UpdatedAt)
+					AddRow(loginDatastore.ID, loginDatastore.UserID, loginDatastore.Username, loginDatastore.Password, loginDatastore.CreatedAt, loginDatastore.UpdatedAt)
 
 				mock.ExpectQuery(regexp.QuoteMeta(firstStmt)).
 					WithArgs(id).
@@ -620,12 +620,12 @@ func (ts *TestSuite) TestDelete() {
 					"id": id,
 				}
 
-				datastoreLogin := datastorefactorymodel.NewLogin(args)
-				login = datastoreLogin.ToDomain()
+				loginDatastore := datastorefactorymodel.NewLogin(args)
+				login = loginDatastore.ToDomain()
 
 				rows := sqlmock.
 					NewRows([]string{"id", "user_id", "username", "password", "created_at", "updated_at"}).
-					AddRow(datastoreLogin.ID, datastoreLogin.UserID, datastoreLogin.Username, datastoreLogin.Password, datastoreLogin.CreatedAt, datastoreLogin.UpdatedAt)
+					AddRow(loginDatastore.ID, loginDatastore.UserID, loginDatastore.Username, loginDatastore.Password, loginDatastore.CreatedAt, loginDatastore.UpdatedAt)
 
 				mock.ExpectQuery(regexp.QuoteMeta(firstStmt)).
 					WithArgs(id).

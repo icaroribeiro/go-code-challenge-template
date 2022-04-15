@@ -1,482 +1,403 @@
 package auth_test
 
-// import (
-// 	"errors"
-// 	"fmt"
-// 	"testing"
-// 	"time"
-
-// 	fake "github.com/brianvoe/gofakeit/v5"
-// 	"github.com/icaroribeiro/go-code-challenge-template/internal/application/customerror"
-// 	authservice "github.com/icaroribeiro/go-code-challenge-template/internal/application/service/auth"
-// 	"github.com/icaroribeiro/go-code-challenge-template/internal/application/validatormock"
-// 	authmodel "github.com/icaroribeiro/go-code-challenge-template/internal/core/domain/model/auth"
-// 	loginmodel "github.com/icaroribeiro/go-code-challenge-template/internal/core/domain/model/login"
-// 	authdbrepositorymock "github.com/icaroribeiro/go-code-challenge-template/internal/core/ports/repositorymock/database/auth"
-// 	logindbrepositorymock "github.com/icaroribeiro/go-code-challenge-template/internal/core/ports/repositorymock/database/login"
-// 	userdbrepositorymock "github.com/icaroribeiro/go-code-challenge-template/internal/core/ports/repositorymock/database/user"
-// 	authmock "github.com/icaroribeiro/go-code-challenge-template/internal/infrastructure/authmock"
-// 	authdbmodel "github.com/icaroribeiro/go-code-challenge-template/internal/infrastructure/persistence/database/model/auth"
-// 	logindbmodel "github.com/icaroribeiro/go-code-challenge-template/internal/infrastructure/persistence/database/model/login"
-// 	datastoremodel "github.com/icaroribeiro/go-code-challenge-template/internal/infrastructure/persistence/database/model/user"
-// 	authdbrepository "github.com/icaroribeiro/go-code-challenge-template/internal/infrastructure/persistence/database/repository/auth"
-// 	logindbrepository "github.com/icaroribeiro/go-code-challenge-template/internal/infrastructure/persistence/database/repository/login"
-// 	userdbrepository "github.com/icaroribeiro/go-code-challenge-template/internal/infrastructure/persistence/database/repository/user"
-// 	security "github.com/icaroribeiro/go-code-challenge-template/internal/infrastructure/security"
-// 	securitymock "github.com/icaroribeiro/go-code-challenge-template/internal/infrastructure/securitymock"
-// 	authdbmodelfactory "github.com/icaroribeiro/go-code-challenge-template/tests/factory/infrastructure/persistence/database/model/auth"
-// 	logindbmodelfactory "github.com/icaroribeiro/go-code-challenge-template/tests/factory/infrastructure/persistence/database/model/login"
-// 	datastoremodelfactory "github.com/icaroribeiro/go-code-challenge-template/tests/factory/infrastructure/persistence/database/model/user"
-// 	securityfactory "github.com/icaroribeiro/go-code-challenge-template/tests/factory/infrastructure/security"
-// 	uuid "github.com/satori/go.uuid"
-// 	"github.com/stretchr/testify/assert"
-// 	"github.com/stretchr/testify/suite"
-// 	"gorm.io/gorm"
-// )
-
-// func TestService(t *testing.T) {
-// 	suite.Run(t, new(TestSuite))
-// }
-
-// func (ts *TestSuite) TestRegister() {
-// 	var credentials security.Credentials
-
-// 	var userdb datastoremodel.User
-
-// 	var logindb logindbmodel.Login
-
-// 	var authdb authdbmodel.Auth
-
-// 	var newAuth authmodel.Auth
-
-// 	tokenExpTimeInSec := fake.Number(2, 10)
-
-// 	token := ""
-
-// 	errorType := customerror.NoType
-
-// 	returnArgs := ReturnArgs{}
-
-// 	ts.Cases = Cases{
-// 		{
-// 			Context: "ItShouldSucceedInRegisteringAUser",
-// 			SetUp: func(t *testing.T) {
-// 				username := fake.Username()
-// 				password := fake.Password(true, true, true, false, false, 8)
-
-// 				args := map[string]interface{}{
-// 					"username": username,
-// 					"password": password,
-// 				}
-
-// 				credentials = securityfactory.NewCredentials(args)
-
-// 				args = map[string]interface{}{
-// 					"id":        uuid.Nil,
-// 					"username":  credentials.Username,
-// 					"createdAt": time.Time{},
-// 					"updatedAt": time.Time{},
-// 				}
-
-// 				userdb = datastoremodelfactory.New(args)
-
-// 				id := uuid.NewV4()
-
-// 				args = map[string]interface{}{
-// 					"id":        id,
-// 					"username":  credentials.Username,
-// 					"createdAt": time.Time{},
-// 					"updatedAt": time.Time{},
-// 				}
-
-// 				newUserdb := datastoremodelfactory.New(args)
-
-// 				args = map[string]interface{}{
-// 					"id":        uuid.Nil,
-// 					"userID":    newUserdb.ID,
-// 					"username":  credentials.Username,
-// 					"password":  credentials.Password,
-// 					"createdAt": time.Time{},
-// 					"updatedAt": time.Time{},
-// 				}
-
-// 				logindb = logindbmodelfactory.New(args)
-
-// 				id = uuid.NewV4()
-
-// 				args = map[string]interface{}{
-// 					"id":        id,
-// 					"userID":    newUserdb.ID,
-// 					"username":  credentials.Username,
-// 					"password":  credentials.Password,
-// 					"createdAt": time.Time{},
-// 					"updatedAt": time.Time{},
-// 				}
-
-// 				newLogindb := logindbmodelfactory.New(args)
-
-// 				args = map[string]interface{}{
-// 					"id":        uuid.Nil,
-// 					"userID":    newUserdb.ID,
-// 					"createdAt": time.Time{},
-// 				}
-
-// 				authdb = authdbmodelfactory.New(args)
-
-// 				id = uuid.NewV4()
-
-// 				args = map[string]interface{}{
-// 					"id":        id,
-// 					"userID":    newUserdb.ID,
-// 					"createdAt": time.Time{},
-// 				}
-
-// 				newAuthdb := authdbmodelfactory.New(args)
-
-// 				newAuth = newAuthdb.ToDomain()
-
-// 				token = fake.Word()
-
-// 				returnArgs = ReturnArgs{
-// 					{nil},
-// 					{logindbmodel.Login{}, nil},
-// 					{newUserdb, nil},
-// 					{newLogindb, nil},
-// 					{newAuthdb, nil},
-// 					{token, nil},
-// 				}
-// 			},
-// 			WantError: false,
-// 			TearDown:  func(t *testing.T) {},
-// 		},
-// 		{
-// 			Context: "ItShouldFailIfTheCredentialsAreNotValid",
-// 			SetUp: func(t *testing.T) {
-// 				args := map[string]interface{}{
-// 					"username": "",
-// 					"password": "",
-// 				}
-
-// 				credentials = securityfactory.NewCredentials(args)
-
-// 				returnArgs = ReturnArgs{
-// 					{errors.New("failed")},
-// 					{logindbmodel.Login{}, nil},
-// 					{datastoremodel.User{}, nil},
-// 					{logindbmodel.Login{}, nil},
-// 					{authdbmodel.Auth{}, nil},
-// 					{"", nil},
-// 				}
-
-// 				errorType = customerror.BadRequest
-// 			},
-// 			WantError: true,
-// 			TearDown:  func(t *testing.T) {},
-// 		},
-// 		// {
-// 		// 	Context: "ItShouldFailIfAnErrorOccursWhenGettingALoginByUsername",
-// 		// 	SetUp: func(t *testing.T) {
-// 		// 		username := fake.Username()
-// 		// 		password := fake.Password(true, true, true, false, false, 8)
-
-// 		// 		credentials = security.Credentials{
-// 		// 			Username: username,
-// 		// 			Password: password,
-// 		// 		}
-
-// 		// 		returnArgs = ReturnArgs{
-// 		// 			{nil},
-// 		// 			{logindbmodel.Login{}, errors.New("failed")},
-// 		// 			{datastoremodel.User{}, nil},
-// 		// 			{logindbmodel.Login{}, nil},
-// 		// 			{authdbmodel.Auth{}, nil},
-// 		// 			{"", nil},
-// 		// 		}
-
-// 		// 		errorType = customerror.NoType
-// 		// 	},
-// 		// 	WantError: true,
-// 		// 	TearDown:  func(t *testing.T) {},
-// 		// },
-// 		// {
-// 		// 	Context: "ItShouldFailIfTheUsernameIsAlreadyRegistered",
-// 		// 	SetUp: func(t *testing.T) {
-// 		// 		username := fake.Username()
-// 		// 		password := fake.Password(true, true, true, false, false, 8)
-
-// 		// 		credentials = security.Credentials{
-// 		// 			Username: username,
-// 		// 			Password: password,
-// 		// 		}
-
-// 		// 		id := uuid.NewV4()
-// 		// 		userID := uuid.NewV4()
-
-// 		// 		logindb = logindbmodel.Login{
-// 		// 			ID:       id,
-// 		// 			UserID:   userID,
-// 		// 			Username: username,
-// 		// 			Password: password,
-// 		// 		}
-
-// 		// 		returnArgs = ReturnArgs{
-// 		// 			{nil},
-// 		// 			{logindb, nil},
-// 		// 			{datastoremodel.User{}, nil},
-// 		// 			{logindbmodel.Login{}, nil},
-// 		// 			{authdbmodel.Auth{}, nil},
-// 		// 			{"", nil},
-// 		// 		}
-
-// 		// 		errorType = customerror.Conflict
-// 		// 	},
-// 		// 	WantError: true,
-// 		// 	TearDown:  func(t *testing.T) {},
-// 		// },
-// 		// {
-// 		// 	Context: "ItShouldFailIfAnErrorOccursWhenCreatingAUser",
-// 		// 	SetUp: func(t *testing.T) {
-// 		// 		username := fake.Username()
-// 		// 		password := fake.Password(true, true, true, false, false, 8)
-
-// 		// 		credentials = security.Credentials{
-// 		// 			Username: username,
-// 		// 			Password: password,
-// 		// 		}
-
-// 		// 		userdb = datastoremodel.User{
-// 		// 			Username: username,
-// 		// 		}
-
-// 		// 		returnArgs = ReturnArgs{
-// 		// 			{nil},
-// 		// 			{logindbmodel.Login{}, nil},
-// 		// 			{datastoremodel.User{}, errors.New("failed")},
-// 		// 			{logindbmodel.Login{}, nil},
-// 		// 			{authdbmodel.Auth{}, nil},
-// 		// 			{"", nil},
-// 		// 		}
-
-// 		// 		errorType = customerror.NoType
-// 		// 	},
-// 		// 	WantError: true,
-// 		// 	TearDown:  func(t *testing.T) {},
-// 		// },
-// 		// {
-// 		// 	Context: "ItShouldFailIfAnErrorOccursWhenCreatingALogin",
-// 		// 	SetUp: func(t *testing.T) {
-// 		// 		username := fake.Username()
-// 		// 		password := fake.Password(true, true, true, false, false, 8)
-
-// 		// 		credentials = security.Credentials{
-// 		// 			Username: username,
-// 		// 			Password: password,
-// 		// 		}
-
-// 		// 		userdb = datastoremodel.User{
-// 		// 			Username: username,
-// 		// 		}
-
-// 		// 		id := uuid.NewV4()
-
-// 		// 		newUserdb := datastoremodel.User{
-// 		// 			ID:       id,
-// 		// 			Username: username,
-// 		// 		}
-
-// 		// 		logindb = logindbmodel.Login{
-// 		// 			UserID:   newUserdb.ID,
-// 		// 			Username: username,
-// 		// 			Password: password,
-// 		// 		}
-
-// 		// 		returnArgs = ReturnArgs{
-// 		// 			{nil},
-// 		// 			{logindbmodel.Login{}, nil},
-// 		// 			{newUserdb, nil},
-// 		// 			{logindbmodel.Login{}, errors.New("failed")},
-// 		// 			{authdbmodel.Auth{}, nil},
-// 		// 			{"", nil},
-// 		// 		}
-
-// 		// 		errorType = customerror.NoType
-// 		// 	},
-// 		// 	WantError: true,
-// 		// 	TearDown:  func(t *testing.T) {},
-// 		// },
-// 		// {
-// 		// 	Context: "ItShouldFailIfAnErrorOccursWhenCreatingAnAuth",
-// 		// 	SetUp: func(t *testing.T) {
-// 		// 		username := fake.Username()
-// 		// 		password := fake.Password(true, true, true, false, false, 8)
-
-// 		// 		credentials = security.Credentials{
-// 		// 			Username: username,
-// 		// 			Password: password,
-// 		// 		}
-
-// 		// 		userdb = datastoremodel.User{
-// 		// 			Username: username,
-// 		// 		}
-
-// 		// 		id := uuid.NewV4()
-
-// 		// 		newUserdb := datastoremodel.User{
-// 		// 			ID:       id,
-// 		// 			Username: username,
-// 		// 		}
-
-// 		// 		logindb = logindbmodel.Login{
-// 		// 			UserID:   newUserdb.ID,
-// 		// 			Username: username,
-// 		// 			Password: password,
-// 		// 		}
-
-// 		// 		id = uuid.NewV4()
-
-// 		// 		newLogindb := logindbmodel.Login{
-// 		// 			ID:       id,
-// 		// 			UserID:   newUserdb.ID,
-// 		// 			Username: username,
-// 		// 			Password: password,
-// 		// 		}
-
-// 		// 		authdb = authdbmodel.Auth{
-// 		// 			UserID: newUserdb.ID,
-// 		// 		}
-
-// 		// 		returnArgs = ReturnArgs{
-// 		// 			{nil},
-// 		// 			{logindbmodel.Login{}, nil},
-// 		// 			{newUserdb, nil},
-// 		// 			{newLogindb, nil},
-// 		// 			{authdbmodel.Auth{}, errors.New("failed")},
-// 		// 			{"", nil},
-// 		// 		}
-
-// 		// 		errorType = customerror.NoType
-// 		// 	},
-// 		// 	WantError: true,
-// 		// 	TearDown:  func(t *testing.T) {},
-// 		// },
-// 		// {
-// 		// 	Context: "ItShouldFailIfAnErrorOccursWhenCreatingAToken",
-// 		// 	SetUp: func(t *testing.T) {
-// 		// 		username := fake.Username()
-// 		// 		password := fake.Password(true, true, true, false, false, 8)
-
-// 		// 		credentials = security.Credentials{
-// 		// 			Username: username,
-// 		// 			Password: password,
-// 		// 		}
-
-// 		// 		userdb = datastoremodel.User{
-// 		// 			Username: username,
-// 		// 		}
-
-// 		// 		id := uuid.NewV4()
-
-// 		// 		newUserdb := datastoremodel.User{
-// 		// 			ID:       id,
-// 		// 			Username: username,
-// 		// 		}
-
-// 		// 		logindb = logindbmodel.Login{
-// 		// 			UserID:   newUserdb.ID,
-// 		// 			Username: username,
-// 		// 			Password: password,
-// 		// 		}
-
-// 		// 		id = uuid.NewV4()
-
-// 		// 		newLogindb := logindbmodel.Login{
-// 		// 			ID:       id,
-// 		// 			UserID:   newUserdb.ID,
-// 		// 			Username: username,
-// 		// 			Password: password,
-// 		// 		}
-
-// 		// 		authdb = authdbmodel.Auth{
-// 		// 			UserID: newUserdb.ID,
-// 		// 		}
-
-// 		// 		id = uuid.NewV4()
-
-// 		// 		newAuthdb = authdbmodel.Auth{
-// 		// 			ID:     id,
-// 		// 			UserID: newUserdb.ID,
-// 		// 		}
-
-// 		// 		newAuth = newAuthdb.ToDomain()
-
-// 		// 		returnArgs = ReturnArgs{
-// 		// 			{nil},
-// 		// 			{logindbmodel.Login{}, nil},
-// 		// 			{newUserdb, nil},
-// 		// 			{newLogindb, nil},
-// 		// 			{newAuthdb, nil},
-// 		// 			{"", errors.New("failed")},
-// 		// 		}
-
-// 		// 		errorType = customerror.NoType
-// 		// 	},
-// 		// 	WantError: true,
-// 		// 	TearDown:  func(t *testing.T) {},
-// 		// },
-// 	}
-
-// 	for _, tc := range ts.Cases {
-// 		ts.T().Run(tc.Context, func(t *testing.T) {
-// 			tc.SetUp(t)
-
-// 			validator := new(validatormock.ValidatorMock)
-// 			validator.On("Validate", credentials, "").Return(returnArgs[0]...)
-
-// 			loginDatastoreRepository := new(logindbrepositorymock.RepositoryMock)
-// 			loginDatastoreRepository.On("GetByUsername", credentials.Username).Return(returnArgs[1]...)
-
-// 			userDatastoreRepository := new(userdbrepositorymock.RepositoryMock)
-// 			userDatastoreRepository.On("Create", userdb).Return(returnArgs[2]...)
-
-// 			loginDatastoreRepository.On("Create", logindb).Return(returnArgs[3]...)
-
-// 			authDatastoreRepository := new(authdbrepositorymock.RepositoryMock)
-// 			authDatastoreRepository.On("Create", authdb).Return(returnArgs[4]...)
-
-// 			authN := new(authmock.AuthMock)
-// 			authN.On("CreateToken", newAuth, tokenExpTimeInSec).Return(returnArgs[5]...)
-
-// 			security := new(securitymock.SecurityMock)
-
-// 			authService := authservice.New(authDatastoreRepository, userDatastoreRepository, loginDatastoreRepository,
-// 				authN, tokenExpTimeInSec, security, validator)
-
-// 			returnedToken, err := authService.Register(credentials)
-
-// 			if !tc.WantError {
-// 				assert.Nil(t, err, fmt.Sprintf("Unexpected error %v.", err))
-// 				assert.Equal(t, token, returnedToken)
-// 			} else {
-// 				assert.NotNil(t, err, "Predicted error lost.")
-// 				assert.Equal(t, errorType, customerror.GetType(err))
-// 				assert.Empty(t, returnedToken)
-// 			}
-
-// 			tc.TearDown(t)
-// 		})
-// 	}
-// }
+import (
+	"errors"
+	"fmt"
+	"testing"
+
+	fake "github.com/brianvoe/gofakeit/v5"
+	authservice "github.com/icaroribeiro/new-go-code-challenge-template/internal/application/service/auth"
+	domainmodel "github.com/icaroribeiro/new-go-code-challenge-template/internal/core/domain/model"
+	authdatastoremockrepository "github.com/icaroribeiro/new-go-code-challenge-template/internal/core/ports/infrastructure/storage/datastore/mockrepository/auth"
+	logindatastoremockrepository "github.com/icaroribeiro/new-go-code-challenge-template/internal/core/ports/infrastructure/storage/datastore/mockrepository/login"
+	userdatastoremockrepository "github.com/icaroribeiro/new-go-code-challenge-template/internal/core/ports/infrastructure/storage/datastore/mockrepository/user"
+	"github.com/icaroribeiro/new-go-code-challenge-template/pkg/customerror"
+	"github.com/icaroribeiro/new-go-code-challenge-template/pkg/security"
+	domainfactorymodel "github.com/icaroribeiro/new-go-code-challenge-template/tests/factory/core/domain/model"
+	securitypkgfactory "github.com/icaroribeiro/new-go-code-challenge-template/tests/factory/pkg/security"
+	mockauth "github.com/icaroribeiro/new-go-code-challenge-template/tests/mocks/pkg/mockauth"
+	mocksecurity "github.com/icaroribeiro/new-go-code-challenge-template/tests/mocks/pkg/mocksecurity"
+	mockvalidator "github.com/icaroribeiro/new-go-code-challenge-template/tests/mocks/pkg/mockvalidator"
+	uuid "github.com/satori/go.uuid"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/suite"
+)
+
+func TestServiceUnit(t *testing.T) {
+	suite.Run(t, new(TestSuite))
+}
+
+func (ts *TestSuite) TestRegister() {
+	credentials := security.Credentials{}
+
+	user := domainmodel.User{}
+
+	login := domainmodel.Login{}
+
+	auth := domainmodel.Auth{}
+
+	newAuth := domainmodel.Auth{}
+
+	tokenExpTimeInSec := fake.Number(2, 10)
+
+	token := ""
+
+	errorType := customerror.NoType
+
+	returnArgs := ReturnArgs{}
+
+	ts.Cases = Cases{
+		{
+			Context: "ItShouldSucceedInRegisteringAUser",
+			SetUp: func(t *testing.T) {
+				credentials = securitypkgfactory.NewCredentials(nil)
+
+				args := map[string]interface{}{
+					"id":       uuid.Nil,
+					"username": credentials.Username,
+				}
+
+				user = domainfactorymodel.NewUser(args)
+
+				id := uuid.NewV4()
+
+				args = map[string]interface{}{
+					"id":       id,
+					"username": credentials.Username,
+				}
+
+				newUser := domainfactorymodel.NewUser(args)
+
+				args = map[string]interface{}{
+					"id":       uuid.Nil,
+					"userID":   newUser.ID,
+					"username": credentials.Username,
+					"password": credentials.Password,
+				}
+
+				login = domainfactorymodel.NewLogin(args)
+
+				args = map[string]interface{}{
+					"id":     uuid.Nil,
+					"userID": newUser.ID,
+				}
+
+				auth = domainfactorymodel.NewAuth(args)
+
+				id = uuid.NewV4()
+
+				args = map[string]interface{}{
+					"id":     id,
+					"userID": newUser.ID,
+				}
+
+				newAuth = domainfactorymodel.NewAuth(args)
+
+				token = fake.Word()
+
+				returnArgs = ReturnArgs{
+					{nil},
+					{domainmodel.Login{}, nil},
+					{newUser, nil},
+					{domainmodel.Login{}, nil},
+					{newAuth, nil},
+					{token, nil},
+				}
+			},
+			WantError: false,
+			TearDown:  func(t *testing.T) {},
+		},
+		{
+			Context: "ItShouldFailIfTheCredentialsAreNotValid",
+			SetUp: func(t *testing.T) {
+				credentials = securitypkgfactory.NewCredentials(nil)
+
+				returnArgs = ReturnArgs{
+					{errors.New("failed")},
+					{domainmodel.Login{}, nil},
+					{domainmodel.User{}, nil},
+					{domainmodel.Login{}, nil},
+					{domainmodel.Auth{}, nil},
+					{"", nil},
+				}
+
+				errorType = customerror.BadRequest
+			},
+			WantError: true,
+			TearDown:  func(t *testing.T) {},
+		},
+		{
+			Context: "ItShouldFailIfAnErrorOccursWhenGettingALoginByUsername",
+			SetUp: func(t *testing.T) {
+				username := fake.Username()
+				password := fake.Password(true, true, true, false, false, 8)
+
+				credentials = security.Credentials{
+					Username: username,
+					Password: password,
+				}
+
+				returnArgs = ReturnArgs{
+					{nil},
+					{domainmodel.Login{}, errors.New("failed")},
+					{domainmodel.User{}, nil},
+					{domainmodel.Login{}, nil},
+					{domainmodel.Auth{}, nil},
+					{"", nil},
+				}
+
+				errorType = customerror.NoType
+			},
+			WantError: true,
+			TearDown:  func(t *testing.T) {},
+		},
+		{
+			Context: "ItShouldFailIfTheUsernameIsAlreadyRegistered",
+			SetUp: func(t *testing.T) {
+				credentials = securitypkgfactory.NewCredentials(nil)
+
+				id := uuid.NewV4()
+				userID := uuid.NewV4()
+
+				login = domainmodel.Login{
+					ID:       id,
+					UserID:   userID,
+					Username: credentials.Username,
+					Password: credentials.Password,
+				}
+
+				returnArgs = ReturnArgs{
+					{nil},
+					{login, nil},
+					{domainmodel.User{}, nil},
+					{domainmodel.Login{}, nil},
+					{domainmodel.Auth{}, nil},
+					{"", nil},
+				}
+
+				errorType = customerror.Conflict
+			},
+			WantError: true,
+			TearDown:  func(t *testing.T) {},
+		},
+		{
+			Context: "ItShouldFailIfAnErrorOccursWhenCreatingAUser",
+			SetUp: func(t *testing.T) {
+				credentials = securitypkgfactory.NewCredentials(nil)
+
+				user = domainmodel.User{
+					Username: credentials.Username,
+				}
+
+				returnArgs = ReturnArgs{
+					{nil},
+					{domainmodel.Login{}, nil},
+					{domainmodel.User{}, errors.New("failed")},
+					{domainmodel.Login{}, nil},
+					{domainmodel.Auth{}, nil},
+					{"", nil},
+				}
+
+				errorType = customerror.NoType
+			},
+			WantError: true,
+			TearDown:  func(t *testing.T) {},
+		},
+		{
+			Context: "ItShouldFailIfAnErrorOccursWhenCreatingALogin",
+			SetUp: func(t *testing.T) {
+				credentials = securitypkgfactory.NewCredentials(nil)
+
+				user = domainmodel.User{
+					Username: credentials.Username,
+				}
+
+				id := uuid.NewV4()
+
+				newUser := domainmodel.User{
+					ID:       id,
+					Username: credentials.Username,
+				}
+
+				login = domainmodel.Login{
+					UserID:   newUser.ID,
+					Username: credentials.Username,
+					Password: credentials.Password,
+				}
+
+				returnArgs = ReturnArgs{
+					{nil},
+					{domainmodel.Login{}, nil},
+					{newUser, nil},
+					{domainmodel.Login{}, errors.New("failed")},
+					{domainmodel.Auth{}, nil},
+					{"", nil},
+				}
+
+				errorType = customerror.NoType
+			},
+			WantError: true,
+			TearDown:  func(t *testing.T) {},
+		},
+		{
+			Context: "ItShouldFailIfAnErrorOccursWhenCreatingAnAuth",
+			SetUp: func(t *testing.T) {
+				credentials = securitypkgfactory.NewCredentials(nil)
+
+				user = domainmodel.User{
+					Username: credentials.Username,
+				}
+
+				id := uuid.NewV4()
+
+				newUser := domainmodel.User{
+					ID:       id,
+					Username: credentials.Username,
+				}
+
+				login = domainmodel.Login{
+					UserID:   newUser.ID,
+					Username: credentials.Username,
+					Password: credentials.Password,
+				}
+
+				id = uuid.NewV4()
+
+				newLogin := domainmodel.Login{
+					ID:       id,
+					UserID:   newUser.ID,
+					Username: credentials.Username,
+					Password: credentials.Password,
+				}
+
+				auth = domainmodel.Auth{
+					UserID: newUser.ID,
+				}
+
+				returnArgs = ReturnArgs{
+					{nil},
+					{domainmodel.Login{}, nil},
+					{newUser, nil},
+					{newLogin, nil},
+					{domainmodel.Auth{}, errors.New("failed")},
+					{"", nil},
+				}
+
+				errorType = customerror.NoType
+			},
+			WantError: true,
+			TearDown:  func(t *testing.T) {},
+		},
+		{
+			Context: "ItShouldFailIfAnErrorOccursWhenCreatingAToken",
+			SetUp: func(t *testing.T) {
+				credentials = securitypkgfactory.NewCredentials(nil)
+
+				user = domainmodel.User{
+					Username: credentials.Username,
+				}
+
+				id := uuid.NewV4()
+
+				newUser := domainmodel.User{
+					ID:       id,
+					Username: credentials.Username,
+				}
+
+				login = domainmodel.Login{
+					UserID:   newUser.ID,
+					Username: credentials.Username,
+					Password: credentials.Password,
+				}
+
+				id = uuid.NewV4()
+
+				newLogin := domainmodel.Login{
+					ID:       id,
+					UserID:   newUser.ID,
+					Username: credentials.Username,
+					Password: credentials.Password,
+				}
+
+				auth = domainmodel.Auth{
+					UserID: newUser.ID,
+				}
+
+				id = uuid.NewV4()
+
+				newAuth = domainmodel.Auth{
+					ID:     id,
+					UserID: newUser.ID,
+				}
+
+				returnArgs = ReturnArgs{
+					{nil},
+					{domainmodel.Login{}, nil},
+					{newUser, nil},
+					{newLogin, nil},
+					{newAuth, nil},
+					{"", errors.New("failed")},
+				}
+
+				errorType = customerror.NoType
+			},
+			WantError: true,
+			TearDown:  func(t *testing.T) {},
+		},
+	}
+
+	for _, tc := range ts.Cases {
+		ts.T().Run(tc.Context, func(t *testing.T) {
+			tc.SetUp(t)
+
+			validator := new(mockvalidator.Validator)
+			validator.On("Validate", credentials).Return(returnArgs[0]...)
+
+			loginDatastoreRepository := new(logindatastoremockrepository.Repository)
+			loginDatastoreRepository.On("GetByUsername", credentials.Username).Return(returnArgs[1]...)
+
+			userDatastoreRepository := new(userdatastoremockrepository.Repository)
+			userDatastoreRepository.On("Create", user).Return(returnArgs[2]...)
+
+			loginDatastoreRepository.On("Create", login).Return(returnArgs[3]...)
+
+			authDatastoreRepository := new(authdatastoremockrepository.Repository)
+			authDatastoreRepository.On("Create", auth).Return(returnArgs[4]...)
+
+			authN := new(mockauth.Auth)
+			authN.On("CreateToken", newAuth, tokenExpTimeInSec).Return(returnArgs[5]...)
+
+			security := new(mocksecurity.Security)
+
+			authService := authservice.New(authDatastoreRepository, loginDatastoreRepository, userDatastoreRepository,
+				authN, security, validator, tokenExpTimeInSec)
+
+			returnedToken, err := authService.Register(credentials)
+
+			if !tc.WantError {
+				assert.Nil(t, err, fmt.Sprintf("Unexpected error %v.", err))
+				assert.Equal(t, token, returnedToken)
+			} else {
+				assert.NotNil(t, err, "Predicted error lost.")
+				assert.Equal(t, errorType, customerror.GetType(err))
+				assert.Empty(t, returnedToken)
+			}
+
+			tc.TearDown(t)
+		})
+	}
+}
 
 // func (ts *TestSuite) TestLogIn() {
 // 	credentials := security.Credentials{}
 
-// 	logindb := logindbmodel.Login{}
+// 	loginDatastore := domainmodel.Login{}
 
 // 	login := loginmodel.Login{}
 
-// 	authdb := authdbmodel.Auth{}
+// 	authDatastore := domainmodel.Auth{}
 
-// 	newAuthdb := authdbmodel.Auth{}
+// 	newAuthDatastore := domainmodel.Auth{}
 
 // 	newAuth := authmodel.Auth{}
 
@@ -503,35 +424,35 @@ package auth_test
 // 				id := uuid.NewV4()
 // 				userID := uuid.NewV4()
 
-// 				logindb = logindbmodel.Login{
+// 				loginDatastore = domainmodel.Login{
 // 					ID:       id,
 // 					UserID:   userID,
 // 					Username: username,
 // 					Password: password,
 // 				}
 
-// 				login = logindb.ToDomain()
+// 				login = loginDatastore.ToDomain()
 
-// 				authdb = authdbmodel.Auth{
-// 					UserID: logindb.UserID,
+// 				authDatastore = domainmodel.Auth{
+// 					UserID: loginDatastore.UserID,
 // 				}
 
 // 				id = uuid.NewV4()
 
-// 				newAuthdb = authdbmodel.Auth{
+// 				newAuthDatastore = domainmodel.Auth{
 // 					ID:     id,
-// 					UserID: logindb.UserID,
+// 					UserID: loginDatastore.UserID,
 // 				}
 
-// 				newAuth = newAuthdb.ToDomain()
+// 				newAuth = newAuthDatastore.ToDomain()
 
 // 				token = fake.Word()
 
 // 				returnArgs = ReturnArgs{
 // 					{nil},
-// 					{logindb, nil},
+// 					{loginDatastore, nil},
 // 					{nil},
-// 					{newAuthdb, nil},
+// 					{newAuthDatastore, nil},
 // 					{token, nil},
 // 				}
 // 			},
@@ -545,9 +466,9 @@ package auth_test
 
 // 				returnArgs = ReturnArgs{
 // 					{errors.New("failed")},
-// 					{logindbmodel.Login{}, nil},
+// 					{domainmodel.Login{}, nil},
 // 					{nil},
-// 					{authdbmodel.Auth{}, nil},
+// 					{domainmodel.Auth{}, nil},
 // 					{"", nil},
 // 				}
 
@@ -569,9 +490,9 @@ package auth_test
 
 // 				returnArgs = ReturnArgs{
 // 					{nil},
-// 					{logindbmodel.Login{}, errors.New("failed")},
+// 					{domainmodel.Login{}, errors.New("failed")},
 // 					{nil},
-// 					{authdbmodel.Auth{}, nil},
+// 					{domainmodel.Auth{}, nil},
 // 					{"", nil},
 // 				}
 
@@ -593,9 +514,9 @@ package auth_test
 
 // 				returnArgs = ReturnArgs{
 // 					{nil},
-// 					{logindbmodel.Login{}, nil},
+// 					{domainmodel.Login{}, nil},
 // 					{nil},
-// 					{authdbmodel.Auth{}, nil},
+// 					{domainmodel.Auth{}, nil},
 // 					{"", nil},
 // 				}
 
@@ -618,20 +539,20 @@ package auth_test
 // 				id := uuid.NewV4()
 // 				userID := uuid.NewV4()
 
-// 				logindb = logindbmodel.Login{
+// 				loginDatastore = domainmodel.Login{
 // 					ID:       id,
 // 					UserID:   userID,
 // 					Username: credentials.Username,
 // 					Password: credentials.Password,
 // 				}
 
-// 				login = logindb.ToDomain()
+// 				login = loginDatastore.ToDomain()
 
 // 				returnArgs = ReturnArgs{
 // 					{nil},
-// 					{logindb, nil},
+// 					{loginDatastore, nil},
 // 					{errors.New("failed")},
-// 					{authdbmodel.Auth{}, nil},
+// 					{domainmodel.Auth{}, nil},
 // 					{"", nil},
 // 				}
 
@@ -654,24 +575,24 @@ package auth_test
 // 				id := uuid.NewV4()
 // 				userID := uuid.NewV4()
 
-// 				logindb = logindbmodel.Login{
+// 				loginDatastore = domainmodel.Login{
 // 					ID:       id,
 // 					UserID:   userID,
 // 					Username: credentials.Username,
 // 					Password: credentials.Password,
 // 				}
 
-// 				login = logindb.ToDomain()
+// 				login = loginDatastore.ToDomain()
 
-// 				authdb = authdbmodel.Auth{
+// 				authDatastore = domainmodel.Auth{
 // 					UserID: login.UserID,
 // 				}
 
 // 				returnArgs = ReturnArgs{
 // 					{nil},
-// 					{logindb, nil},
+// 					{loginDatastore, nil},
 // 					{nil},
-// 					{authdbmodel.Auth{}, errors.New("failed")},
+// 					{domainmodel.Auth{}, errors.New("failed")},
 // 					{"", nil},
 // 				}
 
@@ -694,33 +615,33 @@ package auth_test
 // 				id := uuid.NewV4()
 // 				userID := uuid.NewV4()
 
-// 				logindb = logindbmodel.Login{
+// 				loginDatastore = domainmodel.Login{
 // 					ID:       id,
 // 					UserID:   userID,
 // 					Username: credentials.Username,
 // 					Password: credentials.Password,
 // 				}
 
-// 				login = logindb.ToDomain()
+// 				login = loginDatastore.ToDomain()
 
-// 				authdb = authdbmodel.Auth{
-// 					UserID: logindb.UserID,
+// 				authDatastore = domainmodel.Auth{
+// 					UserID: loginDatastore.UserID,
 // 				}
 
 // 				id = uuid.NewV4()
 
-// 				newAuthdb = authdbmodel.Auth{
+// 				newAuthDatastore = domainmodel.Auth{
 // 					ID:     id,
 // 					UserID: login.UserID,
 // 				}
 
-// 				newAuth = newAuthdb.ToDomain()
+// 				newAuth = newAuthDatastore.ToDomain()
 
 // 				returnArgs = ReturnArgs{
 // 					{nil},
-// 					{logindb, nil},
+// 					{loginDatastore, nil},
 // 					{nil},
-// 					{newAuthdb, nil},
+// 					{newAuthDatastore, nil},
 // 					{"", errors.New("failed")},
 // 				}
 
@@ -735,22 +656,22 @@ package auth_test
 // 		ts.T().Run(tc.Context, func(t *testing.T) {
 // 			tc.SetUp(t)
 
-// 			validator := new(validatormock.ValidatorMock)
+// 			validator := new(mockvalidator.ValidatorMock)
 // 			validator.On("Validate", credentials, "").Return(returnArgs[0]...)
 
-// 			loginDatastoreRepository := new(logindbrepositorymock.RepositoryMock)
+// 			loginDatastoreRepository := new(logindatastoremockrepository.Repository)
 // 			loginDatastoreRepository.On("GetByUsername", credentials.Username).Return(returnArgs[1]...)
 
-// 			security := new(securitymock.SecurityMock)
+// 			security := new(mocksecurity.Security)
 // 			security.On("VerifyPasswords", login.Password, credentials.Password).Return(returnArgs[2]...)
 
-// 			authDatastoreRepository := new(authdbrepositorymock.RepositoryMock)
-// 			authDatastoreRepository.On("Create", authdb).Return(returnArgs[3]...)
+// 			authDatastoreRepository := new(authdatastoremockrepository.Repository)
+// 			authDatastoreRepository.On("Create", authDatastore).Return(returnArgs[3]...)
 
-// 			authN := new(authmock.AuthMock)
+// 			authN := new(mockauth.Auth)
 // 			authN.On("CreateToken", newAuth, tokenExpTimeInSec).Return(returnArgs[4]...)
 
-// 			userDatastoreRepository := new(userdbrepositorymock.RepositoryMock)
+// 			userDatastoreRepository := new(userDatastoremockrepository.Repository)
 
 // 			authService := authservice.New(authDatastoreRepository, userDatastoreRepository, loginDatastoreRepository,
 // 				authN, tokenExpTimeInSec, security, validator)
@@ -831,16 +752,16 @@ package auth_test
 // 		ts.T().Run(tc.Context, func(t *testing.T) {
 // 			tc.SetUp(t)
 
-// 			validator := new(validatormock.ValidatorMock)
+// 			validator := new(mockvalidator.ValidatorMock)
 // 			validator.On("Validate", auth, "").Return(returnArgs[0]...)
 
-// 			authN := new(authmock.AuthMock)
+// 			authN := new(mockauth.Auth)
 // 			authN.On("CreateToken", auth, tokenExpTimeInSec).Return(returnArgs[1]...)
 
-// 			authDatastoreRepository := new(authdbrepositorymock.RepositoryMock)
-// 			userDatastoreRepository := new(userdbrepositorymock.RepositoryMock)
-// 			loginDatastoreRepository := new(logindbrepositorymock.RepositoryMock)
-// 			security := new(securitymock.SecurityMock)
+// 			authDatastoreRepository := new(authDatastoremockrepository.Repository)
+// 			userDatastoreRepository := new(userDatastoremockrepository.Repository)
+// 			loginDatastoreRepository := new(logindatastoremockrepository.Repository)
+// 			security := new(mocksecurity.Security)
 
 // 			authService := authservice.New(authDatastoreRepository, userDatastoreRepository, loginDatastoreRepository,
 // 				authN, tokenExpTimeInSec, security, validator)
@@ -866,11 +787,11 @@ package auth_test
 
 // 	passwords := security.Passwords{}
 
-// 	logindb := logindbmodel.Login{}
+// 	loginDatastore := domainmodel.Login{}
 
 // 	login := loginmodel.Login{}
 
-// 	updatedLogindb := logindbmodel.Login{}
+// 	updatedLogindb := domainmodel.Login{}
 
 // 	errorType := customerror.NoType
 
@@ -895,26 +816,26 @@ package auth_test
 // 				userID := uuid.NewV4()
 // 				username := fake.Username()
 
-// 				logindb = logindbmodel.Login{
+// 				loginDatastore = domainmodel.Login{
 // 					ID:       loginID,
 // 					UserID:   userID,
 // 					Username: username,
 // 					Password: currentPassword,
 // 				}
 
-// 				login = logindb.ToDomain()
+// 				login = loginDatastore.ToDomain()
 
-// 				updatedLogindb = logindb
+// 				updatedLogindb = loginDatastore
 // 				updatedLogindb.Password = newPassword
 
-// 				newLogindb := updatedLogindb
+// 				newLoginDatastore := updatedLogindb
 
 // 				returnArgs = ReturnArgs{
 // 					{nil},
 // 					{nil},
-// 					{logindb, nil},
+// 					{loginDatastore, nil},
 // 					{nil},
-// 					{newLogindb, nil},
+// 					{newLoginDatastore, nil},
 // 				}
 // 			},
 // 			WantError: false,
@@ -927,9 +848,9 @@ package auth_test
 // 				returnArgs = ReturnArgs{
 // 					{errors.New("failed")},
 // 					{nil},
-// 					{logindbmodel.Login{}, nil},
+// 					{domainmodel.Login{}, nil},
 // 					{nil},
-// 					{logindbmodel.Login{}, nil},
+// 					{domainmodel.Login{}, nil},
 // 				}
 
 // 				errorType = customerror.BadRequest
@@ -944,9 +865,9 @@ package auth_test
 // 				returnArgs = ReturnArgs{
 // 					{nil},
 // 					{errors.New("failed")},
-// 					{logindbmodel.Login{}, nil},
+// 					{domainmodel.Login{}, nil},
 // 					{nil},
-// 					{logindbmodel.Login{}, nil},
+// 					{domainmodel.Login{}, nil},
 // 				}
 
 // 				errorType = customerror.BadRequest
@@ -968,9 +889,9 @@ package auth_test
 // 				returnArgs = ReturnArgs{
 // 					{nil},
 // 					{nil},
-// 					{logindbmodel.Login{}, errors.New("failed")},
+// 					{domainmodel.Login{}, errors.New("failed")},
 // 					{nil},
-// 					{logindbmodel.Login{}, nil},
+// 					{domainmodel.Login{}, nil},
 // 				}
 
 // 				errorType = customerror.NoType
@@ -992,9 +913,9 @@ package auth_test
 // 				returnArgs = ReturnArgs{
 // 					{nil},
 // 					{nil},
-// 					{logindbmodel.Login{}, nil},
+// 					{domainmodel.Login{}, nil},
 // 					{nil},
-// 					{logindbmodel.Login{}, nil},
+// 					{domainmodel.Login{}, nil},
 // 				}
 
 // 				errorType = customerror.NotFound
@@ -1017,21 +938,21 @@ package auth_test
 // 				userID := uuid.NewV4()
 // 				username := fake.Username()
 
-// 				logindb = logindbmodel.Login{
+// 				loginDatastore = domainmodel.Login{
 // 					ID:       loginID,
 // 					UserID:   userID,
 // 					Username: username,
 // 					Password: currentPassword,
 // 				}
 
-// 				login = logindb.ToDomain()
+// 				login = loginDatastore.ToDomain()
 
 // 				returnArgs = ReturnArgs{
 // 					{nil},
 // 					{nil},
-// 					{logindb, nil},
+// 					{loginDatastore, nil},
 // 					{errors.New("the password is invalid")},
-// 					{logindbmodel.Login{}, nil},
+// 					{domainmodel.Login{}, nil},
 // 				}
 
 // 				errorType = customerror.Unauthorized
@@ -1054,21 +975,21 @@ package auth_test
 // 				userID := uuid.NewV4()
 // 				username := fake.Username()
 
-// 				logindb = logindbmodel.Login{
+// 				loginDatastore = domainmodel.Login{
 // 					ID:       loginID,
 // 					UserID:   userID,
 // 					Username: username,
 // 					Password: currentPassword,
 // 				}
 
-// 				login = logindb.ToDomain()
+// 				login = loginDatastore.ToDomain()
 
 // 				returnArgs = ReturnArgs{
 // 					{nil},
 // 					{nil},
-// 					{logindb, nil},
+// 					{loginDatastore, nil},
 // 					{errors.New("failed")},
-// 					{logindbmodel.Login{}, nil},
+// 					{domainmodel.Login{}, nil},
 // 				}
 
 // 				errorType = customerror.NoType
@@ -1091,21 +1012,21 @@ package auth_test
 // 				userID := uuid.NewV4()
 // 				username := fake.Username()
 
-// 				logindb = logindbmodel.Login{
+// 				loginDatastore = domainmodel.Login{
 // 					ID:       loginID,
 // 					UserID:   userID,
 // 					Username: username,
 // 					Password: currentPassword,
 // 				}
 
-// 				login = logindb.ToDomain()
+// 				login = loginDatastore.ToDomain()
 
 // 				returnArgs = ReturnArgs{
 // 					{nil},
 // 					{nil},
-// 					{logindb, nil},
+// 					{loginDatastore, nil},
 // 					{nil},
-// 					{logindbmodel.Login{}, nil},
+// 					{domainmodel.Login{}, nil},
 // 				}
 
 // 				errorType = customerror.BadRequest
@@ -1128,24 +1049,24 @@ package auth_test
 // 				userID := uuid.NewV4()
 // 				username := fake.Username()
 
-// 				logindb = logindbmodel.Login{
+// 				loginDatastore = domainmodel.Login{
 // 					ID:       loginID,
 // 					UserID:   userID,
 // 					Username: username,
 // 					Password: currentPassword,
 // 				}
 
-// 				login = logindb.ToDomain()
+// 				login = loginDatastore.ToDomain()
 
-// 				updatedLogindb = logindb
+// 				updatedLogindb = loginDatastore
 // 				updatedLogindb.Password = newPassword
 
 // 				returnArgs = ReturnArgs{
 // 					{nil},
 // 					{nil},
-// 					{logindb, nil},
+// 					{loginDatastore, nil},
 // 					{nil},
-// 					{logindbmodel.Login{}, errors.New("failed")},
+// 					{domainmodel.Login{}, errors.New("failed")},
 // 				}
 
 // 				errorType = customerror.NoType
@@ -1158,21 +1079,21 @@ package auth_test
 // 		ts.T().Run(tc.Context, func(t *testing.T) {
 // 			tc.SetUp(t)
 
-// 			validator := new(validatormock.ValidatorMock)
+// 			validator := new(mockvalidator.ValidatorMock)
 // 			validator.On("Valid", id, "nonzero, uuid").Return(returnArgs[0]...)
 // 			validator.On("Validate", passwords, "").Return(returnArgs[1]...)
 
-// 			loginDatastoreRepository := new(logindbrepositorymock.RepositoryMock)
+// 			loginDatastoreRepository := new(logindatastoremockrepository.Repository)
 // 			loginDatastoreRepository.On("GetByUserID", id).Return(returnArgs[2]...)
 
-// 			security := new(securitymock.SecurityMock)
+// 			security := new(mocksecurity.Security)
 // 			security.On("VerifyPasswords", login.Password, passwords.CurrentPassword).Return(returnArgs[3]...)
 
 // 			loginDatastoreRepository.On("Update", updatedLogindb.ID.String(), updatedLogindb).Return(returnArgs[4]...)
 
-// 			authDatastoreRepository := new(authdbrepositorymock.RepositoryMock)
-// 			userDatastoreRepository := new(userdbrepositorymock.RepositoryMock)
-// 			authN := new(authmock.AuthMock)
+// 			authDatastoreRepository := new(authDatastoremockrepository.Repository)
+// 			userDatastoreRepository := new(userDatastoremockrepository.Repository)
+// 			authN := new(mockauth.Auth)
 
 // 			authService := authservice.New(authDatastoreRepository, userDatastoreRepository, loginDatastoreRepository,
 // 				authN, tokenExpTimeInSec, security, validator)
@@ -1213,11 +1134,11 @@ package auth_test
 // 					"userID": userID,
 // 				}
 
-// 				authdb := authdbmodelfactory.New(args)
+// 				datastorefactorymodel.New(args)
 
 // 				returnArgs = ReturnArgs{
 // 					{nil},
-// 					{authdb, nil},
+// 					{authDatastore, nil},
 // 				}
 // 			},
 // 			WantError: false,
@@ -1229,7 +1150,7 @@ package auth_test
 
 // 				returnArgs = ReturnArgs{
 // 					{errors.New("failed")},
-// 					{authdbmodel.Auth{}, nil},
+// 					{domainmodel.Auth{}, nil},
 // 				}
 
 // 				errorType = customerror.BadRequest
@@ -1243,7 +1164,7 @@ package auth_test
 
 // 				returnArgs = ReturnArgs{
 // 					{nil},
-// 					{authdbmodel.Auth{}, errors.New("failed")},
+// 					{domainmodel.Auth{}, errors.New("failed")},
 // 				}
 
 // 				errorType = customerror.NoType
@@ -1256,16 +1177,16 @@ package auth_test
 // 		ts.T().Run(tc.Context, func(t *testing.T) {
 // 			tc.SetUp(t)
 
-// 			validator := new(validatormock.ValidatorMock)
+// 			validator := new(mockvalidator.ValidatorMock)
 // 			validator.On("Valid", id, "nonzero, uuid").Return(returnArgs[0]...)
 
-// 			authDatastoreRepository := new(authdbrepositorymock.RepositoryMock)
+// 			authDatastoreRepository := new(authDatastoremockrepository.Repository)
 // 			authDatastoreRepository.On("Delete", id).Return(returnArgs[1]...)
 
-// 			userDatastoreRepository := new(userdbrepositorymock.RepositoryMock)
-// 			loginDatastoreRepository := new(logindbrepositorymock.RepositoryMock)
-// 			authN := new(authmock.AuthMock)
-// 			security := new(securitymock.SecurityMock)
+// 			userDatastoreRepository := new(userDatastoremockrepository.Repository)
+// 			loginDatastoreRepository := new(logindatastoremockrepository.Repository)
+// 			authN := new(mockauth.Auth)
+// 			security := new(mocksecurity.Security)
 
 // 			authService := authservice.New(authDatastoreRepository, userDatastoreRepository, loginDatastoreRepository,
 // 				authN, tokenExpTimeInSec, security, validator)
@@ -1285,9 +1206,9 @@ package auth_test
 // func (ts *TestSuite) TestWithDBTrx() {
 // 	dbTrx := &gorm.DB{}
 
-// 	authDatastoreRepositoryWithDBTrx := &authdbrepository.Repository{}
-// 	userDatastoreRepositoryWithDBTrx := &userdbrepository.Repository{}
-// 	loginDatastoreRepositoryWithDBTrx := &logindbrepository.Repository{}
+// 	authDatastoreRepositoryWithDBTrx := &authDatastorerepository.Repository{}
+// 	userDatastoreRepositoryWithDBTrx := &userDatastorerepository.Repository{}
+// 	loginDatastoreRepositoryWithDBTrx := &loginDatastorerepository.Repository{}
 
 // 	tokenExpTimeInSec := fake.Number(2, 10)
 
@@ -1299,9 +1220,9 @@ package auth_test
 // 			SetUp: func(t *testing.T) {
 // 				dbTrx = ts.DB.Begin()
 
-// 				authDatastoreRepositoryWithDBTrx = &authdbrepository.Repository{}
-// 				userDatastoreRepositoryWithDBTrx = &userdbrepository.Repository{}
-// 				loginDatastoreRepositoryWithDBTrx = &logindbrepository.Repository{}
+// 				authDatastoreRepositoryWithDBTrx = &authDatastorerepository.Repository{}
+// 				userDatastoreRepositoryWithDBTrx = &userDatastorerepository.Repository{}
+// 				loginDatastoreRepositoryWithDBTrx = &loginDatastorerepository.Repository{}
 
 // 				returnArgs = ReturnArgs{
 // 					{authDatastoreRepositoryWithDBTrx},
@@ -1317,18 +1238,18 @@ package auth_test
 // 		ts.T().Run(tc.Context, func(t *testing.T) {
 // 			tc.SetUp(t)
 
-// 			authDatastoreRepository := new(authdbrepositorymock.RepositoryMock)
+// 			authDatastoreRepository := new(authDatastoremockrepository.Repository)
 // 			authDatastoreRepository.On("WithDBTrx", dbTrx).Return(returnArgs[0]...)
 
-// 			userDatastoreRepository := new(userdbrepositorymock.RepositoryMock)
+// 			userDatastoreRepository := new(userDatastoremockrepository.Repository)
 // 			userDatastoreRepository.On("WithDBTrx", dbTrx).Return(returnArgs[1]...)
 
-// 			loginDatastoreRepository := new(logindbrepositorymock.RepositoryMock)
+// 			loginDatastoreRepository := new(logindatastoremockrepository.Repository)
 // 			loginDatastoreRepository.On("WithDBTrx", dbTrx).Return(returnArgs[2]...)
 
-// 			authN := new(authmock.AuthMock)
-// 			security := new(securitymock.SecurityMock)
-// 			validator := new(validatormock.ValidatorMock)
+// 			authN := new(mockauth.Auth)
+// 			security := new(mocksecurity.Security)
+// 			validator := new(mockvalidator.ValidatorMock)
 
 // 			authService := authservice.New(authDatastoreRepository, userDatastoreRepository, loginDatastoreRepository,
 // 				authN, tokenExpTimeInSec, security, validator)

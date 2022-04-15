@@ -1,10 +1,10 @@
-github.com/icaroribeiro/new-go-code-challenge-template/internal/application/service/auth/service.go:27:					New				0.0%
-github.com/icaroribeiro/new-go-code-challenge-template/internal/application/service/auth/service.go:48:					Register			0.0%
-github.com/icaroribeiro/new-go-code-challenge-template/internal/application/service/auth/service.go:102:				LogIn				0.0%
-github.com/icaroribeiro/new-go-code-challenge-template/internal/application/service/auth/service.go:149:				RenewToken			0.0%
-github.com/icaroribeiro/new-go-code-challenge-template/internal/application/service/auth/service.go:154:				ModifyPassword			0.0%
-github.com/icaroribeiro/new-go-code-challenge-template/internal/application/service/auth/service.go:192:				LogOut				0.0%
-github.com/icaroribeiro/new-go-code-challenge-template/internal/application/service/auth/service.go:203:				WithDBTrx			0.0%
+github.com/icaroribeiro/new-go-code-challenge-template/internal/application/service/auth/service.go:27:					New				100.0%
+github.com/icaroribeiro/new-go-code-challenge-template/internal/application/service/auth/service.go:47:					Register			100.0%
+github.com/icaroribeiro/new-go-code-challenge-template/internal/application/service/auth/service.go:99:					LogIn				0.0%
+github.com/icaroribeiro/new-go-code-challenge-template/internal/application/service/auth/service.go:146:				RenewToken			0.0%
+github.com/icaroribeiro/new-go-code-challenge-template/internal/application/service/auth/service.go:151:				ModifyPassword			0.0%
+github.com/icaroribeiro/new-go-code-challenge-template/internal/application/service/auth/service.go:189:				LogOut				0.0%
+github.com/icaroribeiro/new-go-code-challenge-template/internal/application/service/auth/service.go:200:				WithDBTrx			0.0%
 github.com/icaroribeiro/new-go-code-challenge-template/internal/application/service/healthcheck/service.go:13:				New				100.0%
 github.com/icaroribeiro/new-go-code-challenge-template/internal/application/service/healthcheck/service.go:21:				GetStatus			100.0%
 github.com/icaroribeiro/new-go-code-challenge-template/internal/application/service/user/service.go:16:					New				100.0%
@@ -90,4 +90,4 @@ github.com/icaroribeiro/new-go-code-challenge-template/pkg/validator/uuid/valida
 github.com/icaroribeiro/new-go-code-challenge-template/pkg/validator/validator.go:14:							New				100.0%
 github.com/icaroribeiro/new-go-code-challenge-template/pkg/validator/validator.go:31:							Validate			100.0%
 github.com/icaroribeiro/new-go-code-challenge-template/pkg/validator/validator.go:36:							ValidateWithTags		100.0%
-total:																	(statements)			64.9%
+total:																	(statements)			69.5%
