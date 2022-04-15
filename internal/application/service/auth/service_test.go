@@ -388,309 +388,305 @@ func (ts *TestSuite) TestRegister() {
 	}
 }
 
-// func (ts *TestSuite) TestLogIn() {
-// 	credentials := security.Credentials{}
+func (ts *TestSuite) TestLogIn() {
+	credentials := security.Credentials{}
 
-// 	loginDatastore := domainmodel.Login{}
+	login := domainmodel.Login{}
 
-// 	login := loginmodel.Login{}
+	auth := domainmodel.Auth{}
 
-// 	authDatastore := domainmodel.Auth{}
+	newAuth := domainmodel.Auth{}
 
-// 	newAuthDatastore := domainmodel.Auth{}
+	tokenExpTimeInSec := fake.Number(2, 10)
 
-// 	newAuth := authmodel.Auth{}
+	token := ""
 
-// 	tokenExpTimeInSec := fake.Number(2, 10)
+	errorType := customerror.NoType
 
-// 	token := ""
+	returnArgs := ReturnArgs{}
 
-// 	errorType := customerror.NoType
+	ts.Cases = Cases{
+		{
+			Context: "ItShouldSucceedInLoggingIn",
+			SetUp: func(t *testing.T) {
+				credentials = securitypkgfactory.NewCredentials(nil)
 
-// 	returnArgs := ReturnArgs{}
+				id := uuid.NewV4()
+				userID := uuid.NewV4()
 
-// 	ts.Cases = Cases{
-// 		{
-// 			Context: "ItShouldSucceedInLoggingIn",
-// 			SetUp: func(t *testing.T) {
-// 				username := fake.Username()
-// 				password := fake.Password(true, true, true, false, false, 8)
+				login = domainmodel.Login{
+					ID:       id,
+					UserID:   userID,
+					Username: credentials.Username,
+					Password: credentials.Password,
+				}
 
-// 				credentials = security.Credentials{
-// 					Username: username,
-// 					Password: password,
-// 				}
+				auth = domainmodel.Auth{
+					UserID: login.UserID,
+				}
 
-// 				id := uuid.NewV4()
-// 				userID := uuid.NewV4()
+				id = uuid.NewV4()
 
-// 				loginDatastore = domainmodel.Login{
-// 					ID:       id,
-// 					UserID:   userID,
-// 					Username: username,
-// 					Password: password,
-// 				}
+				newAuth = domainmodel.Auth{
+					ID:     id,
+					UserID: userID,
+				}
 
-// 				login = loginDatastore.ToDomain()
+				token = fake.Word()
 
-// 				authDatastore = domainmodel.Auth{
-// 					UserID: loginDatastore.UserID,
-// 				}
+				returnArgs = ReturnArgs{
+					{nil},
+					{login, nil},
+					{nil},
+					{domainmodel.Auth{}, nil},
+					{newAuth, nil},
+					{token, nil},
+				}
+			},
+			WantError: false,
+			TearDown:  func(t *testing.T) {},
+		},
+		{
+			Context: "ItShouldFailIfTheEvaluatedCredentialsValuesAreNotValid",
+			SetUp: func(t *testing.T) {
+				credentials = security.Credentials{}
 
-// 				id = uuid.NewV4()
+				returnArgs = ReturnArgs{
+					{errors.New("failed")},
+					{domainmodel.Login{}, nil},
+					{nil},
+					{domainmodel.Auth{}, nil},
+					{domainmodel.Auth{}, nil},
+					{"", nil},
+				}
 
-// 				newAuthDatastore = domainmodel.Auth{
-// 					ID:     id,
-// 					UserID: loginDatastore.UserID,
-// 				}
+				errorType = customerror.BadRequest
+			},
+			WantError: true,
+			TearDown:  func(t *testing.T) {},
+		},
+		{
+			Context: "ItShouldFailIfAnErrorOccursWhenGettingALoginByUsername",
+			SetUp: func(t *testing.T) {
+				credentials = securitypkgfactory.NewCredentials(nil)
 
-// 				newAuth = newAuthDatastore.ToDomain()
+				returnArgs = ReturnArgs{
+					{nil},
+					{domainmodel.Login{}, errors.New("failed")},
+					{nil},
+					{domainmodel.Auth{}, nil},
+					{domainmodel.Auth{}, nil},
+					{"", nil},
+				}
 
-// 				token = fake.Word()
+				errorType = customerror.NoType
+			},
+			WantError: true,
+			TearDown:  func(t *testing.T) {},
+		},
+		{
+			Context: "ItShouldFailIfTheUsernameIsNotRegistered",
+			SetUp: func(t *testing.T) {
+				credentials = securitypkgfactory.NewCredentials(nil)
 
-// 				returnArgs = ReturnArgs{
-// 					{nil},
-// 					{loginDatastore, nil},
-// 					{nil},
-// 					{newAuthDatastore, nil},
-// 					{token, nil},
-// 				}
-// 			},
-// 			WantError: false,
-// 			TearDown:  func(t *testing.T) {},
-// 		},
-// 		{
-// 			Context: "ItShouldFailIfTheEvaluatedCredentialsValuesAreNotValid",
-// 			SetUp: func(t *testing.T) {
-// 				credentials = security.Credentials{}
+				returnArgs = ReturnArgs{
+					{nil},
+					{domainmodel.Login{}, nil},
+					{nil},
+					{domainmodel.Auth{}, nil},
+					{domainmodel.Auth{}, nil},
+					{"", nil},
+				}
 
-// 				returnArgs = ReturnArgs{
-// 					{errors.New("failed")},
-// 					{domainmodel.Login{}, nil},
-// 					{nil},
-// 					{domainmodel.Auth{}, nil},
-// 					{"", nil},
-// 				}
+				errorType = customerror.NotFound
+			},
+			WantError: true,
+			TearDown:  func(t *testing.T) {},
+		},
+		{
+			Context: "ItShouldFailIfAnErrorOccursWhenVerifyingThePasswords",
+			SetUp: func(t *testing.T) {
+				credentials = securitypkgfactory.NewCredentials(nil)
 
-// 				errorType = customerror.BadRequest
-// 			},
-// 			WantError: true,
-// 			TearDown:  func(t *testing.T) {},
-// 		},
-// 		{
-// 			Context: "ItShouldFailIfAnErrorOccursWhenGettingALoginByUsername",
-// 			SetUp: func(t *testing.T) {
-// 				username := fake.Username()
-// 				password := fake.Password(true, true, true, false, false, 8)
+				id := uuid.NewV4()
+				userID := uuid.NewV4()
 
-// 				credentials = security.Credentials{
-// 					Username: username,
-// 					Password: password,
-// 				}
+				login = domainmodel.Login{
+					ID:       id,
+					UserID:   userID,
+					Username: credentials.Username,
+					Password: credentials.Password,
+				}
 
-// 				returnArgs = ReturnArgs{
-// 					{nil},
-// 					{domainmodel.Login{}, errors.New("failed")},
-// 					{nil},
-// 					{domainmodel.Auth{}, nil},
-// 					{"", nil},
-// 				}
+				returnArgs = ReturnArgs{
+					{nil},
+					{login, nil},
+					{errors.New("failed")},
+					{domainmodel.Auth{}, nil},
+					{domainmodel.Auth{}, nil},
+					{"", nil},
+				}
 
-// 				errorType = customerror.NoType
-// 			},
-// 			WantError: true,
-// 			TearDown:  func(t *testing.T) {},
-// 		},
-// 		{
-// 			Context: "ItShouldFailIfTheUsernameIsNotRegistered",
-// 			SetUp: func(t *testing.T) {
-// 				username := fake.Username()
-// 				password := fake.Password(true, true, true, false, false, 8)
+				errorType = customerror.NoType
+			},
+			WantError: true,
+			TearDown:  func(t *testing.T) {},
+		},
+		{
+			Context: "ItShouldFailIfAnErrorOccursWhenCreatingAnAuth",
+			SetUp: func(t *testing.T) {
+				credentials = securitypkgfactory.NewCredentials(nil)
 
-// 				credentials = security.Credentials{
-// 					Username: username,
-// 					Password: password,
-// 				}
+				id := uuid.NewV4()
+				userID := uuid.NewV4()
 
-// 				returnArgs = ReturnArgs{
-// 					{nil},
-// 					{domainmodel.Login{}, nil},
-// 					{nil},
-// 					{domainmodel.Auth{}, nil},
-// 					{"", nil},
-// 				}
+				login = domainmodel.Login{
+					ID:       id,
+					UserID:   userID,
+					Username: credentials.Username,
+					Password: credentials.Password,
+				}
 
-// 				errorType = customerror.NotFound
-// 			},
-// 			WantError: true,
-// 			TearDown:  func(t *testing.T) {},
-// 		},
-// 		{
-// 			Context: "ItShouldFailIfAnErrorOccursWhenVerifyingThePasswords",
-// 			SetUp: func(t *testing.T) {
-// 				username := fake.Username()
-// 				password := fake.Password(true, true, true, false, false, 8)
+				auth = domainmodel.Auth{
+					UserID: login.UserID,
+				}
 
-// 				credentials = security.Credentials{
-// 					Username: username,
-// 					Password: password,
-// 				}
+				returnArgs = ReturnArgs{
+					{nil},
+					{login, nil},
+					{nil},
+					{domainmodel.Auth{}, errors.New("failed")},
+					{domainmodel.Auth{}, nil},
+					{"", nil},
+				}
 
-// 				id := uuid.NewV4()
-// 				userID := uuid.NewV4()
+				errorType = customerror.NoType
+			},
+			WantError: true,
+			TearDown:  func(t *testing.T) {},
+		},
+		{
+			Context: "ItShouldFailIfTheUserIDIsAlreadyRegistered",
+			SetUp: func(t *testing.T) {
+				credentials = securitypkgfactory.NewCredentials(nil)
 
-// 				loginDatastore = domainmodel.Login{
-// 					ID:       id,
-// 					UserID:   userID,
-// 					Username: credentials.Username,
-// 					Password: credentials.Password,
-// 				}
+				id := uuid.NewV4()
+				userID := uuid.NewV4()
 
-// 				login = loginDatastore.ToDomain()
+				login = domainmodel.Login{
+					ID:       id,
+					UserID:   userID,
+					Username: credentials.Username,
+					Password: credentials.Password,
+				}
 
-// 				returnArgs = ReturnArgs{
-// 					{nil},
-// 					{loginDatastore, nil},
-// 					{errors.New("failed")},
-// 					{domainmodel.Auth{}, nil},
-// 					{"", nil},
-// 				}
+				auth = domainmodel.Auth{
+					UserID: login.UserID,
+				}
 
-// 				errorType = customerror.NoType
-// 			},
-// 			WantError: true,
-// 			TearDown:  func(t *testing.T) {},
-// 		},
-// 		{
-// 			Context: "ItShouldFailIfAnErrorOccursWhenCreatingAnAuth",
-// 			SetUp: func(t *testing.T) {
-// 				username := fake.Username()
-// 				password := fake.Password(true, true, true, false, false, 8)
+				id = uuid.NewV4()
 
-// 				credentials = security.Credentials{
-// 					Username: username,
-// 					Password: password,
-// 				}
+				newAuth = domainmodel.Auth{
+					ID:     id,
+					UserID: login.UserID,
+				}
 
-// 				id := uuid.NewV4()
-// 				userID := uuid.NewV4()
+				returnArgs = ReturnArgs{
+					{nil},
+					{login, nil},
+					{nil},
+					{auth, nil},
+					{domainmodel.Auth{}, nil},
+					{"", nil},
+				}
 
-// 				loginDatastore = domainmodel.Login{
-// 					ID:       id,
-// 					UserID:   userID,
-// 					Username: credentials.Username,
-// 					Password: credentials.Password,
-// 				}
+				errorType = customerror.NoType
+			},
+			WantError: true,
+			TearDown:  func(t *testing.T) {},
+		},
+		{
+			Context: "ItShouldFailIfAnErrorOccursWhenCreatingAToken",
+			SetUp: func(t *testing.T) {
+				credentials = securitypkgfactory.NewCredentials(nil)
 
-// 				login = loginDatastore.ToDomain()
+				id := uuid.NewV4()
+				userID := uuid.NewV4()
 
-// 				authDatastore = domainmodel.Auth{
-// 					UserID: login.UserID,
-// 				}
+				login = domainmodel.Login{
+					ID:       id,
+					UserID:   userID,
+					Username: credentials.Username,
+					Password: credentials.Password,
+				}
 
-// 				returnArgs = ReturnArgs{
-// 					{nil},
-// 					{loginDatastore, nil},
-// 					{nil},
-// 					{domainmodel.Auth{}, errors.New("failed")},
-// 					{"", nil},
-// 				}
+				auth = domainmodel.Auth{
+					UserID: login.UserID,
+				}
 
-// 				errorType = customerror.NoType
-// 			},
-// 			WantError: true,
-// 			TearDown:  func(t *testing.T) {},
-// 		},
-// 		{
-// 			Context: "ItShouldFailIfAnErrorOccursWhenCreatingAToken",
-// 			SetUp: func(t *testing.T) {
-// 				username := fake.Username()
-// 				password := fake.Password(true, true, true, false, false, 8)
+				id = uuid.NewV4()
 
-// 				credentials = security.Credentials{
-// 					Username: username,
-// 					Password: password,
-// 				}
+				newAuth = domainmodel.Auth{
+					ID:     id,
+					UserID: login.UserID,
+				}
 
-// 				id := uuid.NewV4()
-// 				userID := uuid.NewV4()
+				returnArgs = ReturnArgs{
+					{nil},
+					{login, nil},
+					{nil},
+					{domainmodel.Auth{}, nil},
+					{newAuth, nil},
+					{"", errors.New("failed")},
+				}
 
-// 				loginDatastore = domainmodel.Login{
-// 					ID:       id,
-// 					UserID:   userID,
-// 					Username: credentials.Username,
-// 					Password: credentials.Password,
-// 				}
+				errorType = customerror.NoType
+			},
+			WantError: true,
+			TearDown:  func(t *testing.T) {},
+		},
+	}
 
-// 				login = loginDatastore.ToDomain()
+	for _, tc := range ts.Cases {
+		ts.T().Run(tc.Context, func(t *testing.T) {
+			tc.SetUp(t)
 
-// 				authDatastore = domainmodel.Auth{
-// 					UserID: loginDatastore.UserID,
-// 				}
+			validator := new(mockvalidator.Validator)
+			validator.On("Validate", credentials).Return(returnArgs[0]...)
 
-// 				id = uuid.NewV4()
+			loginDatastoreRepository := new(logindatastoremockrepository.Repository)
+			loginDatastoreRepository.On("GetByUsername", credentials.Username).Return(returnArgs[1]...)
 
-// 				newAuthDatastore = domainmodel.Auth{
-// 					ID:     id,
-// 					UserID: login.UserID,
-// 				}
+			security := new(mocksecurity.Security)
+			security.On("VerifyPasswords", login.Password, credentials.Password).Return(returnArgs[2]...)
 
-// 				newAuth = newAuthDatastore.ToDomain()
+			authDatastoreRepository := new(authdatastoremockrepository.Repository)
+			authDatastoreRepository.On("GetByUserID", login.UserID.String()).Return(returnArgs[3]...)
+			authDatastoreRepository.On("Create", auth).Return(returnArgs[4]...)
 
-// 				returnArgs = ReturnArgs{
-// 					{nil},
-// 					{loginDatastore, nil},
-// 					{nil},
-// 					{newAuthDatastore, nil},
-// 					{"", errors.New("failed")},
-// 				}
+			authN := new(mockauth.Auth)
+			authN.On("CreateToken", newAuth, tokenExpTimeInSec).Return(returnArgs[5]...)
 
-// 				errorType = customerror.NoType
-// 			},
-// 			WantError: true,
-// 			TearDown:  func(t *testing.T) {},
-// 		},
-// 	}
+			userDatastoreRepository := new(userdatastoremockrepository.Repository)
 
-// 	for _, tc := range ts.Cases {
-// 		ts.T().Run(tc.Context, func(t *testing.T) {
-// 			tc.SetUp(t)
+			authService := authservice.New(authDatastoreRepository, loginDatastoreRepository, userDatastoreRepository,
+				authN, security, validator, tokenExpTimeInSec)
 
-// 			validator := new(mockvalidator.ValidatorMock)
-// 			validator.On("Validate", credentials, "").Return(returnArgs[0]...)
+			returnedToken, err := authService.LogIn(credentials)
 
-// 			loginDatastoreRepository := new(logindatastoremockrepository.Repository)
-// 			loginDatastoreRepository.On("GetByUsername", credentials.Username).Return(returnArgs[1]...)
+			if !tc.WantError {
+				assert.Nil(t, err, fmt.Sprintf("Unexpected error %v.", err))
+				assert.Equal(t, token, returnedToken)
+			} else {
+				assert.NotNil(t, err, "Predicted error lost.")
+				assert.Equal(t, errorType, customerror.GetType(err))
+				assert.Empty(t, returnedToken)
+			}
 
-// 			security := new(mocksecurity.Security)
-// 			security.On("VerifyPasswords", login.Password, credentials.Password).Return(returnArgs[2]...)
-
-// 			authDatastoreRepository := new(authdatastoremockrepository.Repository)
-// 			authDatastoreRepository.On("Create", authDatastore).Return(returnArgs[3]...)
-
-// 			authN := new(mockauth.Auth)
-// 			authN.On("CreateToken", newAuth, tokenExpTimeInSec).Return(returnArgs[4]...)
-
-// 			userDatastoreRepository := new(userDatastoremockrepository.Repository)
-
-// 			authService := authservice.New(authDatastoreRepository, userDatastoreRepository, loginDatastoreRepository,
-// 				authN, tokenExpTimeInSec, security, validator)
-
-// 			returnedToken, err := authService.LogIn(credentials)
-
-// 			if !tc.WantError {
-// 				assert.Nil(t, err, fmt.Sprintf("Unexpected error %v.", err))
-// 				assert.Equal(t, token, returnedToken)
-// 			} else {
-// 				assert.NotNil(t, err, "Predicted error lost.")
-// 				assert.Equal(t, errorType, customerror.GetType(err))
-// 				assert.Empty(t, returnedToken)
-// 			}
-
-// 			tc.TearDown(t)
-// 		})
-// 	}
-// }
+			tc.TearDown(t)
+		})
+	}
+}
 
 // func (ts *TestSuite) TestRenewToken() {
 // 	auth := authmodel.Auth{}
