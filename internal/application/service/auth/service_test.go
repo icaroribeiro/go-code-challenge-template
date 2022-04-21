@@ -1,7 +1,6 @@
 package auth_test
 
 import (
-	"errors"
 	"fmt"
 	"testing"
 
@@ -21,6 +20,7 @@ import (
 	uuid "github.com/satori/go.uuid"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/suite"
+	"gorm.io/gorm"
 )
 
 func TestServiceUnit(t *testing.T) {
@@ -113,7 +113,7 @@ func (ts *TestSuite) TestRegister() {
 				credentials = securitypkgfactory.NewCredentials(nil)
 
 				returnArgs = ReturnArgs{
-					{errors.New("failed")},
+					{customerror.New("failed")},
 					{domainmodel.Login{}, nil},
 					{domainmodel.User{}, nil},
 					{domainmodel.Login{}, nil},
@@ -139,7 +139,7 @@ func (ts *TestSuite) TestRegister() {
 
 				returnArgs = ReturnArgs{
 					{nil},
-					{domainmodel.Login{}, errors.New("failed")},
+					{domainmodel.Login{}, customerror.New("failed")},
 					{domainmodel.User{}, nil},
 					{domainmodel.Login{}, nil},
 					{domainmodel.Auth{}, nil},
@@ -192,7 +192,7 @@ func (ts *TestSuite) TestRegister() {
 				returnArgs = ReturnArgs{
 					{nil},
 					{domainmodel.Login{}, nil},
-					{domainmodel.User{}, errors.New("failed")},
+					{domainmodel.User{}, customerror.New("failed")},
 					{domainmodel.Login{}, nil},
 					{domainmodel.Auth{}, nil},
 					{"", nil},
@@ -229,7 +229,7 @@ func (ts *TestSuite) TestRegister() {
 					{nil},
 					{domainmodel.Login{}, nil},
 					{newUser, nil},
-					{domainmodel.Login{}, errors.New("failed")},
+					{domainmodel.Login{}, customerror.New("failed")},
 					{domainmodel.Auth{}, nil},
 					{"", nil},
 				}
@@ -279,7 +279,7 @@ func (ts *TestSuite) TestRegister() {
 					{domainmodel.Login{}, nil},
 					{newUser, nil},
 					{newLogin, nil},
-					{domainmodel.Auth{}, errors.New("failed")},
+					{domainmodel.Auth{}, customerror.New("failed")},
 					{"", nil},
 				}
 
@@ -336,7 +336,7 @@ func (ts *TestSuite) TestRegister() {
 					{newUser, nil},
 					{newLogin, nil},
 					{newAuth, nil},
-					{"", errors.New("failed")},
+					{"", customerror.New("failed")},
 				}
 
 				errorType = customerror.NoType
@@ -447,12 +447,12 @@ func (ts *TestSuite) TestLogIn() {
 			TearDown:  func(t *testing.T) {},
 		},
 		{
-			Context: "ItShouldFailIfTheEvaluatedCredentialsValuesAreNotValid",
+			Context: "ItShouldFailIfTheCredentialsAreNotValid",
 			SetUp: func(t *testing.T) {
 				credentials = security.Credentials{}
 
 				returnArgs = ReturnArgs{
-					{errors.New("failed")},
+					{customerror.New("failed")},
 					{domainmodel.Login{}, nil},
 					{nil},
 					{domainmodel.Auth{}, nil},
@@ -472,7 +472,7 @@ func (ts *TestSuite) TestLogIn() {
 
 				returnArgs = ReturnArgs{
 					{nil},
-					{domainmodel.Login{}, errors.New("failed")},
+					{domainmodel.Login{}, customerror.New("failed")},
 					{nil},
 					{domainmodel.Auth{}, nil},
 					{domainmodel.Auth{}, nil},
@@ -521,7 +521,7 @@ func (ts *TestSuite) TestLogIn() {
 				returnArgs = ReturnArgs{
 					{nil},
 					{login, nil},
-					{errors.New("failed")},
+					{customerror.New("failed")},
 					{domainmodel.Auth{}, nil},
 					{domainmodel.Auth{}, nil},
 					{"", nil},
@@ -555,7 +555,7 @@ func (ts *TestSuite) TestLogIn() {
 					{nil},
 					{login, nil},
 					{nil},
-					{domainmodel.Auth{}, errors.New("failed")},
+					{domainmodel.Auth{}, customerror.New("failed")},
 					{domainmodel.Auth{}, nil},
 					{"", nil},
 				}
@@ -606,6 +606,39 @@ func (ts *TestSuite) TestLogIn() {
 			TearDown:  func(t *testing.T) {},
 		},
 		{
+			Context: "ItShouldFailIfAnErrorOccursWhenCreatingANewAuth",
+			SetUp: func(t *testing.T) {
+				credentials = securitypkgfactory.NewCredentials(nil)
+
+				id := uuid.NewV4()
+				userID := uuid.NewV4()
+
+				login = domainmodel.Login{
+					ID:       id,
+					UserID:   userID,
+					Username: credentials.Username,
+					Password: credentials.Password,
+				}
+
+				auth = domainmodel.Auth{
+					UserID: login.UserID,
+				}
+
+				returnArgs = ReturnArgs{
+					{nil},
+					{login, nil},
+					{nil},
+					{domainmodel.Auth{}, nil},
+					{domainmodel.Auth{}, customerror.New("failed")},
+					{"", nil},
+				}
+
+				errorType = customerror.NoType
+			},
+			WantError: true,
+			TearDown:  func(t *testing.T) {},
+		},
+		{
 			Context: "ItShouldFailIfAnErrorOccursWhenCreatingAToken",
 			SetUp: func(t *testing.T) {
 				credentials = securitypkgfactory.NewCredentials(nil)
@@ -637,7 +670,7 @@ func (ts *TestSuite) TestLogIn() {
 					{nil},
 					{domainmodel.Auth{}, nil},
 					{newAuth, nil},
-					{"", errors.New("failed")},
+					{"", customerror.New("failed")},
 				}
 
 				errorType = customerror.NoType
@@ -734,7 +767,7 @@ func (ts *TestSuite) TestRenewToken() {
 
 				returnArgs = ReturnArgs{
 					{nil},
-					{"", errors.New("failed")},
+					{"", customerror.New("failed")},
 				}
 
 				errorType = customerror.NoType
@@ -829,239 +862,231 @@ func (ts *TestSuite) TestModifyPassword() {
 			},
 			WantError: false,
 		},
-		// {
-		// 	Context: "ItShouldFailIfTheIDIsNotValid",
-		// 	SetUp: func(t *testing.T) {
-		// 		id = ""
+		{
+			Context: "ItShouldFailIfTheIDIsNotValid",
+			SetUp: func(t *testing.T) {
+				id = ""
 
-		// 		returnArgs = ReturnArgs{
-		// 			{errors.New("failed")},
-		// 			{nil},
-		// 			{domainmodel.Login{}, nil},
-		// 			{nil},
-		// 			{domainmodel.Login{}, nil},
-		// 		}
+				returnArgs = ReturnArgs{
+					{customerror.New("failed")},
+					{nil},
+					{domainmodel.Login{}, nil},
+					{nil},
+					{domainmodel.Login{}, nil},
+				}
 
-		// 		errorType = customerror.BadRequest
-		// 	},
-		// 	WantError: true,
-		// },
-		// {
-		// 	Context: "ItShouldFailIfTheEvaluatedPasswordsValuesAreNotValid",
-		// 	SetUp: func(t *testing.T) {
-		// 		passwords = security.Passwords{}
+				errorType = customerror.BadRequest
+			},
+			WantError: true,
+		},
+		{
+			Context: "ItShouldFailIfTheEvaluatedPasswordsValuesAreNotValid",
+			SetUp: func(t *testing.T) {
+				passwords = security.Passwords{}
 
-		// 		returnArgs = ReturnArgs{
-		// 			{nil},
-		// 			{errors.New("failed")},
-		// 			{domainmodel.Login{}, nil},
-		// 			{nil},
-		// 			{domainmodel.Login{}, nil},
-		// 		}
+				returnArgs = ReturnArgs{
+					{nil},
+					{customerror.New("failed")},
+					{domainmodel.Login{}, nil},
+					{nil},
+					{domainmodel.Login{}, nil},
+				}
 
-		// 		errorType = customerror.BadRequest
-		// 	},
-		// 	WantError: true,
-		// },
-		// {
-		// 	Context: "ItShouldFailIfAnErrorOccursWhenGettingALoginByUsername",
-		// 	SetUp: func(t *testing.T) {
-		// 		id = uuid.NewV4().String()
-		// 		currentPassword := fake.Password(true, true, true, false, false, 8)
-		// 		newPassword := fake.Password(true, true, true, false, false, 8)
+				errorType = customerror.BadRequest
+			},
+			WantError: true,
+		},
+		{
+			Context: "ItShouldFailIfAnErrorOccursWhenGettingALoginByUsername",
+			SetUp: func(t *testing.T) {
+				id = uuid.NewV4().String()
+				currentPassword := fake.Password(true, true, true, false, false, 8)
+				newPassword := fake.Password(true, true, true, false, false, 8)
 
-		// 		passwords = security.Passwords{
-		// 			CurrentPassword: currentPassword,
-		// 			NewPassword:     newPassword,
-		// 		}
+				passwords = security.Passwords{
+					CurrentPassword: currentPassword,
+					NewPassword:     newPassword,
+				}
 
-		// 		returnArgs = ReturnArgs{
-		// 			{nil},
-		// 			{nil},
-		// 			{domainmodel.Login{}, errors.New("failed")},
-		// 			{nil},
-		// 			{domainmodel.Login{}, nil},
-		// 		}
+				returnArgs = ReturnArgs{
+					{nil},
+					{nil},
+					{domainmodel.Login{}, customerror.New("failed")},
+					{nil},
+					{domainmodel.Login{}, nil},
+				}
 
-		// 		errorType = customerror.NoType
-		// 	},
-		// 	WantError: true,
-		// },
-		// {
-		// 	Context: "ItShouldFailIfTheIDIsNotRegistered",
-		// 	SetUp: func(t *testing.T) {
-		// 		id = uuid.NewV4().String()
-		// 		currentPassword := fake.Password(true, true, true, false, false, 8)
-		// 		newPassword := fake.Password(true, true, true, false, false, 8)
+				errorType = customerror.NoType
+			},
+			WantError: true,
+		},
+		{
+			Context: "ItShouldFailIfTheIDIsNotRegistered",
+			SetUp: func(t *testing.T) {
+				id = uuid.NewV4().String()
+				currentPassword := fake.Password(true, true, true, false, false, 8)
+				newPassword := fake.Password(true, true, true, false, false, 8)
 
-		// 		passwords = security.Passwords{
-		// 			CurrentPassword: currentPassword,
-		// 			NewPassword:     newPassword,
-		// 		}
+				passwords = security.Passwords{
+					CurrentPassword: currentPassword,
+					NewPassword:     newPassword,
+				}
 
-		// 		returnArgs = ReturnArgs{
-		// 			{nil},
-		// 			{nil},
-		// 			{domainmodel.Login{}, nil},
-		// 			{nil},
-		// 			{domainmodel.Login{}, nil},
-		// 		}
+				returnArgs = ReturnArgs{
+					{nil},
+					{nil},
+					{domainmodel.Login{}, nil},
+					{nil},
+					{domainmodel.Login{}, nil},
+				}
 
-		// 		errorType = customerror.NotFound
-		// 	},
-		// 	WantError: true,
-		// },
-		// {
-		// 	Context: "ItShouldFailIfAnErrorOfInvalidPasswordHappensWhenVerifyingThePasswords",
-		// 	SetUp: func(t *testing.T) {
-		// 		id = uuid.NewV4().String()
-		// 		currentPassword := fake.Password(true, true, true, false, false, 8)
-		// 		newPassword := fake.Password(true, true, true, false, false, 8)
+				errorType = customerror.NotFound
+			},
+			WantError: true,
+		},
+		{
+			Context: "ItShouldFailIfAnErrorOfInvalidPasswordHappensWhenVerifyingThePasswords",
+			SetUp: func(t *testing.T) {
+				id = uuid.NewV4().String()
+				currentPassword := fake.Password(true, true, true, false, false, 8)
+				newPassword := fake.Password(true, true, true, false, false, 8)
 
-		// 		passwords = security.Passwords{
-		// 			CurrentPassword: currentPassword,
-		// 			NewPassword:     newPassword,
-		// 		}
+				passwords = security.Passwords{
+					CurrentPassword: currentPassword,
+					NewPassword:     newPassword,
+				}
 
-		// 		loginID := uuid.NewV4()
-		// 		userID := uuid.NewV4()
-		// 		username := fake.Username()
+				loginID := uuid.NewV4()
+				userID := uuid.NewV4()
+				username := fake.Username()
 
-		// 		loginDatastore = domainmodel.Login{
-		// 			ID:       loginID,
-		// 			UserID:   userID,
-		// 			Username: username,
-		// 			Password: currentPassword,
-		// 		}
+				login = domainmodel.Login{
+					ID:       loginID,
+					UserID:   userID,
+					Username: username,
+					Password: currentPassword,
+				}
 
-		// 		login = loginDatastore.ToDomain()
+				returnArgs = ReturnArgs{
+					{nil},
+					{nil},
+					{login, nil},
+					{customerror.New("the password is invalid")},
+					{domainmodel.Login{}, nil},
+				}
 
-		// 		returnArgs = ReturnArgs{
-		// 			{nil},
-		// 			{nil},
-		// 			{loginDatastore, nil},
-		// 			{errors.New("the password is invalid")},
-		// 			{domainmodel.Login{}, nil},
-		// 		}
+				errorType = customerror.Unauthorized
+			},
+			WantError: true,
+		},
+		{
+			Context: "ItShouldFailIfAnotherErrorHappensWhenVerifyingThePasswords",
+			SetUp: func(t *testing.T) {
+				id = uuid.NewV4().String()
+				currentPassword := fake.Password(true, true, true, false, false, 8)
+				newPassword := fake.Password(true, true, true, false, false, 8)
 
-		// 		errorType = customerror.Unauthorized
-		// 	},
-		// 	WantError: true,
-		// },
-		// {
-		// 	Context: "ItShouldFailIfAnotherErrorHappensWhenVerifyingThePasswords",
-		// 	SetUp: func(t *testing.T) {
-		// 		id = uuid.NewV4().String()
-		// 		currentPassword := fake.Password(true, true, true, false, false, 8)
-		// 		newPassword := fake.Password(true, true, true, false, false, 8)
+				passwords = security.Passwords{
+					CurrentPassword: currentPassword,
+					NewPassword:     newPassword,
+				}
 
-		// 		passwords = security.Passwords{
-		// 			CurrentPassword: currentPassword,
-		// 			NewPassword:     newPassword,
-		// 		}
+				loginID := uuid.NewV4()
+				userID := uuid.NewV4()
+				username := fake.Username()
 
-		// 		loginID := uuid.NewV4()
-		// 		userID := uuid.NewV4()
-		// 		username := fake.Username()
+				login = domainmodel.Login{
+					ID:       loginID,
+					UserID:   userID,
+					Username: username,
+					Password: currentPassword,
+				}
 
-		// 		loginDatastore = domainmodel.Login{
-		// 			ID:       loginID,
-		// 			UserID:   userID,
-		// 			Username: username,
-		// 			Password: currentPassword,
-		// 		}
+				returnArgs = ReturnArgs{
+					{nil},
+					{nil},
+					{login, nil},
+					{customerror.New("failed")},
+					{domainmodel.Login{}, nil},
+				}
 
-		// 		login = loginDatastore.ToDomain()
+				errorType = customerror.NoType
+			},
+			WantError: true,
+		},
+		{
+			Context: "ItShouldFailIfTheNewPasswordISTheSameAsTheOneCurrentlyRegistered",
+			SetUp: func(t *testing.T) {
+				id = uuid.NewV4().String()
+				currentPassword := fake.Password(true, true, true, false, false, 8)
+				newPassword := currentPassword
 
-		// 		returnArgs = ReturnArgs{
-		// 			{nil},
-		// 			{nil},
-		// 			{loginDatastore, nil},
-		// 			{errors.New("failed")},
-		// 			{domainmodel.Login{}, nil},
-		// 		}
+				passwords = security.Passwords{
+					CurrentPassword: currentPassword,
+					NewPassword:     newPassword,
+				}
 
-		// 		errorType = customerror.NoType
-		// 	},
-		// 	WantError: true,
-		// },
-		// {
-		// 	Context: "ItShouldFailIfTheNewPasswordISTheSameAsTheOneCurrentlyRegistered",
-		// 	SetUp: func(t *testing.T) {
-		// 		id = uuid.NewV4().String()
-		// 		currentPassword := fake.Password(true, true, true, false, false, 8)
-		// 		newPassword := currentPassword
+				loginID := uuid.NewV4()
+				userID := uuid.NewV4()
+				username := fake.Username()
 
-		// 		passwords = security.Passwords{
-		// 			CurrentPassword: currentPassword,
-		// 			NewPassword:     newPassword,
-		// 		}
+				login = domainmodel.Login{
+					ID:       loginID,
+					UserID:   userID,
+					Username: username,
+					Password: currentPassword,
+				}
 
-		// 		loginID := uuid.NewV4()
-		// 		userID := uuid.NewV4()
-		// 		username := fake.Username()
+				returnArgs = ReturnArgs{
+					{nil},
+					{nil},
+					{login, nil},
+					{nil},
+					{domainmodel.Login{}, nil},
+				}
 
-		// 		loginDatastore = domainmodel.Login{
-		// 			ID:       loginID,
-		// 			UserID:   userID,
-		// 			Username: username,
-		// 			Password: currentPassword,
-		// 		}
+				errorType = customerror.BadRequest
+			},
+			WantError: true,
+		},
+		{
+			Context: "ItShouldFailIfAnErrorOccursWhenUpdatingTheLogin",
+			SetUp: func(t *testing.T) {
+				id = uuid.NewV4().String()
+				currentPassword := fake.Password(true, true, true, false, false, 8)
+				newPassword := fake.Password(true, true, true, false, false, 8)
 
-		// 		login = loginDatastore.ToDomain()
+				passwords = security.Passwords{
+					CurrentPassword: currentPassword,
+					NewPassword:     newPassword,
+				}
 
-		// 		returnArgs = ReturnArgs{
-		// 			{nil},
-		// 			{nil},
-		// 			{loginDatastore, nil},
-		// 			{nil},
-		// 			{domainmodel.Login{}, nil},
-		// 		}
+				loginID := uuid.NewV4()
+				userID := uuid.NewV4()
+				username := fake.Username()
 
-		// 		errorType = customerror.BadRequest
-		// 	},
-		// 	WantError: true,
-		// },
-		// {
-		// 	Context: "ItShouldFailIfAnErrorOccursWhenUpdatingTheLogin",
-		// 	SetUp: func(t *testing.T) {
-		// 		id = uuid.NewV4().String()
-		// 		currentPassword := fake.Password(true, true, true, false, false, 8)
-		// 		newPassword := fake.Password(true, true, true, false, false, 8)
+				login = domainmodel.Login{
+					ID:       loginID,
+					UserID:   userID,
+					Username: username,
+					Password: currentPassword,
+				}
 
-		// 		passwords = security.Passwords{
-		// 			CurrentPassword: currentPassword,
-		// 			NewPassword:     newPassword,
-		// 		}
+				updatedLogin = login
+				updatedLogin.Password = newPassword
 
-		// 		loginID := uuid.NewV4()
-		// 		userID := uuid.NewV4()
-		// 		username := fake.Username()
+				returnArgs = ReturnArgs{
+					{nil},
+					{nil},
+					{login, nil},
+					{nil},
+					{domainmodel.Login{}, customerror.New("failed")},
+				}
 
-		// 		loginDatastore = domainmodel.Login{
-		// 			ID:       loginID,
-		// 			UserID:   userID,
-		// 			Username: username,
-		// 			Password: currentPassword,
-		// 		}
-
-		// 		login = loginDatastore.ToDomain()
-
-		// 		updatedLogindb = loginDatastore
-		// 		updatedLogindb.Password = newPassword
-
-		// 		returnArgs = ReturnArgs{
-		// 			{nil},
-		// 			{nil},
-		// 			{loginDatastore, nil},
-		// 			{nil},
-		// 			{domainmodel.Login{}, errors.New("failed")},
-		// 		}
-
-		// 		errorType = customerror.NoType
-		// 	},
-		// 	WantError: true,
-		// },
+				errorType = customerror.NoType
+			},
+			WantError: true,
+		},
 	}
 
 	for _, tc := range ts.Cases {
@@ -1101,156 +1126,160 @@ func (ts *TestSuite) TestModifyPassword() {
 	}
 }
 
-// func (ts *TestSuite) TestLogOut() {
-// 	var id string
+func (ts *TestSuite) TestLogOut() {
+	id := ""
 
-// 	errorType := customerror.NoType
+	errorType := customerror.NoType
 
-// 	tokenExpTimeInSec := fake.Number(2, 10)
+	tokenExpTimeInSec := fake.Number(2, 10)
 
-// 	returnArgs := ReturnArgs{}
+	returnArgs := ReturnArgs{}
 
-// 	ts.Cases = Cases{
-// 		{
-// 			Context: "ItShouldSucceedInLoggingOut",
-// 			SetUp: func(t *testing.T) {
-// 				id = uuid.NewV4().String()
+	ts.Cases = Cases{
+		{
+			Context: "ItShouldSucceedInLoggingOut",
+			SetUp: func(t *testing.T) {
+				id = uuid.NewV4().String()
 
-// 				authID, err := uuid.FromString(id)
-// 				assert.Nil(t, err, fmt.Sprintf("Unexpected error %v.", err))
-// 				userID := uuid.NewV4()
+				authID, err := uuid.FromString(id)
+				assert.Nil(t, err, fmt.Sprintf("Unexpected error %v.", err))
+				userID := uuid.NewV4()
 
-// 				args := map[string]interface{}{
-// 					"id":     authID,
-// 					"userID": userID,
-// 				}
+				args := map[string]interface{}{
+					"id":     authID,
+					"userID": userID,
+				}
 
-// 				datastorefactorymodel.New(args)
+				auth := domainfactorymodel.NewAuth(args)
 
-// 				returnArgs = ReturnArgs{
-// 					{nil},
-// 					{authDatastore, nil},
-// 				}
-// 			},
-// 			WantError: false,
-// 		},
-// 		{
-// 			Context: "ItShouldFailIfTheIDIsNotValid",
-// 			SetUp: func(t *testing.T) {
-// 				id = ""
+				returnArgs = ReturnArgs{
+					{nil},
+					{auth, nil},
+				}
+			},
+			WantError: false,
+		},
+		{
+			Context: "ItShouldFailIfTheIDIsNotValid",
+			SetUp: func(t *testing.T) {
+				id = ""
 
-// 				returnArgs = ReturnArgs{
-// 					{errors.New("failed")},
-// 					{domainmodel.Auth{}, nil},
-// 				}
+				returnArgs = ReturnArgs{
+					{customerror.New("failed")},
+					{domainmodel.Auth{}, nil},
+				}
 
-// 				errorType = customerror.BadRequest
-// 			},
-// 			WantError: true,
-// 		},
-// 		{
-// 			Context: "ItShouldFailIfAnErrorOccursWhenDeletingTheAuth",
-// 			SetUp: func(t *testing.T) {
-// 				id = uuid.NewV4().String()
+				errorType = customerror.BadRequest
+			},
+			WantError: true,
+		},
+		{
+			Context: "ItShouldFailIfAnErrorOccursWhenDeletingTheAuth",
+			SetUp: func(t *testing.T) {
+				id = uuid.NewV4().String()
 
-// 				returnArgs = ReturnArgs{
-// 					{nil},
-// 					{domainmodel.Auth{}, errors.New("failed")},
-// 				}
+				returnArgs = ReturnArgs{
+					{nil},
+					{domainmodel.Auth{}, customerror.New("failed")},
+				}
 
-// 				errorType = customerror.NoType
-// 			},
-// 			WantError: true,
-// 		},
-// 	}
+				errorType = customerror.NoType
+			},
+			WantError: true,
+		},
+	}
 
-// 	for _, tc := range ts.Cases {
-// 		ts.T().Run(tc.Context, func(t *testing.T) {
-// 			tc.SetUp(t)
+	for _, tc := range ts.Cases {
+		ts.T().Run(tc.Context, func(t *testing.T) {
+			tc.SetUp(t)
 
-// 			validator := new(mockvalidator.ValidatorMock)
-// 			validator.On("Valid", id, "nonzero, uuid").Return(returnArgs[0]...)
+			validator := new(mockvalidator.Validator)
+			validator.On("ValidateWithTags", id, "nonzero, uuid").Return(returnArgs[0]...)
 
-// 			authDatastoreRepository := new(authDatastoremockrepository.Repository)
-// 			authDatastoreRepository.On("Delete", id).Return(returnArgs[1]...)
+			authDatastoreRepository := new(authdatastoremockrepository.Repository)
+			authDatastoreRepository.On("Delete", id).Return(returnArgs[1]...)
 
-// 			userDatastoreRepository := new(userDatastoremockrepository.Repository)
-// 			loginDatastoreRepository := new(logindatastoremockrepository.Repository)
-// 			authN := new(mockauth.Auth)
-// 			security := new(mocksecurity.Security)
+			userDatastoreRepository := new(userdatastoremockrepository.Repository)
 
-// 			authService := authservice.New(authDatastoreRepository, userDatastoreRepository, loginDatastoreRepository,
-// 				authN, tokenExpTimeInSec, security, validator)
+			loginDatastoreRepository := new(logindatastoremockrepository.Repository)
 
-// 			err := authService.LogOut(id)
+			authN := new(mockauth.Auth)
+			security := new(mocksecurity.Security)
 
-// 			if !tc.WantError {
-// 				assert.Nil(t, err, fmt.Sprintf("Unexpected error %v.", err))
-// 			} else {
-// 				assert.NotNil(t, err, "Predicted error lost.")
-// 				assert.Equal(t, errorType, customerror.GetType(err))
-// 			}
-// 		})
-// 	}
-// }
+			authService := authservice.New(authDatastoreRepository, loginDatastoreRepository, userDatastoreRepository,
+				authN, security, validator, tokenExpTimeInSec)
 
-// func (ts *TestSuite) TestWithDBTrx() {
-// 	dbTrx := &gorm.DB{}
+			err := authService.LogOut(id)
 
-// 	authDatastoreRepositoryWithDBTrx := &authDatastorerepository.Repository{}
-// 	userDatastoreRepositoryWithDBTrx := &userDatastorerepository.Repository{}
-// 	loginDatastoreRepositoryWithDBTrx := &loginDatastorerepository.Repository{}
+			if !tc.WantError {
+				assert.Nil(t, err, fmt.Sprintf("Unexpected error %v.", err))
+			} else {
+				assert.NotNil(t, err, "Predicted error lost.")
+				assert.Equal(t, errorType, customerror.GetType(err))
+			}
+		})
+	}
+}
 
-// 	tokenExpTimeInSec := fake.Number(2, 10)
+func (ts *TestSuite) TestWithDBTrx() {
+	driver := "postgres"
+	db, _ := NewMockDB(driver)
+	dbTrx := &gorm.DB{}
 
-// 	returnArgs := ReturnArgs{}
+	authDatastoreRepositoryWithDBTrx := &authdatastoremockrepository.Repository{}
+	userDatastoreRepositoryWithDBTrx := &userdatastoremockrepository.Repository{}
+	loginDatastoreRepositoryWithDBTrx := &logindatastoremockrepository.Repository{}
 
-// 	ts.Cases = Cases{
-// 		{
-// 			Context: "ItShouldSucceedInSettingRepositoriesWithDatabaseTransaction",
-// 			SetUp: func(t *testing.T) {
-// 				dbTrx = ts.DB.Begin()
+	tokenExpTimeInSec := fake.Number(2, 10)
 
-// 				authDatastoreRepositoryWithDBTrx = &authDatastorerepository.Repository{}
-// 				userDatastoreRepositoryWithDBTrx = &userDatastorerepository.Repository{}
-// 				loginDatastoreRepositoryWithDBTrx = &loginDatastorerepository.Repository{}
+	returnArgs := ReturnArgs{}
 
-// 				returnArgs = ReturnArgs{
-// 					{authDatastoreRepositoryWithDBTrx},
-// 					{userDatastoreRepositoryWithDBTrx},
-// 					{loginDatastoreRepositoryWithDBTrx},
-// 				}
-// 			},
-// 			WantError: false,
-// 		},
-// 	}
+	ts.Cases = Cases{
+		{
+			Context: "ItShouldSucceedInSettingRepositoriesWithDatabaseTransaction",
+			SetUp: func(t *testing.T) {
+				dbTrx = db
 
-// 	for _, tc := range ts.Cases {
-// 		ts.T().Run(tc.Context, func(t *testing.T) {
-// 			tc.SetUp(t)
+				authDatastoreRepositoryWithDBTrx = &authdatastoremockrepository.Repository{}
+				userDatastoreRepositoryWithDBTrx = &userdatastoremockrepository.Repository{}
+				loginDatastoreRepositoryWithDBTrx = &logindatastoremockrepository.Repository{}
 
-// 			authDatastoreRepository := new(authDatastoremockrepository.Repository)
-// 			authDatastoreRepository.On("WithDBTrx", dbTrx).Return(returnArgs[0]...)
+				returnArgs = ReturnArgs{
+					{authDatastoreRepositoryWithDBTrx},
+					{userDatastoreRepositoryWithDBTrx},
+					{loginDatastoreRepositoryWithDBTrx},
+				}
+			},
+			WantError: false,
+		},
+	}
 
-// 			userDatastoreRepository := new(userDatastoremockrepository.Repository)
-// 			userDatastoreRepository.On("WithDBTrx", dbTrx).Return(returnArgs[1]...)
+	for _, tc := range ts.Cases {
+		ts.T().Run(tc.Context, func(t *testing.T) {
+			tc.SetUp(t)
 
-// 			loginDatastoreRepository := new(logindatastoremockrepository.Repository)
-// 			loginDatastoreRepository.On("WithDBTrx", dbTrx).Return(returnArgs[2]...)
+			authDatastoreRepository := new(authdatastoremockrepository.Repository)
+			authDatastoreRepository.On("WithDBTrx", dbTrx).Return(returnArgs[0]...)
 
-// 			authN := new(mockauth.Auth)
-// 			security := new(mocksecurity.Security)
-// 			validator := new(mockvalidator.ValidatorMock)
+			userDatastoreRepository := new(userdatastoremockrepository.Repository)
+			userDatastoreRepository.On("WithDBTrx", dbTrx).Return(returnArgs[1]...)
 
-// 			authService := authservice.New(authDatastoreRepository, userDatastoreRepository, loginDatastoreRepository,
-// 				authN, tokenExpTimeInSec, security, validator)
+			loginDatastoreRepository := new(logindatastoremockrepository.Repository)
+			loginDatastoreRepository.On("WithDBTrx", dbTrx).Return(returnArgs[2]...)
 
-// 			returnedAuthService := authService.WithDBTrx(dbTrx)
+			authN := new(mockauth.Auth)
+			security := new(mocksecurity.Security)
+			validator := new(mockvalidator.Validator)
 
-// 			if !tc.WantError {
-// 				assert.NotEmpty(t, returnedAuthService, "Service interface is empty.")
-// 				assert.Equal(t, authService, returnedAuthService, "Service interfaces are not the same.")
-// 			}
-// 		})
-// 	}
-// }
+			authService := authservice.New(authDatastoreRepository, loginDatastoreRepository, userDatastoreRepository,
+				authN, security, validator, tokenExpTimeInSec)
+
+			returnedAuthService := authService.WithDBTrx(dbTrx)
+
+			if !tc.WantError {
+				assert.NotEmpty(t, returnedAuthService, "Service interface is empty.")
+				assert.Equal(t, authService, returnedAuthService, "Service interfaces are not the same.")
+			}
+		})
+	}
+}

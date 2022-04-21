@@ -1,7 +1,6 @@
 package auth_test
 
 import (
-	"errors"
 	"fmt"
 	"testing"
 	"time"
@@ -70,7 +69,7 @@ func (ts *TestSuite) TestDecodeToken() {
 	rsaKeys := ts.RSAKeys
 	authpkg := authpkg.New(rsaKeys)
 
-	err := errors.New("")
+	err := customerror.New("failed")
 
 	tokenString := ""
 
@@ -198,7 +197,7 @@ func (ts *TestSuite) TestValidateTokenRenewal() {
 	tokenString := ""
 	timeBeforeTokenExpTimeInSec := 60
 
-	err := errors.New("")
+	err := customerror.New("failed")
 
 	errorType := customerror.NoType
 

@@ -73,9 +73,7 @@ func (ts *TestSuite) TestGetStatus() {
 				Target: route.Path,
 			}
 
-			reqBody := requesthttputilpkg.PrepareRequestBody(requestData.Body)
-
-			req := httptest.NewRequest(requestData.Method, requestData.Target, reqBody)
+			req := httptest.NewRequest(requestData.Method, requestData.Target, nil)
 
 			resprec := httptest.NewRecorder()
 

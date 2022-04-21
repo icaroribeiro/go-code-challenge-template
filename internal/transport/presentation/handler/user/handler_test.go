@@ -12,6 +12,7 @@ import (
 	domainmodel "github.com/icaroribeiro/new-go-code-challenge-template/internal/core/domain/model"
 	usermockservice "github.com/icaroribeiro/new-go-code-challenge-template/internal/core/ports/application/mockservice/user"
 	userhandler "github.com/icaroribeiro/new-go-code-challenge-template/internal/transport/presentation/handler/user"
+	httppresentationmodel "github.com/icaroribeiro/new-go-code-challenge-template/internal/transport/presentation/model"
 	"github.com/icaroribeiro/new-go-code-challenge-template/pkg/customerror"
 	requesthttputilpkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/httputil/request"
 	routehttputilpkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/httputil/route"
@@ -81,9 +82,7 @@ func (ts *TestSuite) TestGetAll() {
 				Target: route.Path,
 			}
 
-			reqBody := requesthttputilpkg.PrepareRequestBody(requestData.Body)
-
-			req := httptest.NewRequest(requestData.Method, requestData.Target, reqBody)
+			req := httptest.NewRequest(requestData.Method, requestData.Target, nil)
 
 			requesthttputilpkg.SetRequestHeaders(req, requestData.Headers)
 
@@ -100,7 +99,7 @@ func (ts *TestSuite) TestGetAll() {
 
 			if !tc.WantError {
 				assert.Equal(t, resprec.Code, tc.StatusCode)
-				returnedUsers := make(domainmodel.Users, 0)
+				returnedUsers := make(httppresentationmodel.Users, 0)
 				err := json.NewDecoder(resprec.Body).Decode(&returnedUsers)
 				assert.Nil(t, err, fmt.Sprintf("Unexpected error %v.", err))
 				assert.Equal(t, returnedUsers[0].ID, user.ID)

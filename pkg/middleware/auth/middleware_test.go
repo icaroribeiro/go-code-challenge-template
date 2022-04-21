@@ -325,8 +325,7 @@ func (ts *TestSuite) TestAuth() {
 	}
 }
 
-/*
-func (ts *TestSuite) TestAuth() {
+func (ts *TestSuite) TestAuthRenewal() {
 	driver := "postgres"
 	db, mock := NewMockDB(driver)
 	bearerToken := []string{"", ""}
@@ -422,7 +421,7 @@ func (ts *TestSuite) TestAuth() {
 			WantError: true,
 		},
 		{
-			Context: "ItShouldFailIfTheTokenIsNotDecoded",
+			Context: "ItShouldFailIfTheTokenIsNotValidForRenewal",
 			SetUp: func(t *testing.T) {
 				bearerToken = []string{"Bearer", "token"}
 
@@ -577,10 +576,10 @@ func (ts *TestSuite) TestAuth() {
 			tc.SetUp(t)
 
 			authN := new(mockauthpkg.Auth)
-			authN.On("DecodeToken", bearerToken[1]).Return(returnArgs[0]...)
+			authN.On("ValidateTokenRenewal", bearerToken[1], timeBeforeTokenExpTimeInSec).Return(returnArgs[0]...)
 			authN.On("FetchAuthFromToken", token).Return(returnArgs[1]...)
 
-			authMiddleware := authmiddlewarepkg.Auth(db, authN, timeBeforeTokenExpTimeInSec)
+			authMiddleware := authmiddlewarepkg.AuthRenewal(db, authN, timeBeforeTokenExpTimeInSec)
 
 			handlerFunc := func(w http.ResponseWriter, r *http.Request) {
 				responsehttputilpkg.RespondWithJson(w, http.StatusOK, messagehttputilpkg.Message{Text: "OK"})
@@ -619,4 +618,3 @@ func (ts *TestSuite) TestAuth() {
 		})
 	}
 }
-*/
