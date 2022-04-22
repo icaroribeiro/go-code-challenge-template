@@ -2,7 +2,6 @@ package auth_test
 
 import (
 	"encoding/json"
-	"errors"
 	"fmt"
 	"net/http"
 	"net/http/httptest"
@@ -19,6 +18,7 @@ import (
 	messagehttputilpkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/httputil/message"
 	requesthttputilpkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/httputil/request"
 	responsehttputilpkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/httputil/response"
+	routehttputilpkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/httputil/route"
 	authmiddlewarepkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/middleware/auth"
 	domainfactorymodel "github.com/icaroribeiro/new-go-code-challenge-template/tests/factory/core/domain/model"
 	datastorefactorymodel "github.com/icaroribeiro/new-go-code-challenge-template/tests/factory/infrastructure/storage/datastore/model"
@@ -61,7 +61,7 @@ func (ts *TestSuite) TestAuth() {
 				token = &jwt.Token{}
 
 				statusCode = http.StatusOK
-				payload = messagehttputilpkg.Message{Text: "OK"}
+				payload = messagehttputilpkg.Message{Text: "ok"}
 
 				id := uuid.NewV4()
 				userID := uuid.NewV4()
@@ -197,7 +197,7 @@ func (ts *TestSuite) TestAuth() {
 
 				mock.ExpectQuery(regexp.QuoteMeta(sqlQuery)).
 					WithArgs(id).
-					WillReturnError(errors.New("failed"))
+					WillReturnError(customerror.New("failed"))
 			},
 			WantError: true,
 		},
@@ -288,12 +288,24 @@ func (ts *TestSuite) TestAuth() {
 			authMiddleware := authmiddlewarepkg.Auth(db, authN)
 
 			handlerFunc := func(w http.ResponseWriter, r *http.Request) {
-				responsehttputilpkg.RespondWithJson(w, http.StatusOK, messagehttputilpkg.Message{Text: "OK"})
+				responsehttputilpkg.RespondWithJson(w, http.StatusOK, messagehttputilpkg.Message{Text: "ok"})
 			}
 
 			returnedHandlerFunc := adapterhttputilpkg.AdaptFunc(handlerFunc).With(authMiddleware)
 
-			req := httptest.NewRequest(http.MethodGet, "/testing", nil)
+			route := routehttputilpkg.Route{
+				Name:        "Testing",
+				Method:      http.MethodGet,
+				Path:        "/testing",
+				HandlerFunc: returnedHandlerFunc,
+			}
+
+			requestData := requesthttputilpkg.RequestData{
+				Method: route.Method,
+				Target: route.Path,
+			}
+
+			req := httptest.NewRequest(requestData.Method, requestData.Target, nil)
 
 			requesthttputilpkg.SetRequestHeaders(req, headers)
 
@@ -301,20 +313,20 @@ func (ts *TestSuite) TestAuth() {
 
 			router := mux.NewRouter()
 
-			router.Name("testing").
-				Methods(http.MethodGet).
-				Path("/testing").
-				HandlerFunc(returnedHandlerFunc)
+			router.Name(route.Name).
+				Methods(route.Method).
+				Path(route.Path).
+				HandlerFunc(route.HandlerFunc)
 
 			router.ServeHTTP(resprec, req)
 
 			if !tc.WantError {
 				assert.Equal(t, resprec.Result().Header.Get("Content-Type"), "application/json")
 				assert.Equal(t, statusCode, resprec.Result().StatusCode)
-				message := messagehttputilpkg.Message{}
-				err := json.NewDecoder(resprec.Body).Decode(&message)
+				returnedMessage := messagehttputilpkg.Message{}
+				err := json.NewDecoder(resprec.Body).Decode(&returnedMessage)
 				assert.Nil(t, err, fmt.Sprintf("Unexpected error: %v", err))
-				assert.Equal(t, payload, message)
+				assert.Equal(t, payload, returnedMessage)
 			} else {
 				assert.Equal(t, statusCode, resprec.Result().StatusCode)
 			}
@@ -355,7 +367,7 @@ func (ts *TestSuite) TestAuthRenewal() {
 				token = &jwt.Token{}
 
 				statusCode = http.StatusOK
-				payload = messagehttputilpkg.Message{Text: "OK"}
+				payload = messagehttputilpkg.Message{Text: "ok"}
 
 				id := uuid.NewV4()
 				userID := uuid.NewV4()
@@ -491,7 +503,7 @@ func (ts *TestSuite) TestAuthRenewal() {
 
 				mock.ExpectQuery(regexp.QuoteMeta(sqlQuery)).
 					WithArgs(id).
-					WillReturnError(errors.New("failed"))
+					WillReturnError(customerror.New("failed"))
 			},
 			WantError: true,
 		},
@@ -582,12 +594,24 @@ func (ts *TestSuite) TestAuthRenewal() {
 			authMiddleware := authmiddlewarepkg.AuthRenewal(db, authN, timeBeforeTokenExpTimeInSec)
 
 			handlerFunc := func(w http.ResponseWriter, r *http.Request) {
-				responsehttputilpkg.RespondWithJson(w, http.StatusOK, messagehttputilpkg.Message{Text: "OK"})
+				responsehttputilpkg.RespondWithJson(w, http.StatusOK, messagehttputilpkg.Message{Text: "ok"})
 			}
 
 			returnedHandlerFunc := adapterhttputilpkg.AdaptFunc(handlerFunc).With(authMiddleware)
 
-			req := httptest.NewRequest(http.MethodGet, "/testing", nil)
+			route := routehttputilpkg.Route{
+				Name:        "Testing",
+				Method:      http.MethodGet,
+				Path:        "/testing",
+				HandlerFunc: returnedHandlerFunc,
+			}
+
+			requestData := requesthttputilpkg.RequestData{
+				Method: route.Method,
+				Target: route.Path,
+			}
+
+			req := httptest.NewRequest(requestData.Method, requestData.Target, nil)
 
 			requesthttputilpkg.SetRequestHeaders(req, headers)
 
@@ -595,20 +619,20 @@ func (ts *TestSuite) TestAuthRenewal() {
 
 			router := mux.NewRouter()
 
-			router.Name("testing").
-				Methods(http.MethodGet).
-				Path("/testing").
-				HandlerFunc(returnedHandlerFunc)
+			router.Name(route.Name).
+				Methods(route.Method).
+				Path(route.Path).
+				HandlerFunc(route.HandlerFunc)
 
 			router.ServeHTTP(resprec, req)
 
 			if !tc.WantError {
 				assert.Equal(t, resprec.Result().Header.Get("Content-Type"), "application/json")
 				assert.Equal(t, statusCode, resprec.Result().StatusCode)
-				message := messagehttputilpkg.Message{}
-				err := json.NewDecoder(resprec.Body).Decode(&message)
+				returnedMessage := messagehttputilpkg.Message{}
+				err := json.NewDecoder(resprec.Body).Decode(&returnedMessage)
 				assert.Nil(t, err, fmt.Sprintf("Unexpected error: %v", err))
-				assert.Equal(t, payload, message)
+				assert.Equal(t, payload, returnedMessage)
 			} else {
 				assert.Equal(t, statusCode, resprec.Result().StatusCode)
 			}

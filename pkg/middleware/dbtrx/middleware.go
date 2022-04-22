@@ -5,9 +5,7 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/icaroribeiro/new-go-code-challenge-template/pkg/customerror"
 	requesthttputilpkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/httputil/request"
-	responsehttputilpkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/httputil/response"
 	"gorm.io/gorm"
 )
 
@@ -19,8 +17,8 @@ var (
 // written HTTP status code to be captured.
 type responseWriter struct {
 	http.ResponseWriter
-	statusCode  int
 	wroteHeader bool
+	statusCode  int
 }
 
 func wrapResponseWriter(w http.ResponseWriter) *responseWriter {
@@ -57,6 +55,7 @@ func DBTrx(db *gorm.DB) func(http.HandlerFunc) http.HandlerFunc {
 		return func(w http.ResponseWriter, r *http.Request) {
 			if db == nil {
 				next.ServeHTTP(w, r)
+				return
 			}
 
 			dbTrx := db.Begin()
@@ -76,11 +75,10 @@ func DBTrx(db *gorm.DB) func(http.HandlerFunc) http.HandlerFunc {
 
 			next.ServeHTTP(wrapped, r)
 
-			if isStatusCodeInList(wrapped.statusCode, statusCodesList) {
+			if isStatusCodeInList(wrapped.Status(), statusCodesList) {
 				if err := dbTrx.Commit().Error; err != nil {
-					errorMessage := "database transaction commit failed: "
-					responsehttputilpkg.RespondErrorWithJson(w, customerror.Newf(errorMessage, err.Error()))
-					return
+					errorMsg := "database transaction commit failed"
+					log.Panicf("%s: %s", errorMsg, err.Error())
 				}
 			} else {
 				log.Printf("rolling back database transaction due to status code: %d", wrapped.statusCode)

@@ -6,6 +6,8 @@ import (
 	"testing"
 
 	handlerhttputilpkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/httputil/handler"
+	requesthttputilpkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/httputil/request"
+	routehttputilpkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/httputil/route"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/suite"
 )
@@ -30,7 +32,18 @@ func (ts *TestSuite) TestGetNotFoundHandler() {
 		ts.T().Run(tc.Context, func(t *testing.T) {
 			tc.SetUp(t)
 
-			req := httptest.NewRequest(http.MethodGet, "/testing", nil)
+			route := routehttputilpkg.Route{
+				Name:   "Testing",
+				Method: http.MethodGet,
+				Path:   "/testing",
+			}
+
+			requestData := requesthttputilpkg.RequestData{
+				Method: route.Method,
+				Target: route.Path,
+			}
+
+			req := httptest.NewRequest(requestData.Method, requestData.Target, nil)
 
 			resprec := httptest.NewRecorder()
 
@@ -59,7 +72,18 @@ func (ts *TestSuite) TestGetMethodNotAllowedHandler() {
 		ts.T().Run(tc.Context, func(t *testing.T) {
 			tc.SetUp(t)
 
-			req := httptest.NewRequest(http.MethodGet, "/testing", nil)
+			route := routehttputilpkg.Route{
+				Name:   "Testing",
+				Method: http.MethodGet,
+				Path:   "/testing",
+			}
+
+			requestData := requesthttputilpkg.RequestData{
+				Method: route.Method,
+				Target: route.Path,
+			}
+
+			req := httptest.NewRequest(requestData.Method, requestData.Target, nil)
 
 			resprec := httptest.NewRecorder()
 

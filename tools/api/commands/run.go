@@ -16,7 +16,6 @@ import (
 	"github.com/gorilla/mux"
 	_ "github.com/icaroribeiro/new-go-code-challenge-template/docs/api/swagger"
 	healthcheckservice "github.com/icaroribeiro/new-go-code-challenge-template/internal/application/service/healthcheck"
-	dbtrxmiddleware "github.com/icaroribeiro/new-go-code-challenge-template/internal/infrastructure/storage/datastore/middleware/dbtrx"
 	healthcheckhandler "github.com/icaroribeiro/new-go-code-challenge-template/internal/transport/presentation/handler/healthcheck"
 	healthcheckrouter "github.com/icaroribeiro/new-go-code-challenge-template/internal/transport/router/healthcheck"
 	swaggerrouter "github.com/icaroribeiro/new-go-code-challenge-template/internal/transport/router/swagger"
@@ -25,6 +24,7 @@ import (
 	envpkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/env"
 	handlerhttputilpkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/httputil/handler"
 	routehttputilpkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/httputil/route"
+	dbtrxmiddleware "github.com/icaroribeiro/new-go-code-challenge-template/pkg/middleware/dbtrx"
 	serverpkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/server"
 	"github.com/spf13/cobra"
 

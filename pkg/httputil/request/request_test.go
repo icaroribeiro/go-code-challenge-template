@@ -14,6 +14,7 @@ import (
 	"github.com/icaroribeiro/new-go-code-challenge-template/pkg/customerror"
 	requesthttputilpkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/httputil/request"
 	responsehttputilpkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/httputil/response"
+	routehttputilpkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/httputil/route"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/suite"
 )
@@ -100,7 +101,18 @@ func (ts *TestSuite) TestSetRequestHeaders() {
 		ts.T().Run(tc.Context, func(t *testing.T) {
 			tc.SetUp(t)
 
-			req := httptest.NewRequest(http.MethodGet, "/testing", nil)
+			route := routehttputilpkg.Route{
+				Name:   "Testing",
+				Method: http.MethodGet,
+				Path:   "/testing",
+			}
+
+			requestData := requesthttputilpkg.RequestData{
+				Method: route.Method,
+				Target: route.Path,
+			}
+
+			req := httptest.NewRequest(requestData.Method, requestData.Target, nil)
 
 			requesthttputilpkg.SetRequestHeaders(req, headers)
 
@@ -154,7 +166,19 @@ func (ts *TestSuite) TestSetRequestContext() {
 				assert.Equal(t, expectedCount, count)
 			}
 
-			req := httptest.NewRequest(http.MethodGet, "/testing", nil)
+			route := routehttputilpkg.Route{
+				Name:        "Testing",
+				Method:      http.MethodGet,
+				Path:        "/testing",
+				HandlerFunc: countHandlerFunc,
+			}
+
+			requestData := requesthttputilpkg.RequestData{
+				Method: route.Method,
+				Target: route.Path,
+			}
+
+			req := httptest.NewRequest(requestData.Method, requestData.Target, nil)
 
 			requesthttputilpkg.SetRequestContext(req, contextMap)
 
@@ -162,10 +186,10 @@ func (ts *TestSuite) TestSetRequestContext() {
 
 			router := mux.NewRouter()
 
-			router.Name("testing").
-				Methods(http.MethodGet).
-				Path("/testing").
-				HandlerFunc(countHandlerFunc)
+			router.Name(route.Name).
+				Methods(route.Method).
+				Path(route.Path).
+				HandlerFunc(route.HandlerFunc)
 
 			router.ServeHTTP(resprec, req)
 

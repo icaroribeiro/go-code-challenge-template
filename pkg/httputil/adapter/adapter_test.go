@@ -13,6 +13,7 @@ import (
 	adapterhttputilpkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/httputil/adapter"
 	requesthttputilpkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/httputil/request"
 	responsehttputilpkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/httputil/response"
+	routehttputilpkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/httputil/route"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/suite"
 )
@@ -124,16 +125,28 @@ func (ts *TestSuite) TestWith() {
 
 			returnedHandlerFunc := adapterhttputilpkg.AdaptFunc(countHandlerFunc).With(handlerFuncs...)
 
-			req := httptest.NewRequest(http.MethodGet, "/testing", nil)
+			route := routehttputilpkg.Route{
+				Name:        "Testing",
+				Method:      http.MethodPost,
+				Path:        "/testing",
+				HandlerFunc: returnedHandlerFunc,
+			}
+
+			requestData := requesthttputilpkg.RequestData{
+				Method: route.Method,
+				Target: route.Path,
+			}
+
+			req := httptest.NewRequest(requestData.Method, requestData.Target, nil)
 
 			resprec := httptest.NewRecorder()
 
 			router := mux.NewRouter()
 
-			router.Name("testing").
-				Methods(http.MethodGet).
-				Path("/testing").
-				HandlerFunc(returnedHandlerFunc)
+			router.Name(route.Name).
+				Methods(route.Method).
+				Path(route.Path).
+				HandlerFunc(route.HandlerFunc)
 
 			router.ServeHTTP(resprec, req)
 

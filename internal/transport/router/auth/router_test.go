@@ -1,18 +1,19 @@
 package auth_test
 
 import (
+	"net/http"
 	"reflect"
 	"runtime"
 	"testing"
 
 	authmockservice "github.com/icaroribeiro/new-go-code-challenge-template/internal/core/ports/application/mockservice/auth"
-	dbtrxmiddleware "github.com/icaroribeiro/new-go-code-challenge-template/internal/infrastructure/storage/datastore/middleware/dbtrx"
 	authhandler "github.com/icaroribeiro/new-go-code-challenge-template/internal/transport/presentation/handler/auth"
 	authrouter "github.com/icaroribeiro/new-go-code-challenge-template/internal/transport/router/auth"
 	authpkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/auth"
 	adapterhttputilpkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/httputil/adapter"
 	routehttputilpkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/httputil/route"
 	authmiddlewarepkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/middleware/auth"
+	dbtrxmiddleware "github.com/icaroribeiro/new-go-code-challenge-template/pkg/middleware/dbtrx"
 	loggingmiddlewarepkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/middleware/logging"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/suite"
@@ -47,35 +48,35 @@ func (ts *TestSuite) TestConfigureRoutes() {
 				routes = routehttputilpkg.Routes{
 					routehttputilpkg.Route{
 						Name:   "SignUp",
-						Method: "POST",
+						Method: http.MethodPost,
 						Path:   "/sign_up",
 						HandlerFunc: adapterhttputilpkg.AdaptFunc(authHandler.SignUp).
 							With(adapters["loggingMiddleware"], adapters["dbTrxMiddleware"]),
 					},
 					routehttputilpkg.Route{
 						Name:   "SignIn",
-						Method: "POST",
+						Method: http.MethodPost,
 						Path:   "/sign_in",
 						HandlerFunc: adapterhttputilpkg.AdaptFunc(authHandler.SignIn).
 							With(adapters["loggingMiddleware"], adapters["dbTrxMiddleware"]),
 					},
 					routehttputilpkg.Route{
 						Name:   "RefreshToken",
-						Method: "POST",
+						Method: http.MethodPost,
 						Path:   "/refresh_token",
 						HandlerFunc: adapterhttputilpkg.AdaptFunc(authHandler.RefreshToken).
 							With(adapters["loggingMiddleware"], adapters["authRenewalMiddleware"]),
 					},
 					routehttputilpkg.Route{
 						Name:   "ChangePassword",
-						Method: "POST",
+						Method: http.MethodPost,
 						Path:   "/change_password",
 						HandlerFunc: adapterhttputilpkg.AdaptFunc(authHandler.ChangePassword).
 							With(adapters["loggingMiddleware"], adapters["authMiddleware"]),
 					},
 					routehttputilpkg.Route{
 						Name:   "SignOut",
-						Method: "POST",
+						Method: http.MethodPost,
 						Path:   "/sign_out",
 						HandlerFunc: adapterhttputilpkg.AdaptFunc(authHandler.SignOut).
 							With(adapters["loggingMiddleware"], adapters["authMiddleware"]),

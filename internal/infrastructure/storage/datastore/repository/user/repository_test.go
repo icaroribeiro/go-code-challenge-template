@@ -1,7 +1,6 @@
 package user_test
 
 import (
-	"errors"
 	"fmt"
 	"regexp"
 	"testing"
@@ -74,7 +73,7 @@ func (ts *TestSuite) TestCreate() {
 
 				mock.ExpectExec(regexp.QuoteMeta(sqlQuery)).
 					WithArgs(sqlmock.AnyArg(), user.Username, sqlmock.AnyArg(), sqlmock.AnyArg()).
-					WillReturnError(errors.New("failed"))
+					WillReturnError(customerror.New("failed"))
 
 				mock.ExpectRollback()
 
@@ -154,7 +153,7 @@ func (ts *TestSuite) TestGetAll() {
 			Context: "ItShouldFailIfAnErrorOccursWhenFindingAllUser",
 			SetUp: func(t *testing.T) {
 				mock.ExpectQuery(regexp.QuoteMeta(sqlQuery)).
-					WillReturnError(errors.New("failed"))
+					WillReturnError(customerror.New("failed"))
 
 				errorType = customerror.NoType
 			},

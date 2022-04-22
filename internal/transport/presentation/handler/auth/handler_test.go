@@ -2,7 +2,6 @@ package auth_test
 
 import (
 	"encoding/json"
-	"errors"
 	"fmt"
 	"net/http"
 	"net/http/httptest"
@@ -155,7 +154,7 @@ func (ts *TestSuite) TestSignUp() {
 				contextMap[dbTrxKey] = dbTrx
 
 				returnArgs = ReturnArgs{
-					{"", errors.New("failed")},
+					{"", customerror.New("failed")},
 				}
 
 			},
@@ -176,7 +175,7 @@ func (ts *TestSuite) TestSignUp() {
 
 			route := routehttputilpkg.Route{
 				Name:        "SignUp",
-				Method:      "POST",
+				Method:      http.MethodPost,
 				Path:        "/sign_up",
 				HandlerFunc: authHandler.SignUp,
 			}
@@ -370,7 +369,7 @@ func (ts *TestSuite) TestSignIn() {
 
 			route := routehttputilpkg.Route{
 				Name:        "SignIn",
-				Method:      "POST",
+				Method:      http.MethodPost,
 				Path:        "/sign_in",
 				HandlerFunc: authHandler.SignIn,
 			}
@@ -487,7 +486,7 @@ func (ts *TestSuite) TestRefreshToken() {
 				contextMap[authDetailsKey] = auth
 
 				returnArgs = ReturnArgs{
-					{"", errors.New("failed")},
+					{"", customerror.New("failed")},
 				}
 			},
 			StatusCode: http.StatusInternalServerError,
@@ -507,7 +506,7 @@ func (ts *TestSuite) TestRefreshToken() {
 
 			route := routehttputilpkg.Route{
 				Name:        "RefreshToken",
-				Method:      "POST",
+				Method:      http.MethodPost,
 				Path:        "/refresh_token",
 				HandlerFunc: authHandler.RefreshToken,
 			}
@@ -716,7 +715,7 @@ func (ts *TestSuite) TestChangePassword() {
 
 			route := routehttputilpkg.Route{
 				Name:        "ChangePassword",
-				Method:      "POST",
+				Method:      http.MethodPost,
 				Path:        "/change_password",
 				HandlerFunc: authHandler.ChangePassword,
 			}
@@ -831,7 +830,7 @@ func (ts *TestSuite) TestSignOut() {
 				contextMap[authDetailsKey] = auth
 
 				returnArgs = ReturnArgs{
-					{errors.New("failed")},
+					{customerror.New("failed")},
 				}
 			},
 			StatusCode: http.StatusInternalServerError,
@@ -851,7 +850,7 @@ func (ts *TestSuite) TestSignOut() {
 
 			route := routehttputilpkg.Route{
 				Name:        "LogOut",
-				Method:      "POST",
+				Method:      http.MethodPost,
 				Path:        "/sign_out",
 				HandlerFunc: authHandler.SignOut,
 			}
