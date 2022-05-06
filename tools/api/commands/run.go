@@ -15,26 +15,37 @@ import (
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gorilla/mux"
 	_ "github.com/icaroribeiro/new-go-code-challenge-template/docs/api/swagger"
+	authservice "github.com/icaroribeiro/new-go-code-challenge-template/internal/application/service/auth"
 	healthcheckservice "github.com/icaroribeiro/new-go-code-challenge-template/internal/application/service/healthcheck"
+	userservice "github.com/icaroribeiro/new-go-code-challenge-template/internal/application/service/user"
+	authdatastorerepository "github.com/icaroribeiro/new-go-code-challenge-template/internal/infrastructure/storage/datastore/repository/auth"
+	logindatastorerepository "github.com/icaroribeiro/new-go-code-challenge-template/internal/infrastructure/storage/datastore/repository/login"
+	userdatastorerepository "github.com/icaroribeiro/new-go-code-challenge-template/internal/infrastructure/storage/datastore/repository/user"
+	authhandler "github.com/icaroribeiro/new-go-code-challenge-template/internal/transport/presentation/handler/auth"
 	healthcheckhandler "github.com/icaroribeiro/new-go-code-challenge-template/internal/transport/presentation/handler/healthcheck"
+	userhandler "github.com/icaroribeiro/new-go-code-challenge-template/internal/transport/presentation/handler/user"
+	authrouter "github.com/icaroribeiro/new-go-code-challenge-template/internal/transport/router/auth"
 	healthcheckrouter "github.com/icaroribeiro/new-go-code-challenge-template/internal/transport/router/healthcheck"
 	swaggerrouter "github.com/icaroribeiro/new-go-code-challenge-template/internal/transport/router/swagger"
+	userrouter "github.com/icaroribeiro/new-go-code-challenge-template/internal/transport/router/user"
 	authpkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/auth"
 	datastorepkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/datastore"
 	envpkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/env"
+	adapterhttputilpkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/httputil/adapter"
 	handlerhttputilpkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/httputil/handler"
 	routehttputilpkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/httputil/route"
-	dbtrxmiddleware "github.com/icaroribeiro/new-go-code-challenge-template/pkg/middleware/dbtrx"
-	serverpkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/server"
-	"github.com/spf13/cobra"
-
-	//validatorpkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/validator"
-	//uuidvalidator "github.com/icaroribeiro/new-go-code-challenge-template/pkg/validator/uuid"
-	//validatorv2 "gopkg.in/validator.v2"
-	adapterhttputilpkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/httputil/adapter"
 	authmiddlewarepkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/middleware/auth"
+	dbtrxmiddleware "github.com/icaroribeiro/new-go-code-challenge-template/pkg/middleware/dbtrx"
 	loggingmiddlewarepkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/middleware/logging"
+	securitypkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/security"
+	serverpkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/server"
+	validatorpkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/validator"
+	passwordvalidator "github.com/icaroribeiro/new-go-code-challenge-template/pkg/validator/password"
+	usernamevalidator "github.com/icaroribeiro/new-go-code-challenge-template/pkg/validator/username"
+	uuidvalidator "github.com/icaroribeiro/new-go-code-challenge-template/pkg/validator/uuid"
+	"github.com/spf13/cobra"
 	httpswaggerpkg "github.com/swaggo/http-swagger"
+	validatorv2 "gopkg.in/validator.v2"
 )
 
 var RunCmd = &cobra.Command{
@@ -101,14 +112,32 @@ func execRunCmd(cmd *cobra.Command, args []string) {
 		log.Panicf("Got error when acessing the database instance: %s", err.Error())
 	}
 
-	// validationFuncs := map[string]validatorv2.ValidationFunc{
-	// 	"uuid": uuidvalidator.Validate,
-	// }
+	authDatastoreRepository := authdatastorerepository.New(db)
+	loginDatastoreRepository := logindatastorerepository.New(db)
+	userDatastoreRepository := userdatastorerepository.New(db)
 
-	// validator, err := validatorpkg.New(validationFuncs)
-	// if err != nil {
-	// 	log.Panic(err.Error())
-	// }
+	validationFuncs := map[string]validatorv2.ValidationFunc{
+		"uuid":     uuidvalidator.Validate,
+		"username": usernamevalidator.Validate,
+		"password": passwordvalidator.Validate,
+	}
+
+	validator, err := validatorpkg.New(validationFuncs)
+	if err != nil {
+		log.Panic(err.Error())
+	}
+
+	security := securitypkg.New()
+
+	healthCheckService := healthcheckservice.New(db)
+	authService := authservice.New(authDatastoreRepository, loginDatastoreRepository, userDatastoreRepository,
+		authN, security, validator, tokenExpTimeInSec)
+	userService := userservice.New(userDatastoreRepository, validator)
+
+	swaggerHandler := httpswaggerpkg.WrapHandler
+	healthCheckHandler := healthcheckhandler.New(healthCheckService)
+	authHandler := authhandler.New(authService)
+	userHandler := userhandler.New(userService)
 
 	adapters := map[string]adapterhttputilpkg.Adapter{
 		"loggingMiddleware":     loggingmiddlewarepkg.Logging(),
@@ -118,20 +147,10 @@ func execRunCmd(cmd *cobra.Command, args []string) {
 	}
 
 	routes := make(routehttputilpkg.Routes, 0)
-
-	swaggerHandler := httpswaggerpkg.WrapHandler
 	routes = append(routes, swaggerrouter.ConfigureRoutes(swaggerHandler, adapters)...)
-
-	// auth
-	// -----
-	log.Println(tokenExpTimeInSec)
-
-	healthCheckService := healthcheckservice.New(db)
-	healthCheckHandler := healthcheckhandler.New(healthCheckService)
 	routes = append(routes, healthcheckrouter.ConfigureRoutes(healthCheckHandler, adapters)...)
-
-	// user
-	// -----
+	routes = append(routes, authrouter.ConfigureRoutes(authHandler, adapters)...)
+	routes = append(routes, userrouter.ConfigureRoutes(userHandler, adapters)...)
 
 	router := setupRouter(routes)
 
