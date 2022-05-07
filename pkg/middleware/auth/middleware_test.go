@@ -48,7 +48,7 @@ func (ts *TestSuite) TestAuth() {
 
 	ts.Cases = Cases{
 		{
-			Context: "ItShouldSucceedInWrappingAFunctionAndApplyingAuthenticationToARequest",
+			Context: "ItShouldSucceedInWrappingAFunctionWithAuthenticationMiddleware",
 			SetUp: func(t *testing.T) {
 				bearerToken = []string{"Bearer", "token"}
 
@@ -354,7 +354,7 @@ func (ts *TestSuite) TestAuthRenewal() {
 
 	ts.Cases = Cases{
 		{
-			Context: "ItShouldSucceedInWrappingAFunctionAndApplyingAuthenticationToARequest",
+			Context: "ItShouldSucceedInWrappingAFunctionWithAuthRenewalMiddleware",
 			SetUp: func(t *testing.T) {
 				bearerToken = []string{"Bearer", "token"}
 

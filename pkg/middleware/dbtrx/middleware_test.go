@@ -44,7 +44,7 @@ func (ts *TestSuite) TestDBTrx() {
 
 	driver := "postgres"
 	db, mock := NewMockDB(driver)
-	dbTrx := &gorm.DB{}
+	dbAux := &gorm.DB{}
 
 	var handlerFunc func(w http.ResponseWriter, r *http.Request)
 
@@ -54,9 +54,9 @@ func (ts *TestSuite) TestDBTrx() {
 
 	ts.Cases = Cases{
 		{
-			Context: "A",
+			Context: "ItShouldSucceedInWrappingAFunctionWithDBTrxMiddleware",
 			SetUp: func(t *testing.T) {
-				dbTrx = db
+				dbAux = db
 
 				statusCode = http.StatusOK
 
@@ -65,13 +65,13 @@ func (ts *TestSuite) TestDBTrx() {
 
 					i := r.Context().Value(dbTrxKey)
 
-					dbTrx, _ := i.(*gorm.DB)
+					dbAux, _ := i.(*gorm.DB)
 
 					userDatastore := datastoremodel.User{
 						Username: username,
 					}
 
-					_ = dbTrx.Create(&userDatastore)
+					_ = dbAux.Create(&userDatastore)
 
 					responsehttputilpkg.RespondWithJson(w, http.StatusOK, messagehttputilpkg.Message{Text: "ok"})
 				}
@@ -87,9 +87,9 @@ func (ts *TestSuite) TestDBTrx() {
 			WantError: false,
 		},
 		{
-			Context: "B",
+			Context: "ItShouldFailIfTheDatabaseParameterUsedByTheDBTrxMiddlewareIsNil",
 			SetUp: func(t *testing.T) {
-				dbTrx = nil
+				dbAux = nil
 
 				statusCode = http.StatusInternalServerError
 
@@ -98,8 +98,8 @@ func (ts *TestSuite) TestDBTrx() {
 
 					i := r.Context().Value(dbTrxKey)
 
-					dbTrx, ok := i.(*gorm.DB)
-					if !ok || dbTrx == nil {
+					dbAux, ok := i.(*gorm.DB)
+					if !ok || dbAux == nil {
 						responsehttputilpkg.RespondErrorWithJson(w, customerror.New("failed"))
 						return
 					}
@@ -108,9 +108,9 @@ func (ts *TestSuite) TestDBTrx() {
 			WantError: true,
 		},
 		{
-			Context: "C",
+			Context: "ItShouldFailIfTheDatabaseTransactionPerformedByTheWrappedFunctionFails",
 			SetUp: func(t *testing.T) {
-				dbTrx = db
+				dbAux = db
 
 				statusCode = http.StatusInternalServerError
 
@@ -119,15 +119,16 @@ func (ts *TestSuite) TestDBTrx() {
 
 					i := r.Context().Value(dbTrxKey)
 
-					dbTrx, _ := i.(*gorm.DB)
+					dbAux, _ := i.(*gorm.DB)
 
 					userDatastore := datastoremodel.User{
 						Username: username,
 					}
 
-					_ = dbTrx.Create(&userDatastore)
-
-					responsehttputilpkg.RespondErrorWithJson(w, customerror.New("failed"))
+					result := dbAux.Create(&userDatastore)
+					if result.Error != nil {
+						responsehttputilpkg.RespondErrorWithJson(w, customerror.New("failed"))
+					}
 				}
 
 				mock.ExpectBegin()
@@ -141,9 +142,9 @@ func (ts *TestSuite) TestDBTrx() {
 			WantError: true,
 		},
 		{
-			Context: "D",
+			Context: "ItShouldFailIfTheCommitStatementToEndTheDatabaseTransactionExecutedInsideTheDBTrxMiddlewareFails",
 			SetUp: func(t *testing.T) {
-				dbTrx = db
+				dbAux = db
 
 				statusCode = http.StatusOK
 
@@ -152,27 +153,32 @@ func (ts *TestSuite) TestDBTrx() {
 
 					i := r.Context().Value(dbTrxKey)
 
-					dbTrx, _ := i.(*gorm.DB)
+					dbAux, _ := i.(*gorm.DB)
 
 					userDatastore := datastoremodel.User{
 						Username: username,
 					}
 
-					_ = dbTrx.Create(&userDatastore)
-
-					responsehttputilpkg.RespondWithJson(w, http.StatusOK, messagehttputilpkg.Message{Text: "ok"})
+					result := dbAux.Create(&userDatastore)
+					if result.Error == nil {
+						responsehttputilpkg.RespondWithJson(w, http.StatusOK, messagehttputilpkg.Message{Text: "ok"})
+					}
 				}
 
 				mock.ExpectBegin()
+
+				mock.ExpectExec(regexp.QuoteMeta(sqlQuery)).
+					WithArgs(sqlmock.AnyArg(), user.Username, sqlmock.AnyArg(), sqlmock.AnyArg()).
+					WillReturnResult(sqlmock.NewResult(1, 1))
 
 				mock.ExpectCommit().WillReturnError(customerror.New("failed"))
 			},
 			WantError: true,
 		},
 		{
-			Context: "E",
+			Context: "ItShouldFailIfTheDatabaseTransactionPerformedByTheWrappedFunctionFailsAndTheFunctionCallsPanicMethodToStopItsExecutionImmediately",
 			SetUp: func(t *testing.T) {
-				dbTrx = db
+				dbAux = db
 
 				statusCode = http.StatusInternalServerError
 
@@ -181,18 +187,19 @@ func (ts *TestSuite) TestDBTrx() {
 
 					i := r.Context().Value(dbTrxKey)
 
-					dbTrx, _ := i.(*gorm.DB)
+					dbAux, _ := i.(*gorm.DB)
 
 					userDatastore := datastoremodel.User{
 						Username: username,
 					}
 
-					_ = dbTrx.Create(&userDatastore)
-
-					// It is duplicated only to test the code that evaluates
-					// if the header is already written in the WriteHeader method.
-					responsehttputilpkg.RespondErrorWithJson(w, customerror.New("failed"))
-					responsehttputilpkg.RespondErrorWithJson(w, customerror.New("failed"))
+					result := dbAux.Create(&userDatastore)
+					if result.Error != nil {
+						// It is duplicated only to test the code that evaluates
+						// if the header is already written in the WriteHeader method.
+						responsehttputilpkg.RespondErrorWithJson(w, customerror.New("failed"))
+						responsehttputilpkg.RespondErrorWithJson(w, customerror.New("failed"))
+					}
 
 					panic(customerror.New("failed"))
 				}
@@ -213,7 +220,7 @@ func (ts *TestSuite) TestDBTrx() {
 		ts.T().Run(tc.Context, func(t *testing.T) {
 			tc.SetUp(t)
 
-			dbtrxMiddleware := dbtrxmiddlewarepkg.DBTrx(dbTrx)
+			dbtrxMiddleware := dbtrxmiddlewarepkg.DBTrx(dbAux)
 
 			returnedHandlerFunc := adapterhttputilpkg.AdaptFunc(handlerFunc).With(dbtrxMiddleware)
 

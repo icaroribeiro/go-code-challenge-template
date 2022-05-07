@@ -49,7 +49,7 @@ func (ts *TestSuite) TestLogging() {
 
 	ts.Cases = Cases{
 		{
-			Context: "ItShouldSucceedInWrappingAFunctionAndLogsRequestsToOut",
+			Context: "ItShouldSucceedInWrappingAFunctionWithLoggingMiddleware",
 		},
 	}
 
