@@ -120,7 +120,7 @@ func (a *Service) LogIn(credentials securitypkg.Credentials) (string, error) {
 	}
 
 	if !auth.IsEmpty() {
-		return "", customerror.New("the user with username %s is already logged in")
+		return "", customerror.Newf("the user with username %s is already logged in", credentials.Username)
 	}
 
 	auth = domainmodel.Auth{
