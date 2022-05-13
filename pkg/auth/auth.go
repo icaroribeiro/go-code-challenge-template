@@ -2,6 +2,7 @@ package auth
 
 import (
 	"crypto/rsa"
+	"log"
 	"time"
 
 	"github.com/dgrijalva/jwt-go"
@@ -78,6 +79,7 @@ func (a *Auth) DecodeToken(tokenString string) (*jwt.Token, error) {
 // ValidateTokenRenewal is the function that translates a token string in a jwt token
 // and validates if the jwt token is already expired to be renewed.
 func (a *Auth) ValidateTokenRenewal(tokenString string, timeBeforeTokenExpTimeInSec int) (*jwt.Token, error) {
+	log.Println("timeBeforeTokenExpTimeInSec:", timeBeforeTokenExpTimeInSec)
 	token, err := parseToken(tokenString, a.RSAKeys.PublicKey)
 
 	if verr, ok := err.(*jwt.ValidationError); ok {

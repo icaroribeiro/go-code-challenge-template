@@ -15,7 +15,7 @@ check-api-version:
 	go run cmd/api/main.go version
 
 run-api:
-	. ./scripts/setup_env_vars.sh;
+	. ./scripts/setup_env_vars.sh; \
 	go run cmd/api/main.go run
 
 doc-api:
