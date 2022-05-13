@@ -19,6 +19,7 @@ import (
 	uuid "github.com/satori/go.uuid"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/suite"
+	"gorm.io/gorm"
 )
 
 func TestHandlerUnit(t *testing.T) {
@@ -27,6 +28,9 @@ func TestHandlerUnit(t *testing.T) {
 
 func (ts *TestSuite) TestGetAll() {
 	user := domainmodel.User{}
+
+	dbTrx := &gorm.DB{}
+	dbTrx = nil
 
 	returnArgs := ReturnArgs{}
 
@@ -66,6 +70,7 @@ func (ts *TestSuite) TestGetAll() {
 			tc.SetUp(t)
 
 			userService := new(usermockservice.Service)
+			userService.On("WithDBTrx", dbTrx).Return(userService)
 			userService.On("GetAll").Return(returnArgs[0]...)
 
 			userHandler := userhandler.New(userService)

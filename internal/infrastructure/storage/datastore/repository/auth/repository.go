@@ -26,47 +26,47 @@ func New(db *gorm.DB) authdatastorerepository.IRepository {
 
 // Create is the function that creates an auth in the datastore.
 func (r *Repository) Create(auth domainmodel.Auth) (domainmodel.Auth, error) {
-	authDS := datastoremodel.Auth{}
-	authDS.FromDomain(auth)
+	authDatastore := datastoremodel.Auth{}
+	authDatastore.FromDomain(auth)
 
-	result := r.DB.Create(&authDS)
+	result := r.DB.Create(&authDatastore)
 	if result.Error != nil {
 		if strings.Contains(result.Error.Error(), "auths_user_id_key") {
-			loginDS := datastoremodel.Login{}
+			loginDatastore := datastoremodel.Login{}
 
-			if result := r.DB.Find(&loginDS, "user_id=?", authDS.UserID); result.Error != nil {
+			if result := r.DB.Find(&loginDatastore, "user_id=?", authDatastore.UserID); result.Error != nil {
 				return domainmodel.Auth{}, result.Error
 			}
 
-			if result.RowsAffected == 0 && loginDS.IsEmpty() {
-				return domainmodel.Auth{}, customerror.NotFound.Newf("the login record with user id %s was not found", authDS.UserID)
+			if result.RowsAffected == 0 && loginDatastore.IsEmpty() {
+				return domainmodel.Auth{}, customerror.NotFound.Newf("the login record with user id %s was not found", authDatastore.UserID)
 			}
 
-			return domainmodel.Auth{}, customerror.Conflict.Newf("The user with id %s is already logged in", authDS.UserID)
+			return domainmodel.Auth{}, customerror.Conflict.Newf("The user with id %s is already logged in", authDatastore.UserID)
 		}
 
 		return domainmodel.Auth{}, result.Error
 	}
 
-	return authDS.ToDomain(), nil
+	return authDatastore.ToDomain(), nil
 }
 
 // GetByUserID is the function that gets an auth by user id from the datastore.
 func (r *Repository) GetByUserID(userID string) (domainmodel.Auth, error) {
-	authDS := datastoremodel.Auth{}
+	authDatastore := datastoremodel.Auth{}
 
-	if result := r.DB.Find(&authDS, "user_id=?", userID); result.Error != nil {
+	if result := r.DB.Find(&authDatastore, "user_id=?", userID); result.Error != nil {
 		return domainmodel.Auth{}, result.Error
 	}
 
-	return authDS.ToDomain(), nil
+	return authDatastore.ToDomain(), nil
 }
 
 // Delete is the function that deletes an auth by id from the datastore.
 func (r *Repository) Delete(id string) (domainmodel.Auth, error) {
-	authDS := datastoremodel.Auth{}
+	authDatastore := datastoremodel.Auth{}
 
-	result := r.DB.Find(&authDS, "id=?", id)
+	result := r.DB.Find(&authDatastore, "id=?", id)
 	if result.Error != nil {
 		return domainmodel.Auth{}, result.Error
 	}
@@ -75,7 +75,7 @@ func (r *Repository) Delete(id string) (domainmodel.Auth, error) {
 		return domainmodel.Auth{}, customerror.NotFound.Newf("the auth with id %s was not found", id)
 	}
 
-	if result = r.DB.Delete(&authDS); result.Error != nil {
+	if result = r.DB.Delete(&authDatastore); result.Error != nil {
 		return domainmodel.Auth{}, result.Error
 	}
 
@@ -83,7 +83,7 @@ func (r *Repository) Delete(id string) (domainmodel.Auth, error) {
 		return domainmodel.Auth{}, customerror.NotFound.Newf("the auth with id %s was not deleted", id)
 	}
 
-	return authDS.ToDomain(), nil
+	return authDatastore.ToDomain(), nil
 }
 
 // WithDBTrx is the function that enables the repository with datastore transaction.

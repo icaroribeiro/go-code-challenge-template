@@ -7,8 +7,9 @@ github.com/icaroribeiro/new-go-code-challenge-template/internal/application/serv
 github.com/icaroribeiro/new-go-code-challenge-template/internal/application/service/auth/service.go:200:				WithDBTrx			100.0%
 github.com/icaroribeiro/new-go-code-challenge-template/internal/application/service/healthcheck/service.go:13:				New				100.0%
 github.com/icaroribeiro/new-go-code-challenge-template/internal/application/service/healthcheck/service.go:21:				GetStatus			100.0%
-github.com/icaroribeiro/new-go-code-challenge-template/internal/application/service/user/service.go:16:					New				100.0%
-github.com/icaroribeiro/new-go-code-challenge-template/internal/application/service/user/service.go:23:					GetAll				100.0%
+github.com/icaroribeiro/new-go-code-challenge-template/internal/application/service/user/service.go:17:					New				100.0%
+github.com/icaroribeiro/new-go-code-challenge-template/internal/application/service/user/service.go:24:					GetAll				100.0%
+github.com/icaroribeiro/new-go-code-challenge-template/internal/application/service/user/service.go:34:					WithDBTrx			100.0%
 github.com/icaroribeiro/new-go-code-challenge-template/internal/infrastructure/storage/datastore/repository/auth/repository.go:20:	New				100.0%
 github.com/icaroribeiro/new-go-code-challenge-template/internal/infrastructure/storage/datastore/repository/auth/repository.go:28:	Create				100.0%
 github.com/icaroribeiro/new-go-code-challenge-template/internal/infrastructure/storage/datastore/repository/auth/repository.go:55:	GetByUserID			100.0%

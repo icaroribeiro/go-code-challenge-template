@@ -31,7 +31,7 @@ func New(userService userservice.IService) IHandler {
 // @failure 500 {object} error.Error
 // @router /users [GET]
 func (h *Handler) GetAll(w http.ResponseWriter, r *http.Request) {
-	domainUsers, err := h.UserService.GetAll()
+	domainUsers, err := h.UserService.WithDBTrx(nil).GetAll()
 	if err != nil {
 		responsehttputilpkg.RespondErrorWithJson(w, err)
 		return

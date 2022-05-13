@@ -5,6 +5,7 @@ import (
 	userservice "github.com/icaroribeiro/new-go-code-challenge-template/internal/core/ports/application/service/user"
 	userdatastorerepository "github.com/icaroribeiro/new-go-code-challenge-template/internal/core/ports/infrastructure/storage/datastore/repository/user"
 	validatorpkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/validator"
+	"gorm.io/gorm"
 )
 
 type Service struct {
@@ -27,4 +28,11 @@ func (u *Service) GetAll() (domainmodel.Users, error) {
 	}
 
 	return users, nil
+}
+
+// WithDBTrx is the function that enables the service with database transaction.
+func (u *Service) WithDBTrx(dbTrx *gorm.DB) userservice.IService {
+	u.UserDatastoreRepository = u.UserDatastoreRepository.WithDBTrx(dbTrx)
+
+	return u
 }

@@ -26,10 +26,10 @@ func New(db *gorm.DB) logindatastorerepository.IRepository {
 
 // Create is the function that creates a login in the database.
 func (r *Repository) Create(login domainmodel.Login) (domainmodel.Login, error) {
-	loginDS := datastoremodel.Login{}
-	loginDS.FromDomain(login)
+	loginDatastore := datastoremodel.Login{}
+	loginDatastore.FromDomain(login)
 
-	if result := r.DB.Create(&loginDS); result.Error != nil {
+	if result := r.DB.Create(&loginDatastore); result.Error != nil {
 		if strings.Contains(result.Error.Error(), "logins_user_id_key") {
 			return domainmodel.Login{}, customerror.Conflict.Newf("The user with id %s is already logged in", login.Username)
 		}
@@ -37,37 +37,37 @@ func (r *Repository) Create(login domainmodel.Login) (domainmodel.Login, error) 
 		return domainmodel.Login{}, result.Error
 	}
 
-	return loginDS.ToDomain(), nil
+	return loginDatastore.ToDomain(), nil
 }
 
 // GetByUsername is the function that gets a user by username from the database.
 func (r *Repository) GetByUsername(username string) (domainmodel.Login, error) {
-	loginDS := datastoremodel.Login{}
+	loginDatastore := datastoremodel.Login{}
 
-	if result := r.DB.Find(&loginDS, "username=?", username); result.Error != nil {
+	if result := r.DB.Find(&loginDatastore, "username=?", username); result.Error != nil {
 		return domainmodel.Login{}, result.Error
 	}
 
-	return loginDS.ToDomain(), nil
+	return loginDatastore.ToDomain(), nil
 }
 
 // GetByUsername is the function that gets a user by username from the database.
 func (r *Repository) GetByUserID(userID string) (domainmodel.Login, error) {
-	loginDS := datastoremodel.Login{}
+	loginDatastore := datastoremodel.Login{}
 
-	if result := r.DB.Find(&loginDS, "user_id=?", userID); result.Error != nil {
+	if result := r.DB.Find(&loginDatastore, "user_id=?", userID); result.Error != nil {
 		return domainmodel.Login{}, result.Error
 	}
 
-	return loginDS.ToDomain(), nil
+	return loginDatastore.ToDomain(), nil
 }
 
 // Update is the function that updates a login by id in the database.
 func (r *Repository) Update(id string, login domainmodel.Login) (domainmodel.Login, error) {
-	loginDS := datastoremodel.Login{}
-	loginDS.FromDomain(login)
+	loginDatastore := datastoremodel.Login{}
+	loginDatastore.FromDomain(login)
 
-	result := r.DB.Model(&loginDS).Where("id=?", id).Updates(&loginDS)
+	result := r.DB.Model(&loginDatastore).Where("id=?", id).Updates(&loginDatastore)
 	if result.Error != nil {
 		return domainmodel.Login{}, result.Error
 	}
@@ -76,7 +76,7 @@ func (r *Repository) Update(id string, login domainmodel.Login) (domainmodel.Log
 		return domainmodel.Login{}, customerror.NotFound.Newf("the login with id %s was not updated", id)
 	}
 
-	if result = r.DB.Find(&loginDS, "id=?", id); result.Error != nil {
+	if result = r.DB.Find(&loginDatastore, "id=?", id); result.Error != nil {
 		return domainmodel.Login{}, result.Error
 	}
 
@@ -84,14 +84,14 @@ func (r *Repository) Update(id string, login domainmodel.Login) (domainmodel.Log
 		return domainmodel.Login{}, customerror.NotFound.Newf("the login id %s was not found", id)
 	}
 
-	return loginDS.ToDomain(), nil
+	return loginDatastore.ToDomain(), nil
 }
 
 // Delete is the function that deletes a login by id from the database.
 func (r *Repository) Delete(id string) (domainmodel.Login, error) {
-	loginDS := datastoremodel.Login{}
+	loginDatastore := datastoremodel.Login{}
 
-	result := r.DB.Find(&loginDS, "id=?", id)
+	result := r.DB.Find(&loginDatastore, "id=?", id)
 	if result.Error != nil {
 		return domainmodel.Login{}, result.Error
 	}
@@ -100,7 +100,7 @@ func (r *Repository) Delete(id string) (domainmodel.Login, error) {
 		return domainmodel.Login{}, customerror.NotFound.Newf("the login with id %s was not found", id)
 	}
 
-	if result = r.DB.Delete(&loginDS); result.Error != nil {
+	if result = r.DB.Delete(&loginDatastore); result.Error != nil {
 		return domainmodel.Login{}, result.Error
 	}
 
@@ -108,7 +108,7 @@ func (r *Repository) Delete(id string) (domainmodel.Login, error) {
 		return domainmodel.Login{}, customerror.NotFound.Newf("the login with id %s was not deleted", id)
 	}
 
-	return loginDS.ToDomain(), nil
+	return loginDatastore.ToDomain(), nil
 }
 
 // WithDBTrx is the function that enables the repository with database transaction.

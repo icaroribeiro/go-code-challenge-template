@@ -26,10 +26,10 @@ func New(db *gorm.DB) userdatastorerepository.IRepository {
 
 // Create is the function that creates a user in the database.
 func (r *Repository) Create(user domainmodel.User) (domainmodel.User, error) {
-	userDS := datastoremodel.User{}
-	userDS.FromDomain(user)
+	userDatastore := datastoremodel.User{}
+	userDatastore.FromDomain(user)
 
-	if result := r.DB.Create(&userDS); result.Error != nil {
+	if result := r.DB.Create(&userDatastore); result.Error != nil {
 		if strings.Contains(result.Error.Error(), "duplicate key value") {
 			return domainmodel.User{}, customerror.Conflict.New(result.Error.Error())
 		}
@@ -37,18 +37,18 @@ func (r *Repository) Create(user domainmodel.User) (domainmodel.User, error) {
 		return domainmodel.User{}, result.Error
 	}
 
-	return userDS.ToDomain(), nil
+	return userDatastore.ToDomain(), nil
 }
 
 // GetAll is the function that gets the list of all users from the database.
 func (r *Repository) GetAll() (domainmodel.Users, error) {
-	usersDS := datastoremodel.Users{}
+	usersDatastore := datastoremodel.Users{}
 
-	if result := r.DB.Find(&usersDS); result.Error != nil {
+	if result := r.DB.Find(&usersDatastore); result.Error != nil {
 		return domainmodel.Users{}, result.Error
 	}
 
-	return usersDS.ToDomain(), nil
+	return usersDatastore.ToDomain(), nil
 }
 
 // WithDBTrx is the function that enables the repository with database transaction.
