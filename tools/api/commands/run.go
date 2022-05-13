@@ -92,8 +92,6 @@ func execRunCmd(cmd *cobra.Command, args []string) {
 		log.Panic(err.Error())
 	}
 
-	log.Println("timeBeforeTokenExpTimeInSec:", timeBeforeTokenExpTimeInSec)
-
 	dbConfig, err := setupDBConfig()
 	if err != nil {
 		log.Panic(err.Error())

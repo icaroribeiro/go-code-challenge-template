@@ -8,7 +8,7 @@ audit-api:
 	go mod tidy
 
 format-api:
-	gofmt -w .;
+	gofmt -w .; \
 	golint ./...
 
 check-api-version:
@@ -28,7 +28,7 @@ build-mocks:
 	. ./scripts/build_mocks.sh
 
 test-api:
-	. ./scripts/setup_env_vars.test.sh;
+	. ./scripts/setup_env_vars.test.sh; \
 	go test ./... -v -coverprofile=./docs/api/tests/unit/coverage.out
 
 analyze-api:
