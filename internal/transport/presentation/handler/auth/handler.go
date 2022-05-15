@@ -33,13 +33,13 @@ func New(authService authservice.IService) IHandler {
 // @id SignUp
 // @accept json
 // @produce json
-// @Param credentials body security.Credentials true "SignUp"
-// @Success 200 {object} token.Token
-// @Failure 400 {object} error.Error
-// @Failure 401 {object} error.Error
-// @Failure 404 {object} error.Error
-// @Failure 500 {object} error.Error
-// @Router /sign_up [POST]
+// @param credentials body security.Credentials true "SignUp"
+// @success 200 {object} token.Token
+// @failure 400 {object} error.Error
+// @failure 401 {object} error.Error
+// @failure 404 {object} error.Error
+// @failure 500 {object} error.Error
+// @router /sign_up [POST]
 func (h *Handler) SignUp(w http.ResponseWriter, r *http.Request) {
 	var dbTrxKey requesthttputilpkg.ContextKeyType = "db_trx"
 
@@ -76,13 +76,13 @@ func (h *Handler) SignUp(w http.ResponseWriter, r *http.Request) {
 // @id SignIn
 // @accept json
 // @produce json
-// @Param credentials body security.Credentials true "SignIn"
-// @Success 200 {object} token.Token
-// @Failure 400 {object} error.Error
-// @Failure 401 {object} error.Error
-// @Failure 404 {object} error.Error
-// @Failure 500 {object} error.Error
-// @Router /sign_in [POST]
+// @param credentials body security.Credentials true "SignIn"
+// @success 200 {object} token.Token
+// @failure 400 {object} error.Error
+// @failure 401 {object} error.Error
+// @failure 404 {object} error.Error
+// @failure 500 {object} error.Error
+// @router /sign_in [POST]
 func (h *Handler) SignIn(w http.ResponseWriter, r *http.Request) {
 	var dbTrxKey requesthttputilpkg.ContextKeyType = "db_trx"
 
@@ -116,11 +116,11 @@ func (h *Handler) SignIn(w http.ResponseWriter, r *http.Request) {
 // @description
 // @id RefreshToken
 // @produce json
-// @Success 200 {object} token.Token
-// @Failure 400 {object} error.Error
-// @Failure 401 {object} error.Error
-// @Failure 500 {object} error.Error
-// @Router /refresh_token [POST]
+// @success 200 {object} token.Token
+// @failure 400 {object} error.Error
+// @failure 401 {object} error.Error
+// @failure 500 {object} error.Error
+// @router /refresh_token [POST]
 // @security ApiKeyAuth
 func (h *Handler) RefreshToken(w http.ResponseWriter, r *http.Request) {
 	var authDetailsKey requesthttputilpkg.ContextKeyType = "auth_details"
@@ -148,13 +148,13 @@ func (h *Handler) RefreshToken(w http.ResponseWriter, r *http.Request) {
 // @id ChangePassword
 // @accept json
 // @produce json
-// @Param passwords body security.Passwords true "Reset Password"
-// @Success 200 {object} message.Message
-// @Failure 400 {object} error.Error
-// @Failure 401 {object} error.Error
-// @Failure 404 {object} error.Error
-// @Failure 500 {object} error.Error
-// @Router /change_password [POST]
+// @param passwords body security.Passwords true "Reset Password"
+// @success 200 {object} message.Message
+// @failure 400 {object} error.Error
+// @failure 401 {object} error.Error
+// @failure 404 {object} error.Error
+// @failure 500 {object} error.Error
+// @router /change_password [POST]
 // @security ApiKeyAuth
 func (h *Handler) ChangePassword(w http.ResponseWriter, r *http.Request) {
 	var authDetailsKey requesthttputilpkg.ContextKeyType = "auth_details"
@@ -189,11 +189,11 @@ func (h *Handler) ChangePassword(w http.ResponseWriter, r *http.Request) {
 // @description
 // @id SignOut
 // @produce json
-// @Success 200 {object} message.Message
-// @Failure 400 {object} error.Error
-// @Failure 401 {object} error.Error
-// @Failure 500 {object} error.Error
-// @Router /sign_out [POST]
+// @success 200 {object} message.Message
+// @failure 400 {object} error.Error
+// @failure 401 {object} error.Error
+// @failure 500 {object} error.Error
+// @router /sign_out [POST]
 // @security ApiKeyAuth
 func (h *Handler) SignOut(w http.ResponseWriter, r *http.Request) {
 	var authDetailsKey requesthttputilpkg.ContextKeyType = "auth_details"

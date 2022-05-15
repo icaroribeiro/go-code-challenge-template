@@ -21,13 +21,13 @@ func New(healthCheckService healthcheckservice.IService) IHandler {
 
 // GetStatus godoc
 // @tags health check
-// @Summary API endpoint used to verify if the service has started up correctly and is ready to accept requests.
-// @Description
-// @ID GetStatus
-// @Produce json
-// @Success 200 {object} message.Message
-// @Failure 500 {object} error.Error
-// @Router /status [GET]
+// @summary API endpoint used to verify if the service has started up correctly and is ready to accept requests.
+// @description
+// @id GetStatus
+// @produce json
+// @success 200 {object} message.Message
+// @failure 500 {object} error.Error
+// @router /status [GET]
 func (h *Handler) GetStatus(w http.ResponseWriter, r *http.Request) {
 	text := "everything is up and running"
 

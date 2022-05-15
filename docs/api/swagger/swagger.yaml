@@ -1,8 +1,39 @@
 basePath: /
 definitions:
+  error.Error:
+    properties:
+      error:
+        type: string
+    type: object
   message.Message:
     properties:
       message:
+        type: string
+    type: object
+  model.User:
+    properties:
+      id:
+        type: string
+      username:
+        type: string
+    type: object
+  security.Credentials:
+    properties:
+      password:
+        type: string
+      username:
+        type: string
+    type: object
+  security.Passwords:
+    properties:
+      current_password:
+        type: string
+      new_password:
+        type: string
+    type: object
+  token.Token:
+    properties:
+      token:
         type: string
     type: object
 host: localhost:8080
@@ -18,6 +49,176 @@ info:
   title: New Go Code Challenge Template API
   version: "1.0"
 paths:
+  /change_password:
+    post:
+      consumes:
+      - application/json
+      operationId: ChangePassword
+      parameters:
+      - description: Reset Password
+        in: body
+        name: passwords
+        required: true
+        schema:
+          $ref: '#/definitions/security.Passwords'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/message.Message'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/error.Error'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/error.Error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/error.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/error.Error'
+      security:
+      - ApiKeyAuth: []
+      summary: API endpoint to reset the user's password.
+      tags:
+      - authentication
+  /refresh_token:
+    post:
+      operationId: RefreshToken
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/token.Token'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/error.Error'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/error.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/error.Error'
+      security:
+      - ApiKeyAuth: []
+      summary: API endpoint to refresh the access token.
+      tags:
+      - authentication
+  /sign_in:
+    post:
+      consumes:
+      - application/json
+      operationId: SignIn
+      parameters:
+      - description: SignIn
+        in: body
+        name: credentials
+        required: true
+        schema:
+          $ref: '#/definitions/security.Credentials'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/token.Token'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/error.Error'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/error.Error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/error.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/error.Error'
+      summary: API endpoint to perform sign in.
+      tags:
+      - authentication
+  /sign_out:
+    post:
+      operationId: SignOut
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/message.Message'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/error.Error'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/error.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/error.Error'
+      security:
+      - ApiKeyAuth: []
+      summary: API endpoint to perform sign out.
+      tags:
+      - authentication
+  /sign_up:
+    post:
+      consumes:
+      - application/json
+      operationId: SignUp
+      parameters:
+      - description: SignUp
+        in: body
+        name: credentials
+        required: true
+        schema:
+          $ref: '#/definitions/security.Credentials'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/token.Token'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/error.Error'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/error.Error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/error.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/error.Error'
+      summary: API endpoint to perform sign up.
+      tags:
+      - authentication
   /status:
     get:
       operationId: GetStatus
@@ -28,9 +229,44 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/message.Message'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/error.Error'
       summary: API endpoint used to verify if the service has started up correctly and is ready to accept requests.
       tags:
       - health check
+  /users:
+    get:
+      operationId: GetAllUsers
+      parameters:
+      - description: Param 1
+        in: query
+        name: param1
+        type: integer
+      - description: Param 2
+        in: query
+        name: param2
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/model.User'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/error.Error'
+      security:
+      - ApiKeyAuth: []
+      summary: API endpoint to get the list of all users.
+      tags:
+      - user
 schemes:
 - http
 swagger: "2.0"
