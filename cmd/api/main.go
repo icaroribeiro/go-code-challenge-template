@@ -22,14 +22,17 @@ var rootCmd = &cobra.Command{
 // @tag.description It refers to the operation related to health check.
 // @tag.name authentication
 // @tag.description It refers to the operations related to authentication.
+// @tag.name user
+// @tag.description It refers to the operations related to user.
 // @termsOfService http://swagger.io/terms/
 // @contact.name API Support
 // @contact.email icaroribeiro@hotmail.com
 // @license.name Apache 2.0
 // @license.url http://www.apache.org/licenses/LICENSE-2.0.html
-// @host localhost:8080
-// @basePath /
 // @schemes http
+// @SecurityDefinitions.apikey ApiKeyAuth
+// @in header
+// @name Authorization
 func main() {
 	rootCmd.AddCommand(cmd.VersionCmd)
 	rootCmd.AddCommand(cmd.RunCmd)
