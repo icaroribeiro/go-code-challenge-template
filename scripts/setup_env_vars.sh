@@ -15,7 +15,7 @@ export RSA_PRIVATE_KEY_PATH="./configs/auth/rsa_keys/rsa.private"
 # JWT settings
 #
 export TOKEN_EXP_TIME_IN_SEC="60"
-export TIME_BEFORE_TOKEN_EXP_TIME_IN_SEC="40"
+export TIME_BEFORE_TOKEN_EXP_TIME_IN_SEC="30"
 
 #
 # Database settings

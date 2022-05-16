@@ -30,7 +30,7 @@ type TestSuite struct {
 }
 
 var (
-	tokenExpTimeInSecStr = env.GetEnvWithDefaultValue("TOKEN_EXP_TIME_IN_SEC", "600")
+	tokenExpTimeInSecStr = env.GetEnvWithDefaultValue("TOKEN_EXP_TIME_IN_SEC", "60")
 )
 
 func NewMockDB(driver string) (*gorm.DB, sqlmock.Sqlmock) {
