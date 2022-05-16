@@ -45,7 +45,7 @@ var (
 	publicKeyPath  = env.GetEnvWithDefaultValue("RSA_PUBLIC_KEY_PATH", "../../../tests/configs/auth/rsa_keys/rsa.public")
 	privateKeyPath = env.GetEnvWithDefaultValue("RSA_PRIVATE_KEY_PATH", "../../../tests/configs/auth/rsa_keys/rsa.private")
 
-	tokenExpTimeInSecStr = env.GetEnvWithDefaultValue("TOKEN_EXP_TIME_IN_SEC", "60")
+	tokenExpTimeInSecStr = env.GetEnvWithDefaultValue("TOKEN_EXP_TIME_IN_SEC", "120")
 
 	dbDriver   = envpkg.GetEnvWithDefaultValue("DB_DRIVER", "postgres")
 	dbUser     = envpkg.GetEnvWithDefaultValue("DB_USER", "postgres")
