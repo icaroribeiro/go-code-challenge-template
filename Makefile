@@ -11,7 +11,7 @@ format-api:
 	gofmt -w .; \
 	golint ./...
 
-check-api-version:
+checkversion-api:
 	go run cmd/api/main.go version
 
 run-api:

@@ -73,7 +73,7 @@ var (
 )
 
 func execRunCmd(cmd *cobra.Command, args []string) {
-	tcpAddress := setupTcpAddress()
+	httpPort := setupHttpPort()
 
 	rsaKeys, err := setupRSAKeys()
 	if err != nil {
@@ -154,7 +154,7 @@ func execRunCmd(cmd *cobra.Command, args []string) {
 
 	router := setupRouter(routes)
 
-	server := serverpkg.New(tcpAddress, router)
+	server := serverpkg.New(fmt.Sprintf(":%s", httpPort), router)
 
 	idleChan := make(chan struct{})
 
@@ -170,15 +170,15 @@ func execRunCmd(cmd *cobra.Command, args []string) {
 	<-idleChan
 }
 
-// setupTcpAddress is the function that configures the tcp address used by the server.
-func setupTcpAddress() string {
+// setupHttpPort is the function that configures the port address used by the server.
+func setupHttpPort() string {
 	if deploy == "YES" {
 		if httpPort = os.Getenv("PORT"); httpPort == "" {
 			log.Panicf("failed to read the PORT env variable to the application deployment")
 		}
 	}
 
-	return fmt.Sprintf(":%s", httpPort)
+	return httpPort
 }
 
 // setupRSAKeys is the function that configures the RSA keys.
