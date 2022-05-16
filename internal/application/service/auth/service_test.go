@@ -971,7 +971,7 @@ func (ts *TestSuite) TestModifyPassword() {
 					{nil},
 					{nil},
 					{login, nil},
-					{customerror.New("the password is invalid")},
+					{customerror.Unauthorized.New("the password is invalid")},
 					{domainmodel.Login{}, nil},
 				}
 

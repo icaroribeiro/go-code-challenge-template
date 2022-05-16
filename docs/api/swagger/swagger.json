@@ -17,8 +17,6 @@
         },
         "version": "1.0"
     },
-    "host": "localhost:8080",
-    "basePath": "/",
     "paths": {
         "/change_password": {
             "post": {
@@ -326,21 +324,6 @@
                 ],
                 "summary": "API endpoint to get the list of all users.",
                 "operationId": "GetAllUsers",
-                "parameters": [
-                    {
-                        "type": "integer",
-                        "description": "Param 1",
-                        "name": "param1",
-                        "in": "query"
-                    },
-                    {
-                        "type": "integer",
-                        "description": "Param 2",
-                        "name": "param2",
-                        "in": "query",
-                        "required": true
-                    }
-                ],
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -420,6 +403,13 @@
             }
         }
     },
+    "securityDefinitions": {
+        "ApiKeyAuth": {
+            "type": "apiKey",
+            "name": "Authorization",
+            "in": "header"
+        }
+    },
     "tags": [
         {
             "description": "It refers to the operation related to health check.",
@@ -428,6 +418,10 @@
         {
             "description": "It refers to the operations related to authentication.",
             "name": "authentication"
+        },
+        {
+            "description": "It refers to the operations related to user.",
+            "name": "user"
         }
     ]
 }

@@ -167,7 +167,7 @@ func (a *Service) ModifyPassword(id string, passwords securitypkg.Passwords) err
 	}
 
 	if err = a.Security.VerifyPasswords(login.Password, passwords.CurrentPassword); err != nil {
-		if err.Error() == "the password is invalid" {
+		if customerror.GetType(err) == customerror.Unauthorized {
 			return customerror.Unauthorized.New("the current password did not match the one already registered")
 		}
 

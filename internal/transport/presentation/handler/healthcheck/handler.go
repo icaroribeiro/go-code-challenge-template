@@ -29,11 +29,10 @@ func New(healthCheckService healthcheckservice.IService) IHandler {
 // @failure 500 {object} error.Error
 // @router /status [GET]
 func (h *Handler) GetStatus(w http.ResponseWriter, r *http.Request) {
-	text := "everything is up and running"
-
 	if err := h.HealthCheckService.GetStatus(); err != nil {
 		responsehttputilpkg.RespondErrorWithJson(w, err)
 	}
 
+	text := "everything is up and running"
 	responsehttputilpkg.RespondWithJson(w, http.StatusOK, messagehttputilpkg.Message{Text: text})
 }

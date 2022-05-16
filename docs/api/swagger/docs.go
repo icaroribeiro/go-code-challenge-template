@@ -338,21 +338,6 @@ var doc = `{
                 ],
                 "summary": "API endpoint to get the list of all users.",
                 "operationId": "GetAllUsers",
-                "parameters": [
-                    {
-                        "type": "integer",
-                        "description": "Param 1",
-                        "name": "param1",
-                        "in": "query"
-                    },
-                    {
-                        "type": "integer",
-                        "description": "Param 2",
-                        "name": "param2",
-                        "in": "query",
-                        "required": true
-                    }
-                ],
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -432,6 +417,13 @@ var doc = `{
             }
         }
     },
+    "securityDefinitions": {
+        "ApiKeyAuth": {
+            "type": "apiKey",
+            "name": "Authorization",
+            "in": "header"
+        }
+    },
     "tags": [
         {
             "description": "It refers to the operation related to health check.",
@@ -440,6 +432,10 @@ var doc = `{
         {
             "description": "It refers to the operations related to authentication.",
             "name": "authentication"
+        },
+        {
+            "description": "It refers to the operations related to user.",
+            "name": "user"
         }
     ]
 }`
@@ -456,8 +452,8 @@ type swaggerInfo struct {
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = swaggerInfo{
 	Version:     "1.0",
-	Host:        "localhost:8080",
-	BasePath:    "/",
+	Host:        "",
+	BasePath:    "",
 	Schemes:     []string{"http"},
 	Title:       "New Go Code Challenge Template API",
 	Description: "A REST API developed using Golang, Json Web Token and PostgreSQL database.",

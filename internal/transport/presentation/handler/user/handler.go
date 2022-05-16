@@ -25,9 +25,8 @@ func New(userService userservice.IService) IHandler {
 // @description
 // @id GetAllUsers
 // @produce json
-// @param param1 query int false "Param 1"
-// @param param2 query int true "Param 2"
 // @success 200 {array} model.User
+// @failure 401 {object} error.Error
 // @failure 500 {object} error.Error
 // @router /users [GET]
 // @security ApiKeyAuth

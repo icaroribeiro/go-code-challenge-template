@@ -36,8 +36,8 @@ func New(authService authservice.IService) IHandler {
 // @param credentials body security.Credentials true "SignUp"
 // @success 200 {object} token.Token
 // @failure 400 {object} error.Error
-// @failure 401 {object} error.Error
 // @failure 404 {object} error.Error
+// @failure 409 {object} error.Error
 // @failure 500 {object} error.Error
 // @router /sign_up [POST]
 func (h *Handler) SignUp(w http.ResponseWriter, r *http.Request) {
@@ -81,6 +81,7 @@ func (h *Handler) SignUp(w http.ResponseWriter, r *http.Request) {
 // @failure 400 {object} error.Error
 // @failure 401 {object} error.Error
 // @failure 404 {object} error.Error
+// @failure 409 {object} error.Error
 // @failure 500 {object} error.Error
 // @router /sign_in [POST]
 func (h *Handler) SignIn(w http.ResponseWriter, r *http.Request) {
@@ -192,6 +193,7 @@ func (h *Handler) ChangePassword(w http.ResponseWriter, r *http.Request) {
 // @success 200 {object} message.Message
 // @failure 400 {object} error.Error
 // @failure 401 {object} error.Error
+// @failure 404 {object} error.Error
 // @failure 500 {object} error.Error
 // @router /sign_out [POST]
 // @security ApiKeyAuth

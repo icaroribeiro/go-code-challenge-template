@@ -1,4 +1,3 @@
-basePath: /
 definitions:
   error.Error:
     properties:
@@ -36,7 +35,6 @@ definitions:
       token:
         type: string
     type: object
-host: localhost:8080
 info:
   contact:
     email: icaroribeiro@hotmail.com
@@ -239,16 +237,6 @@ paths:
   /users:
     get:
       operationId: GetAllUsers
-      parameters:
-      - description: Param 1
-        in: query
-        name: param1
-        type: integer
-      - description: Param 2
-        in: query
-        name: param2
-        required: true
-        type: integer
       produces:
       - application/json
       responses:
@@ -269,9 +257,16 @@ paths:
       - user
 schemes:
 - http
+securityDefinitions:
+  ApiKeyAuth:
+    in: header
+    name: Authorization
+    type: apiKey
 swagger: "2.0"
 tags:
 - description: It refers to the operation related to health check.
   name: health check
 - description: It refers to the operations related to authentication.
   name: authentication
+- description: It refers to the operations related to user.
+  name: user
