@@ -11,7 +11,7 @@ import (
 	requesthttputilpkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/httputil/request"
 	responsehttputilpkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/httputil/response"
 	tokenhttputilpkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/httputil/token"
-	"github.com/icaroribeiro/new-go-code-challenge-template/pkg/security"
+	securitypkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/security"
 	"gorm.io/gorm"
 )
 
@@ -52,7 +52,7 @@ func (h *Handler) SignUp(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	credentials := security.Credentials{}
+	credentials := securitypkg.Credentials{}
 
 	err := json.NewDecoder(r.Body).Decode(&credentials)
 	if err != nil {
@@ -95,7 +95,7 @@ func (h *Handler) SignIn(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	credentials := security.Credentials{}
+	credentials := securitypkg.Credentials{}
 
 	if err := json.NewDecoder(r.Body).Decode(&credentials); err != nil {
 		responsehttputilpkg.RespondErrorWithJson(w, customerror.BadRequest.New(err.Error()))
@@ -168,7 +168,7 @@ func (h *Handler) ChangePassword(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	passwords := security.Passwords{}
+	passwords := securitypkg.Passwords{}
 
 	if err := json.NewDecoder(r.Body).Decode(&passwords); err != nil {
 		responsehttputilpkg.RespondErrorWithJson(w, customerror.BadRequest.New(err.Error()))
