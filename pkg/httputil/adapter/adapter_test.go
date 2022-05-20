@@ -42,9 +42,11 @@ func (ts *TestSuite) TestAdaptFunc() {
 	}
 }
 
-const (
-	_count requesthttputilpkg.ContextKeyType = "count"
-)
+var countCtxKey = &contextKey{"count"}
+
+type contextKey struct {
+	name string
+}
 
 func addOneToCountHandlerFunc() func(http.HandlerFunc) http.HandlerFunc {
 	return func(next http.HandlerFunc) http.HandlerFunc {
@@ -53,7 +55,7 @@ func addOneToCountHandlerFunc() func(http.HandlerFunc) http.HandlerFunc {
 			ok := false
 
 			ctx := r.Context()
-			i := ctx.Value(_count)
+			i := ctx.Value(countCtxKey)
 			if i == nil {
 				count = 1
 			} else {
@@ -65,7 +67,7 @@ func addOneToCountHandlerFunc() func(http.HandlerFunc) http.HandlerFunc {
 				count += 1
 			}
 
-			ctx = context.WithValue(ctx, _count, count)
+			ctx = context.WithValue(ctx, countCtxKey, count)
 			r = r.WithContext(ctx)
 
 			next.ServeHTTP(w, r)
@@ -112,7 +114,7 @@ func (ts *TestSuite) TestWith() {
 			tc.SetUp(t)
 
 			countHandlerFunc := func(w http.ResponseWriter, r *http.Request) {
-				i := r.Context().Value(_count)
+				i := r.Context().Value(countCtxKey)
 
 				count, ok := i.(int)
 				if !ok {

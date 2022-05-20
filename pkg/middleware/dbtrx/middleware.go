@@ -68,7 +68,7 @@ func DBTrx(db *gorm.DB) func(http.HandlerFunc) http.HandlerFunc {
 			// It is necessary to set database transaction that can be used for performing operations with transaction.
 			ctx := r.Context()
 			var dbTrxKey requesthttputilpkg.ContextKeyType = "db_trx"
-			ctx = context.WithValue(ctx, dbTrxKey, dbTrx)
+			ctx = context.WithValue(r.Context(), dbTrxKey, dbTrx)
 			r = r.WithContext(ctx)
 
 			wrapped := wrapResponseWriter(w)
@@ -77,8 +77,7 @@ func DBTrx(db *gorm.DB) func(http.HandlerFunc) http.HandlerFunc {
 
 			if isStatusCodeInList(wrapped.Status(), statusCodesList) {
 				if err := dbTrx.Commit().Error; err != nil {
-					errorMsg := "database transaction commit failed"
-					log.Panicf("%s: %s", errorMsg, err.Error())
+					log.Panicf("database transaction commit failed: %s", err.Error())
 				}
 			} else {
 				log.Printf("rolling back database transaction due to status code: %d", wrapped.statusCode)
