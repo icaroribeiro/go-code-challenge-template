@@ -70,7 +70,7 @@ github.com/icaroribeiro/new-go-code-challenge-template/pkg/httputil/response/res
 github.com/icaroribeiro/new-go-code-challenge-template/pkg/httputil/response/response.go:28:						RespondErrorWithJson		100.0%
 github.com/icaroribeiro/new-go-code-challenge-template/pkg/middleware/auth/middleware.go:17:						extractTokenString		100.0%
 github.com/icaroribeiro/new-go-code-challenge-template/pkg/middleware/auth/middleware.go:33:						buildAuth			100.0%
-github.com/icaroribeiro/new-go-code-challenge-template/pkg/middleware/auth/middleware.go:61:						setupAuthDetailsInRequest	100.0%
+github.com/icaroribeiro/new-go-code-challenge-template/pkg/middleware/auth/middleware.go:61:						setupAuthDetailsInRequestContext	100.0%
 github.com/icaroribeiro/new-go-code-challenge-template/pkg/middleware/auth/middleware.go:70:						Auth				100.0%
 github.com/icaroribeiro/new-go-code-challenge-template/pkg/middleware/auth/middleware.go:99:						AuthRenewal			100.0%
 github.com/icaroribeiro/new-go-code-challenge-template/pkg/middleware/dbtrx/middleware.go:24:						wrapResponseWriter		100.0%

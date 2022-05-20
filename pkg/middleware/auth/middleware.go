@@ -58,7 +58,7 @@ func buildAuth(db *gorm.DB, authN authpkg.IAuth, token *jwt.Token) (domainmodel.
 	return auth, nil
 }
 
-func setupAuthDetailsInRequest(w http.ResponseWriter, r *http.Request, auth domainmodel.Auth) *http.Request {
+func setupAuthDetailsInRequestContext(w http.ResponseWriter, r *http.Request, auth domainmodel.Auth) *http.Request {
 	// It is necessary to set auth details that can be used for performing authenticated operations.
 	ctx := r.Context()
 	var authDetailsKey requesthttputilpkg.ContextKeyType = "auth_details"
@@ -88,7 +88,7 @@ func Auth(db *gorm.DB, authN authpkg.IAuth) func(http.HandlerFunc) http.HandlerF
 				return
 			}
 
-			r = setupAuthDetailsInRequest(w, r, auth)
+			r = setupAuthDetailsInRequestContext(w, r, auth)
 
 			next.ServeHTTP(w, r)
 		}
@@ -117,7 +117,7 @@ func AuthRenewal(db *gorm.DB, authN authpkg.IAuth, timeBeforeTokenExpTimeInSec i
 				return
 			}
 
-			r = setupAuthDetailsInRequest(w, r, auth)
+			r = setupAuthDetailsInRequestContext(w, r, auth)
 
 			next.ServeHTTP(w, r)
 		}
