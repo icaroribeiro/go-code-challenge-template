@@ -13,7 +13,7 @@ import (
 	adapterhttputilpkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/httputil/adapter"
 	routehttputilpkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/httputil/route"
 	authmiddlewarepkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/middleware/auth"
-	dbtrxmiddleware "github.com/icaroribeiro/new-go-code-challenge-template/pkg/middleware/dbtrx"
+	dbtrxmiddlewarepkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/middleware/dbtrx"
 	loggingmiddlewarepkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/middleware/logging"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/suite"
@@ -38,7 +38,7 @@ func (ts *TestSuite) TestConfigureRoutes() {
 		"loggingMiddleware":     loggingmiddlewarepkg.Logging(),
 		"authMiddleware":        authmiddlewarepkg.Auth(db, authN),
 		"authRenewalMiddleware": authmiddlewarepkg.AuthRenewal(db, authN, timeBeforeTokenExpTimeInSec),
-		"dbTrxMiddleware":       dbtrxmiddleware.DBTrx(db),
+		"dbTrxMiddleware":       dbtrxmiddlewarepkg.DBTrx(db),
 	}
 
 	ts.Cases = Cases{

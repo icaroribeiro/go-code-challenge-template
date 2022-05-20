@@ -77,11 +77,13 @@ func DBTrx(db *gorm.DB) func(http.HandlerFunc) http.HandlerFunc {
 
 			if isStatusCodeInList(wrapped.Status(), statusCodesList) {
 				if err := dbTrx.Commit().Error; err != nil {
-					log.Panicf("database transaction commit failed: %s", err.Error())
+					log.Panicf("failed to commit database transaction: %s", err.Error())
 				}
 			} else {
 				log.Printf("rolling back database transaction due to status code: %d", wrapped.statusCode)
-				dbTrx.Rollback()
+				if err := dbTrx.Rollback().Error; err != nil {
+					log.Panicf("failed to rollback database transaction: %s", err.Error())
+				}
 			}
 		}
 	}

@@ -35,7 +35,7 @@ import (
 	handlerhttputilpkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/httputil/handler"
 	routehttputilpkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/httputil/route"
 	authmiddlewarepkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/middleware/auth"
-	dbtrxmiddleware "github.com/icaroribeiro/new-go-code-challenge-template/pkg/middleware/dbtrx"
+	dbtrxmiddlewarepkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/middleware/dbtrx"
 	loggingmiddlewarepkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/middleware/logging"
 	securitypkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/security"
 	serverpkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/server"
@@ -143,7 +143,7 @@ func execRunCmd(cmd *cobra.Command, args []string) {
 		"loggingMiddleware":     loggingmiddlewarepkg.Logging(),
 		"authMiddleware":        authmiddlewarepkg.Auth(db, authN),
 		"authRenewalMiddleware": authmiddlewarepkg.AuthRenewal(db, authN, timeBeforeTokenExpTimeInSec),
-		"dbTrxMiddleware":       dbtrxmiddleware.DBTrx(db),
+		"dbTrxMiddleware":       dbtrxmiddlewarepkg.DBTrx(db),
 	}
 
 	routes := make(routehttputilpkg.Routes, 0)
