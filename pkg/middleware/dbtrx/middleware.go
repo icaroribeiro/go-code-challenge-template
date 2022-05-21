@@ -9,6 +9,12 @@ import (
 	"gorm.io/gorm"
 )
 
+var dbTrxCtxKey = &contextKey{"db_trx"}
+
+type contextKey struct {
+	name string
+}
+
 var (
 	statusCodesList = []int{http.StatusOK}
 )
@@ -70,6 +76,8 @@ func DBTrx(db *gorm.DB) func(http.HandlerFunc) http.HandlerFunc {
 			var dbTrxKey requesthttputilpkg.ContextKeyType = "db_trx"
 			ctx = context.WithValue(r.Context(), dbTrxKey, dbTrx)
 			r = r.WithContext(ctx)
+			// ctx := context.WithValue(r.Context(), dbTrxCtxKey, dbTrx)
+			// r = r.WithContext(ctx)
 
 			wrapped := wrapResponseWriter(w)
 
@@ -87,4 +95,10 @@ func DBTrx(db *gorm.DB) func(http.HandlerFunc) http.HandlerFunc {
 			}
 		}
 	}
+}
+
+// ForContext is the function that finds the db_trx from the context.
+func ForContext(ctx context.Context) *gorm.DB {
+	raw, _ := ctx.Value(dbTrxCtxKey).(*gorm.DB)
+	return raw
 }
