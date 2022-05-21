@@ -59,12 +59,14 @@ func SetRequestHeaders(r *http.Request, headers map[string][]string) {
 // SetRequestContext is the fucntion that configures the context before executing the request.
 func SetRequestContext(r *http.Request, contextMap map[interface{}]interface{}) {
 	for key, value := range contextMap {
-		ctx := (*r).Context()
+		ctx := context.WithValue((*r).Context(), key, value)
+		*r = *r.WithContext(ctx)
+		// ctx := (*r).Context()
 
-		contextKey, ok := key.(ContextKeyType)
-		if ok {
-			ctx = context.WithValue(ctx, contextKey, value)
-			*r = *r.WithContext(ctx)
-		}
+		// contextKey, ok := key.(ContextKeyType)
+		// if ok {
+		// 	ctx = context.WithValue(ctx, contextKey, value)
+		// 	*r = *r.WithContext(ctx)
+		// }
 	}
 }

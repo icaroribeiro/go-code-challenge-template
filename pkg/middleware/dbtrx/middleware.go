@@ -5,7 +5,7 @@ import (
 	"log"
 	"net/http"
 
-	requesthttputilpkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/httputil/request"
+	"github.com/icaroribeiro/new-go-code-challenge-template/pkg/customerror"
 	"gorm.io/gorm"
 )
 
@@ -72,12 +72,8 @@ func DBTrx(db *gorm.DB) func(http.HandlerFunc) http.HandlerFunc {
 			}()
 
 			// It is necessary to set database transaction that can be used for performing operations with transaction.
-			ctx := r.Context()
-			var dbTrxKey requesthttputilpkg.ContextKeyType = "db_trx"
-			ctx = context.WithValue(r.Context(), dbTrxKey, dbTrx)
+			ctx := context.WithValue(r.Context(), dbTrxCtxKey, dbTrx)
 			r = r.WithContext(ctx)
-			// ctx := context.WithValue(r.Context(), dbTrxCtxKey, dbTrx)
-			// r = r.WithContext(ctx)
 
 			wrapped := wrapResponseWriter(w)
 
@@ -98,7 +94,11 @@ func DBTrx(db *gorm.DB) func(http.HandlerFunc) http.HandlerFunc {
 }
 
 // ForContext is the function that finds the db_trx from the context.
-func ForContext(ctx context.Context) *gorm.DB {
-	raw, _ := ctx.Value(dbTrxCtxKey).(*gorm.DB)
-	return raw
+func ForContext(ctx context.Context) (*gorm.DB, error) {
+	raw, ok := ctx.Value(dbTrxCtxKey).(*gorm.DB)
+	if !ok || raw == nil {
+		return nil, customerror.New("failed to get the db_trx key from the request context")
+	}
+
+	return raw, nil
 }

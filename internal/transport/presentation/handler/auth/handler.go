@@ -11,6 +11,7 @@ import (
 	requesthttputilpkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/httputil/request"
 	responsehttputilpkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/httputil/response"
 	tokenhttputilpkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/httputil/token"
+	dbtrxmiddlewarepkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/middleware/dbtrx"
 	securitypkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/security"
 	"gorm.io/gorm"
 )
@@ -41,20 +42,22 @@ func New(authService authservice.IService) IHandler {
 // @failure 500 {object} error.Error
 // @router /sign_up [POST]
 func (h *Handler) SignUp(w http.ResponseWriter, r *http.Request) {
-	var dbTrxKey requesthttputilpkg.ContextKeyType = "db_trx"
+	// var dbTrxKey requesthttputilpkg.ContextKeyType = "db_trx"
 
-	i := r.Context().Value(dbTrxKey)
+	// i := r.Context().Value(dbTrxKey)
 
-	dbTrx, ok := i.(*gorm.DB)
-	if !ok || dbTrx == nil {
-		responsehttputilpkg.RespondErrorWithJson(w,
-			customerror.New("failed to get the db_trx key from the context of the request"))
+	// dbTrx, ok := i.(*gorm.DB)
+	// if !ok || dbTrx == nil {
+
+	dbTrx, err := dbtrxmiddlewarepkg.ForContext(r.Context())
+	if err != nil {
+		responsehttputilpkg.RespondErrorWithJson(w, err)
 		return
 	}
 
 	credentials := securitypkg.Credentials{}
 
-	err := json.NewDecoder(r.Body).Decode(&credentials)
+	err = json.NewDecoder(r.Body).Decode(&credentials)
 	if err != nil {
 		responsehttputilpkg.RespondErrorWithJson(w, customerror.BadRequest.New(err.Error()))
 		return
@@ -91,7 +94,7 @@ func (h *Handler) SignIn(w http.ResponseWriter, r *http.Request) {
 
 	dbTrx, ok := i.(*gorm.DB)
 	if !ok || dbTrx == nil {
-		responsehttputilpkg.RespondErrorWithJson(w, customerror.New("failed to get db_trx key from the context of the request"))
+		responsehttputilpkg.RespondErrorWithJson(w, customerror.New("failed to get db_trx key from the request context"))
 		return
 	}
 
@@ -130,7 +133,7 @@ func (h *Handler) RefreshToken(w http.ResponseWriter, r *http.Request) {
 
 	auth, ok := i.(domainmodel.Auth)
 	if !ok {
-		responsehttputilpkg.RespondErrorWithJson(w, customerror.New("failed to get auth_details key from the context of the request"))
+		responsehttputilpkg.RespondErrorWithJson(w, customerror.New("failed to get auth_details key from the request context"))
 		return
 	}
 
@@ -164,7 +167,7 @@ func (h *Handler) ChangePassword(w http.ResponseWriter, r *http.Request) {
 
 	auth, ok := i.(domainmodel.Auth)
 	if !ok {
-		responsehttputilpkg.RespondErrorWithJson(w, customerror.New("failed to get auth_details key from the context of the request"))
+		responsehttputilpkg.RespondErrorWithJson(w, customerror.New("failed to get auth_details key from the request context"))
 		return
 	}
 
@@ -204,7 +207,7 @@ func (h *Handler) SignOut(w http.ResponseWriter, r *http.Request) {
 
 	auth, ok := i.(domainmodel.Auth)
 	if !ok {
-		responsehttputilpkg.RespondErrorWithJson(w, customerror.New("failed to get auth_details key from the context of the request"))
+		responsehttputilpkg.RespondErrorWithJson(w, customerror.New("failed to get auth_details key from the request context"))
 		return
 	}
 
