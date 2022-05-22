@@ -182,10 +182,10 @@ func (ts *TestSuite) TestSignUp() {
 			}
 
 			requestData := requesthttputilpkg.RequestData{
-				Method:      route.Method,
-				Target:      route.Path,
-				Body:        body,
-				ContextMap2: contextMap,
+				Method: route.Method,
+				Target: route.Path,
+				Body:   body,
+				//ContextMap2: contextMap,
 			}
 
 			reqBody := requesthttputilpkg.PrepareRequestBody(requestData.Body)
