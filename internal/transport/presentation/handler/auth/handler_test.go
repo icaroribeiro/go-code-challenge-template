@@ -13,12 +13,10 @@ import (
 	authmockservice "github.com/icaroribeiro/new-go-code-challenge-template/internal/core/ports/application/mockservice/auth"
 	authhandler "github.com/icaroribeiro/new-go-code-challenge-template/internal/transport/presentation/handler/auth"
 	"github.com/icaroribeiro/new-go-code-challenge-template/pkg/customerror"
-	adapterhttputilpkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/httputil/adapter"
 	messagehttputilpkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/httputil/message"
 	requesthttputilpkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/httputil/request"
 	routehttputilpkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/httputil/route"
 	tokenhttputilpkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/httputil/token"
-	dbtrxmiddlewarepkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/middleware/dbtrx"
 	"github.com/icaroribeiro/new-go-code-challenge-template/pkg/security"
 	uuid "github.com/satori/go.uuid"
 	"github.com/stretchr/testify/assert"
@@ -36,11 +34,10 @@ func (ts *TestSuite) TestSignUp() {
 	body := ""
 
 	driver := "postgres"
-	db, mock := NewMockDB(driver)
+	db, _ := NewMockDB(driver)
 	dbTrx := &gorm.DB{}
 
-	//contextMap := make(map[interface{}]interface{})
-	adapters := map[string]adapterhttputilpkg.Adapter{}
+	contextMap := make(map[contextKey]interface{})
 
 	token := ""
 
@@ -65,17 +62,11 @@ func (ts *TestSuite) TestSignUp() {
 				}`,
 					credentials.Username, credentials.Password)
 
-				//var dbTrxKey requesthttputilpkg.ContextKeyType = "db_trx"
-				//contextMap[dbTrxCtxKey] = dbTrx
-
 				dbTrx = db
 
-				//mock.ExpectCommit()
-
-				mock.ExpectBegin()
-				mock.ExpectCommit()
-
-				adapters["dbTrxMiddleware"] = dbtrxmiddlewarepkg.DBTrx(db)
+				// var dbTrxKey requesthttputilpkg.ContextKeyType = "db_trx"
+				// contextMap[dbTrxKey] = dbTrx
+				contextMap[*dbTrxCtxKey] = dbTrx
 
 				token = fake.Word()
 
@@ -178,31 +169,30 @@ func (ts *TestSuite) TestSignUp() {
 			tc.SetUp(t)
 
 			authService := new(authmockservice.Service)
-			authService.On("WithDBTrx", &dbTrx).Return(authService)
+			authService.On("WithDBTrx", dbTrx).Return(authService)
 			authService.On("Register", credentials).Return(returnArgs[0]...)
 
 			authHandler := authhandler.New(authService)
 
 			route := routehttputilpkg.Route{
-				Name:   "SignUp",
-				Method: http.MethodPost,
-				Path:   "/sign_up",
-				HandlerFunc: adapterhttputilpkg.AdaptFunc(authHandler.SignUp).
-					With(adapters["dbTrxMiddleware"]),
+				Name:        "SignUp",
+				Method:      http.MethodPost,
+				Path:        "/sign_up",
+				HandlerFunc: authHandler.SignUp,
 			}
 
 			requestData := requesthttputilpkg.RequestData{
-				Method: route.Method,
-				Target: route.Path,
-				Body:   body,
-				//ContextMap: contextMap,
+				Method:      route.Method,
+				Target:      route.Path,
+				Body:        body,
+				ContextMap2: contextMap,
 			}
 
 			reqBody := requesthttputilpkg.PrepareRequestBody(requestData.Body)
 
 			req := httptest.NewRequest(requestData.Method, requestData.Target, reqBody)
 
-			//requesthttputilpkg.SetRequestContext(req, requestData.ContextMap)
+			requesthttputilpkg.SetRequestContext2(req, requestData.ContextMap)
 
 			resprec := httptest.NewRecorder()
 

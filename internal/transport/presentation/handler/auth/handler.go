@@ -42,12 +42,18 @@ func New(authService authservice.IService) IHandler {
 // @failure 500 {object} error.Error
 // @router /sign_up [POST]
 func (h *Handler) SignUp(w http.ResponseWriter, r *http.Request) {
+	// var err error
 	// var dbTrxKey requesthttputilpkg.ContextKeyType = "db_trx"
 
 	// i := r.Context().Value(dbTrxKey)
 
 	// dbTrx, ok := i.(*gorm.DB)
 	// if !ok || dbTrx == nil {
+	// 	// dbTrx, err := dbtrxmiddlewarepkg.ForContext(r.Context())
+	// 	// if err != nil {
+	// 	//responsehttputilpkg.RespondErrorWithJson(w, err)
+	// 	return
+	// }
 
 	dbTrx, err := dbtrxmiddlewarepkg.ForContext(r.Context())
 	if err != nil {
