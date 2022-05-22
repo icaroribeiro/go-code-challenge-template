@@ -37,7 +37,7 @@ func (ts *TestSuite) TestSignUp() {
 
 	driver := "postgres"
 	db, mock := NewMockDB(driver)
-	//dbTrx := &gorm.DB{}
+	dbTrx := &gorm.DB{}
 
 	//contextMap := make(map[interface{}]interface{})
 	adapters := map[string]adapterhttputilpkg.Adapter{}
@@ -68,10 +68,11 @@ func (ts *TestSuite) TestSignUp() {
 				//var dbTrxKey requesthttputilpkg.ContextKeyType = "db_trx"
 				//contextMap[dbTrxCtxKey] = dbTrx
 
-				//dbTrx = db.Begin()
+				dbTrx = db
+
+				//mock.ExpectCommit()
 
 				mock.ExpectBegin()
-
 				mock.ExpectCommit()
 
 				adapters["dbTrxMiddleware"] = dbtrxmiddlewarepkg.DBTrx(db)
@@ -177,7 +178,7 @@ func (ts *TestSuite) TestSignUp() {
 			tc.SetUp(t)
 
 			authService := new(authmockservice.Service)
-			authService.On("WithDBTrx", db.Begin()).Return(authService)
+			authService.On("WithDBTrx", &dbTrx).Return(authService)
 			authService.On("Register", credentials).Return(returnArgs[0]...)
 
 			authHandler := authhandler.New(authService)
