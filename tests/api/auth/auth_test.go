@@ -21,6 +21,8 @@ import (
 	requesthttputilpkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/httputil/request"
 	routehttputilpkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/httputil/route"
 	tokenhttputilpkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/httputil/token"
+	authmiddlewarepkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/middleware/auth"
+	dbtrxmiddlewarepkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/middleware/dbtrx"
 	securitypkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/security"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/suite"
@@ -40,7 +42,7 @@ func (ts *TestSuite) TestSignUp() {
 
 	body := ""
 
-	contextMap := make(map[interface{}]interface{})
+	dbTrxCtxValue := &gorm.DB{}
 
 	ts.Cases = Cases{
 		{
@@ -66,8 +68,7 @@ func (ts *TestSuite) TestSignUp() {
 				}`,
 					credentials.Username, credentials.Password)
 
-				var dbTrxKey requesthttputilpkg.ContextKeyType = "db_trx"
-				contextMap[dbTrxKey] = dbTrx
+				dbTrxCtxValue = dbTrx
 			},
 			StatusCode: http.StatusOK,
 			WantError:  false,
@@ -91,8 +92,7 @@ func (ts *TestSuite) TestSignUp() {
 
 				body = ""
 
-				var dbTrxKey requesthttputilpkg.ContextKeyType = "db_trx"
-				contextMap[dbTrxKey] = nil
+				dbTrxCtxValue = nil
 			},
 			StatusCode: http.StatusInternalServerError,
 			WantError:  true,
@@ -120,8 +120,7 @@ func (ts *TestSuite) TestSignUp() {
 				`,
 					credentials.Username, credentials.Password)
 
-				var dbTrxKey requesthttputilpkg.ContextKeyType = "db_trx"
-				contextMap[dbTrxKey] = dbTrx
+				dbTrxCtxValue = dbTrx
 			},
 			StatusCode: http.StatusBadRequest,
 			WantError:  true,
@@ -153,8 +152,7 @@ func (ts *TestSuite) TestSignUp() {
 				}`,
 					credentials.Username, credentials.Password)
 
-				var dbTrxKey requesthttputilpkg.ContextKeyType = "db_trx"
-				contextMap[dbTrxKey] = dbTrx
+				dbTrxCtxValue = dbTrx
 			},
 			StatusCode: http.StatusInternalServerError,
 			WantError:  true,
@@ -184,17 +182,18 @@ func (ts *TestSuite) TestSignUp() {
 			}
 
 			requestData := requesthttputilpkg.RequestData{
-				Method:     route.Method,
-				Target:     route.Path,
-				Body:       body,
-				ContextMap: contextMap,
+				Method: route.Method,
+				Target: route.Path,
+				Body:   body,
 			}
 
 			reqBody := requesthttputilpkg.PrepareRequestBody(requestData.Body)
 
 			req := httptest.NewRequest(requestData.Method, requestData.Target, reqBody)
 
-			requesthttputilpkg.SetRequestContext(req, requestData.ContextMap)
+			ctx := req.Context()
+			ctx = dbtrxmiddlewarepkg.NewContext(ctx, dbTrxCtxValue)
+			req = req.WithContext(ctx)
 
 			resprec := httptest.NewRecorder()
 
@@ -235,7 +234,7 @@ func (ts *TestSuite) TestSignIn() {
 
 	body := ""
 
-	contextMap := make(map[interface{}]interface{})
+	dbTrxCtxValue := &gorm.DB{}
 
 	ts.Cases = Cases{
 		{
@@ -277,8 +276,7 @@ func (ts *TestSuite) TestSignIn() {
 				}`,
 					credentials.Username, credentials.Password)
 
-				var dbTrxKey requesthttputilpkg.ContextKeyType = "db_trx"
-				contextMap[dbTrxKey] = dbTrx
+				dbTrxCtxValue = dbTrx
 			},
 			StatusCode: http.StatusOK,
 			WantError:  false,
@@ -302,8 +300,7 @@ func (ts *TestSuite) TestSignIn() {
 
 				body = ""
 
-				var dbTrxKey requesthttputilpkg.ContextKeyType = "db_trx"
-				contextMap[dbTrxKey] = nil
+				dbTrxCtxValue = nil
 			},
 			StatusCode: http.StatusInternalServerError,
 			WantError:  true,
@@ -331,8 +328,7 @@ func (ts *TestSuite) TestSignIn() {
 				`,
 					credentials.Username, credentials.Password)
 
-				var dbTrxKey requesthttputilpkg.ContextKeyType = "db_trx"
-				contextMap[dbTrxKey] = dbTrx
+				dbTrxCtxValue = dbTrx
 			},
 			StatusCode: http.StatusBadRequest,
 			WantError:  true,
@@ -364,8 +360,7 @@ func (ts *TestSuite) TestSignIn() {
 				}`,
 					credentials.Username, credentials.Password)
 
-				var dbTrxKey requesthttputilpkg.ContextKeyType = "db_trx"
-				contextMap[dbTrxKey] = dbTrx
+				dbTrxCtxValue = dbTrx
 			},
 			StatusCode: http.StatusInternalServerError,
 			WantError:  true,
@@ -395,17 +390,18 @@ func (ts *TestSuite) TestSignIn() {
 			}
 
 			requestData := requesthttputilpkg.RequestData{
-				Method:     route.Method,
-				Target:     route.Path,
-				Body:       body,
-				ContextMap: contextMap,
+				Method: route.Method,
+				Target: route.Path,
+				Body:   body,
 			}
 
 			reqBody := requesthttputilpkg.PrepareRequestBody(requestData.Body)
 
 			req := httptest.NewRequest(requestData.Method, requestData.Target, reqBody)
 
-			requesthttputilpkg.SetRequestContext(req, requestData.ContextMap)
+			ctx := req.Context()
+			ctx = dbtrxmiddlewarepkg.NewContext(ctx, dbTrxCtxValue)
+			req = req.WithContext(ctx)
 
 			resprec := httptest.NewRecorder()
 
@@ -444,7 +440,7 @@ func (ts *TestSuite) TestRefreshToken() {
 
 	authDatastore := datastoremodel.Auth{}
 
-	contextMap := make(map[interface{}]interface{})
+	authDetailsCtxValue := domainmodel.Auth{}
 
 	ts.Cases = Cases{
 		{
@@ -481,8 +477,7 @@ func (ts *TestSuite) TestRefreshToken() {
 				result = dbTrx.Create(&authDatastore)
 				assert.Nil(t, result.Error, fmt.Sprintf("Unexpected error %v.", result.Error))
 
-				var authDetailsKey requesthttputilpkg.ContextKeyType = "auth_details"
-				contextMap[authDetailsKey] = authDatastore.ToDomain()
+				authDetailsCtxValue = authDatastore.ToDomain()
 			},
 			StatusCode: http.StatusOK,
 			WantError:  false,
@@ -492,15 +487,14 @@ func (ts *TestSuite) TestRefreshToken() {
 			},
 		},
 		{
-			Context: "ItShouldFailIfTheAuthDetailsFromTheRequestContextIsInvalid",
+			Context: "ItShouldFailIfTheAuthDetailsFromTheRequestContextIsEmpty",
 			SetUp: func(t *testing.T) {
 				dbTrx = ts.DB.Begin()
 				assert.Nil(t, dbTrx.Error, fmt.Sprintf("Unexpected error %v.", dbTrx.Error))
 
 				authN = authpkg.New(ts.RSAKeys)
 
-				var authDetailsKey requesthttputilpkg.ContextKeyType = "auth_details"
-				contextMap[authDetailsKey] = fake.Word()
+				authDetailsCtxValue = domainmodel.Auth{}
 			},
 			StatusCode: http.StatusInternalServerError,
 			WantError:  true,
@@ -530,14 +524,15 @@ func (ts *TestSuite) TestRefreshToken() {
 			}
 
 			requestData := requesthttputilpkg.RequestData{
-				Method:     route.Method,
-				Target:     route.Path,
-				ContextMap: contextMap,
+				Method: route.Method,
+				Target: route.Path,
 			}
 
 			req := httptest.NewRequest(requestData.Method, requestData.Target, nil)
 
-			requesthttputilpkg.SetRequestContext(req, requestData.ContextMap)
+			ctx := req.Context()
+			ctx = authmiddlewarepkg.NewContext(ctx, authDetailsCtxValue)
+			req = req.WithContext(ctx)
 
 			resprec := httptest.NewRecorder()
 
@@ -582,7 +577,7 @@ func (ts *TestSuite) TestChangePassword() {
 
 	body := ""
 
-	contextMap := make(map[interface{}]interface{})
+	authDetailsCtxValue := domainmodel.Auth{}
 
 	ts.Cases = Cases{
 		{
@@ -636,8 +631,7 @@ func (ts *TestSuite) TestChangePassword() {
 				}`,
 					passwords.CurrentPassword, passwords.NewPassword)
 
-				var authDetailsKey requesthttputilpkg.ContextKeyType = "auth_details"
-				contextMap[authDetailsKey] = auth
+				authDetailsCtxValue = auth
 			},
 			StatusCode: http.StatusOK,
 			WantError:  false,
@@ -647,15 +641,14 @@ func (ts *TestSuite) TestChangePassword() {
 			},
 		},
 		{
-			Context: "ItShouldFailIfTheAuthDetailsFromTheRequestContextIsInvalid",
+			Context: "ItShouldFailIfTheAuthDetailsFromTheRequestContextIsEmpty",
 			SetUp: func(t *testing.T) {
 				dbTrx = ts.DB.Begin()
 				assert.Nil(t, dbTrx.Error, fmt.Sprintf("Unexpected error %v.", dbTrx.Error))
 
 				authN = authpkg.New(ts.RSAKeys)
 
-				var authDetailsKey requesthttputilpkg.ContextKeyType = "auth_details"
-				contextMap[authDetailsKey] = fake.Word()
+				authDetailsCtxValue = domainmodel.Auth{}
 			},
 			StatusCode: http.StatusInternalServerError,
 			WantError:  true,
@@ -669,7 +662,33 @@ func (ts *TestSuite) TestChangePassword() {
 
 				authN = authpkg.New(ts.RSAKeys)
 
-				auth = domainmodel.Auth{}
+				username := fake.Username()
+				password := fake.Password(true, true, true, false, false, 8)
+
+				userDatastore = datastoremodel.User{
+					Username: username,
+				}
+
+				result := dbTrx.Create(&userDatastore)
+				assert.Nil(t, result.Error, fmt.Sprintf("Unexpected error %v.", result.Error))
+
+				loginDatastore = datastoremodel.Login{
+					UserID:   userDatastore.ID,
+					Username: username,
+					Password: password,
+				}
+
+				result = dbTrx.Create(&loginDatastore)
+				assert.Nil(t, result.Error, fmt.Sprintf("Unexpected error %v.", result.Error))
+
+				authDatastore = datastoremodel.Auth{
+					UserID: userDatastore.ID,
+				}
+
+				result = dbTrx.Create(&authDatastore)
+				assert.Nil(t, result.Error, fmt.Sprintf("Unexpected error %v.", result.Error))
+
+				auth = authDatastore.ToDomain()
 
 				currentPassword := fake.Password(true, true, true, false, false, 8)
 				newPassword := fake.Password(true, true, true, false, false, 8)
@@ -685,8 +704,7 @@ func (ts *TestSuite) TestChangePassword() {
 				`,
 					passwords.CurrentPassword, passwords.NewPassword)
 
-				var authDetailsKey requesthttputilpkg.ContextKeyType = "auth_details"
-				contextMap[authDetailsKey] = auth
+				authDetailsCtxValue = auth
 			},
 			StatusCode: http.StatusBadRequest,
 			WantError:  true,
@@ -720,8 +738,7 @@ func (ts *TestSuite) TestChangePassword() {
 				}`,
 					passwords.CurrentPassword, passwords.NewPassword)
 
-				var authDetailsKey requesthttputilpkg.ContextKeyType = "auth_details"
-				contextMap[authDetailsKey] = auth
+				authDetailsCtxValue = auth
 			},
 			StatusCode: http.StatusInternalServerError,
 			WantError:  true,
@@ -751,17 +768,18 @@ func (ts *TestSuite) TestChangePassword() {
 			}
 
 			requestData := requesthttputilpkg.RequestData{
-				Method:     route.Method,
-				Target:     route.Path,
-				Body:       body,
-				ContextMap: contextMap,
+				Method: route.Method,
+				Target: route.Path,
+				Body:   body,
 			}
 
 			reqBody := requesthttputilpkg.PrepareRequestBody(requestData.Body)
 
 			req := httptest.NewRequest(requestData.Method, requestData.Target, reqBody)
 
-			requesthttputilpkg.SetRequestContext(req, requestData.ContextMap)
+			ctx := req.Context()
+			ctx = authmiddlewarepkg.NewContext(ctx, authDetailsCtxValue)
+			req = req.WithContext(ctx)
 
 			resprec := httptest.NewRecorder()
 
@@ -802,7 +820,7 @@ func (ts *TestSuite) TestSignOut() {
 
 	auth := domainmodel.Auth{}
 
-	contextMap := make(map[interface{}]interface{})
+	authDetailsCtxValue := domainmodel.Auth{}
 
 	ts.Cases = Cases{
 		{
@@ -841,8 +859,7 @@ func (ts *TestSuite) TestSignOut() {
 
 				auth = authDatastore.ToDomain()
 
-				var authDetailsKey requesthttputilpkg.ContextKeyType = "auth_details"
-				contextMap[authDetailsKey] = auth
+				authDetailsCtxValue = auth
 			},
 			StatusCode: http.StatusOK,
 			WantError:  false,
@@ -859,8 +876,7 @@ func (ts *TestSuite) TestSignOut() {
 
 				authN = authpkg.New(ts.RSAKeys)
 
-				var authDetailsKey requesthttputilpkg.ContextKeyType = "auth_details"
-				contextMap[authDetailsKey] = fake.Word()
+				authDetailsCtxValue = domainmodel.Auth{}
 			},
 			StatusCode: http.StatusInternalServerError,
 			WantError:  true,
@@ -879,8 +895,7 @@ func (ts *TestSuite) TestSignOut() {
 
 				auth = domainmodel.Auth{}
 
-				var authDetailsKey requesthttputilpkg.ContextKeyType = "auth_details"
-				contextMap[authDetailsKey] = auth
+				authDetailsCtxValue = auth
 			},
 			StatusCode: http.StatusInternalServerError,
 			WantError:  true,
@@ -910,14 +925,15 @@ func (ts *TestSuite) TestSignOut() {
 			}
 
 			requestData := requesthttputilpkg.RequestData{
-				Method:     route.Method,
-				Target:     route.Path,
-				ContextMap: contextMap,
+				Method: route.Method,
+				Target: route.Path,
 			}
 
 			req := httptest.NewRequest(requestData.Method, requestData.Target, nil)
 
-			requesthttputilpkg.SetRequestContext(req, requestData.ContextMap)
+			ctx := req.Context()
+			ctx = authmiddlewarepkg.NewContext(ctx, authDetailsCtxValue)
+			req = req.WithContext(ctx)
 
 			resprec := httptest.NewRecorder()
 

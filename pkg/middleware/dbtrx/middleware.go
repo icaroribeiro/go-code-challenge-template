@@ -5,7 +5,6 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/icaroribeiro/new-go-code-challenge-template/pkg/customerror"
 	"gorm.io/gorm"
 )
 
@@ -25,6 +24,17 @@ type responseWriter struct {
 	http.ResponseWriter
 	wroteHeader bool
 	statusCode  int
+}
+
+// NewContext is the function that returns a new Context that carries db_trx value.
+func NewContext(ctx context.Context, dbTrx *gorm.DB) context.Context {
+	return context.WithValue(ctx, dbTrxCtxKey, dbTrx)
+}
+
+// FromContext is the function that returns the db_trx value stored in context, if any.
+func FromContext(ctx context.Context) (*gorm.DB, bool) {
+	raw, ok := ctx.Value(dbTrxCtxKey).(*gorm.DB)
+	return raw, ok
 }
 
 func wrapResponseWriter(w http.ResponseWriter) *responseWriter {
@@ -72,7 +82,7 @@ func DBTrx(db *gorm.DB) func(http.HandlerFunc) http.HandlerFunc {
 			}()
 
 			// It is necessary to set database transaction that can be used for performing operations with transaction.
-			ctx := context.WithValue(r.Context(), dbTrxCtxKey, dbTrx)
+			ctx := NewContext(r.Context(), dbTrx)
 			r = r.WithContext(ctx)
 
 			wrapped := wrapResponseWriter(w)
@@ -91,14 +101,4 @@ func DBTrx(db *gorm.DB) func(http.HandlerFunc) http.HandlerFunc {
 			}
 		}
 	}
-}
-
-// ForContext is the function that finds the db_trx from the context.
-func ForContext(ctx context.Context) (*gorm.DB, error) {
-	raw, ok := ctx.Value(dbTrxCtxKey).(*gorm.DB)
-	if !ok || raw == nil {
-		return nil, customerror.New("failed to get the db_trx key from the request context")
-	}
-
-	return raw, nil
 }

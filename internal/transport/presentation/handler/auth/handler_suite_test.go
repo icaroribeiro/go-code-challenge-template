@@ -27,12 +27,6 @@ type TestSuite struct {
 	Cases Cases
 }
 
-var dbTrxCtxKey = &contextKey{"db_trx"}
-
-type contextKey struct {
-	name string
-}
-
 func NewMockDB(driver string) (*gorm.DB, sqlmock.Sqlmock) {
 	errorMsg := "failed to open a stub database connection"
 

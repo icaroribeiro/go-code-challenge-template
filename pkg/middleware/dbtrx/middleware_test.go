@@ -1,6 +1,7 @@
 package dbtrx_test
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -27,6 +28,72 @@ import (
 
 func TestMiddlewareUnit(t *testing.T) {
 	suite.Run(t, new(TestSuite))
+}
+
+func (ts *TestSuite) TestNewContext() {
+	driver := "postgres"
+	db, _ := NewMockDB(driver)
+	dbTrxCtxValue := &gorm.DB{}
+
+	ctx := context.Background()
+
+	ts.Cases = Cases{
+		{
+			Context: "ItShouldSucceedInCreatingACopyOfAContextWithAnAssociatedValue",
+			SetUp: func(t *testing.T) {
+				dbTrxCtxValue = db
+			},
+			WantError: false,
+		},
+	}
+
+	for _, tc := range ts.Cases {
+		ts.T().Run(tc.Context, func(t *testing.T) {
+			tc.SetUp(t)
+
+			returnedCtx := dbtrxmiddlewarepkg.NewContext(ctx, dbTrxCtxValue)
+
+			if !tc.WantError {
+				assert.NotEmpty(t, returnedCtx)
+				returnedDBTrxCtxValue, ok := dbtrxmiddlewarepkg.FromContext(returnedCtx)
+				assert.True(t, ok, "Unexpected type assertion error")
+				assert.Equal(t, dbTrxCtxValue, returnedDBTrxCtxValue)
+			}
+		})
+	}
+}
+
+func (ts *TestSuite) TestFromContext() {
+	driver := "postgres"
+	db, _ := NewMockDB(driver)
+	dbTrxCtxValue := &gorm.DB{}
+
+	ctx := context.Background()
+
+	ts.Cases = Cases{
+		{
+			Context: "ItShouldSucceedInGettingAssociatedValueWithAContext",
+			SetUp: func(t *testing.T) {
+				dbTrxCtxValue = db
+				ctx = dbtrxmiddlewarepkg.NewContext(ctx, dbTrxCtxValue)
+			},
+			WantError: false,
+		},
+	}
+
+	for _, tc := range ts.Cases {
+		ts.T().Run(tc.Context, func(t *testing.T) {
+			tc.SetUp(t)
+
+			returnedDBTrxCtxValue, ok := dbtrxmiddlewarepkg.FromContext(ctx)
+
+			if !tc.WantError {
+				assert.True(t, ok, "Unexpected type assertion error")
+				assert.NotEmpty(t, returnedDBTrxCtxValue)
+				assert.Equal(t, dbTrxCtxValue, returnedDBTrxCtxValue)
+			}
+		})
+	}
 }
 
 func (ts *TestSuite) TestDBTrx() {
@@ -61,7 +128,7 @@ func (ts *TestSuite) TestDBTrx() {
 				statusCode = http.StatusOK
 
 				handlerFunc = func(w http.ResponseWriter, r *http.Request) {
-					dbAux, _ := dbtrxmiddlewarepkg.ForContext(r.Context())
+					dbAux, _ := dbtrxmiddlewarepkg.FromContext(r.Context())
 
 					userDatastore := datastoremodel.User{
 						Username: username,
@@ -90,9 +157,9 @@ func (ts *TestSuite) TestDBTrx() {
 				statusCode = http.StatusInternalServerError
 
 				handlerFunc = func(w http.ResponseWriter, r *http.Request) {
-					_, err := dbtrxmiddlewarepkg.ForContext(r.Context())
-					if err != nil {
-						responsehttputilpkg.RespondErrorWithJson(w, err)
+					_, ok := dbtrxmiddlewarepkg.FromContext(r.Context())
+					if !ok {
+						responsehttputilpkg.RespondErrorWithJson(w, customerror.New("failed"))
 						return
 					}
 				}
@@ -107,7 +174,7 @@ func (ts *TestSuite) TestDBTrx() {
 				statusCode = http.StatusInternalServerError
 
 				handlerFunc = func(w http.ResponseWriter, r *http.Request) {
-					dbAux, _ := dbtrxmiddlewarepkg.ForContext(r.Context())
+					dbAux, _ := dbtrxmiddlewarepkg.FromContext(r.Context())
 
 					userDatastore := datastoremodel.User{
 						Username: username,
@@ -137,7 +204,7 @@ func (ts *TestSuite) TestDBTrx() {
 				statusCode = http.StatusOK
 
 				handlerFunc = func(w http.ResponseWriter, r *http.Request) {
-					dbAux, _ := dbtrxmiddlewarepkg.ForContext(r.Context())
+					dbAux, _ := dbtrxmiddlewarepkg.FromContext(r.Context())
 
 					userDatastore := datastoremodel.User{
 						Username: username,
@@ -167,7 +234,7 @@ func (ts *TestSuite) TestDBTrx() {
 				statusCode = http.StatusInternalServerError
 
 				handlerFunc = func(w http.ResponseWriter, r *http.Request) {
-					dbAux, _ := dbtrxmiddlewarepkg.ForContext(r.Context())
+					dbAux, _ := dbtrxmiddlewarepkg.FromContext(r.Context())
 
 					userDatastore := datastoremodel.User{
 						Username: username,
@@ -197,7 +264,7 @@ func (ts *TestSuite) TestDBTrx() {
 				statusCode = http.StatusInternalServerError
 
 				handlerFunc = func(w http.ResponseWriter, r *http.Request) {
-					dbAux, _ := dbtrxmiddlewarepkg.ForContext(r.Context())
+					dbAux, _ := dbtrxmiddlewarepkg.FromContext(r.Context())
 
 					userDatastore := datastoremodel.User{
 						Username: username,

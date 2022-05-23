@@ -9,10 +9,26 @@ import (
 	domainmodel "github.com/icaroribeiro/new-go-code-challenge-template/internal/core/domain/model"
 	authpkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/auth"
 	"github.com/icaroribeiro/new-go-code-challenge-template/pkg/customerror"
-	requesthttputilpkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/httputil/request"
 	responsehttputilpkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/httputil/response"
 	"gorm.io/gorm"
 )
+
+var authDetailsCtxKey = &contextKey{"auth_details"}
+
+type contextKey struct {
+	name string
+}
+
+// NewContext is the function that returns a new Context that carries auth_details value.
+func NewContext(ctx context.Context, auth domainmodel.Auth) context.Context {
+	return context.WithValue(ctx, authDetailsCtxKey, auth)
+}
+
+// FromContext is the function that returns the auth_details value stored in context, if any.
+func FromContext(ctx context.Context) (domainmodel.Auth, bool) {
+	raw, ok := ctx.Value(authDetailsCtxKey).(domainmodel.Auth)
+	return raw, ok
+}
 
 func extractTokenString(w http.ResponseWriter, r *http.Request) (string, error) {
 	hdrAuth := r.Header.Get("Authorization")
@@ -58,14 +74,6 @@ func buildAuth(db *gorm.DB, authN authpkg.IAuth, token *jwt.Token) (domainmodel.
 	return auth, nil
 }
 
-func setupAuthDetailsInRequestContext(w http.ResponseWriter, r *http.Request, auth domainmodel.Auth) *http.Request {
-	// It is necessary to set auth details that can be used for performing authenticated operations.
-	ctx := r.Context()
-	var authDetailsKey requesthttputilpkg.ContextKeyType = "auth_details"
-	ctx = context.WithValue(ctx, authDetailsKey, auth)
-	return r.WithContext(ctx)
-}
-
 // Auth is the function that wraps a http.Handler to evaluate the authentication of API based on a JWT token.
 func Auth(db *gorm.DB, authN authpkg.IAuth) func(http.HandlerFunc) http.HandlerFunc {
 	return func(next http.HandlerFunc) http.HandlerFunc {
@@ -88,7 +96,9 @@ func Auth(db *gorm.DB, authN authpkg.IAuth) func(http.HandlerFunc) http.HandlerF
 				return
 			}
 
-			r = setupAuthDetailsInRequestContext(w, r, auth)
+			// It is necessary to set auth details that can be used for performing authenticated operations.
+			ctx := NewContext(r.Context(), auth)
+			r = r.WithContext(ctx)
 
 			next.ServeHTTP(w, r)
 		}
@@ -117,7 +127,9 @@ func AuthRenewal(db *gorm.DB, authN authpkg.IAuth, timeBeforeTokenExpTimeInSec i
 				return
 			}
 
-			r = setupAuthDetailsInRequestContext(w, r, auth)
+			// It is necessary to set auth details that can be used for performing authenticated operations.
+			ctx := NewContext(r.Context(), auth)
+			r = r.WithContext(ctx)
 
 			next.ServeHTTP(w, r)
 		}

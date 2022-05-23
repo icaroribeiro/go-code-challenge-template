@@ -17,6 +17,8 @@ import (
 	requesthttputilpkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/httputil/request"
 	routehttputilpkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/httputil/route"
 	tokenhttputilpkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/httputil/token"
+	authmiddlewarepkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/middleware/auth"
+	dbtrxmiddlewarepkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/middleware/dbtrx"
 	"github.com/icaroribeiro/new-go-code-challenge-template/pkg/security"
 	uuid "github.com/satori/go.uuid"
 	"github.com/stretchr/testify/assert"
@@ -35,9 +37,8 @@ func (ts *TestSuite) TestSignUp() {
 
 	driver := "postgres"
 	db, _ := NewMockDB(driver)
-	dbTrx := &gorm.DB{}
 
-	contextMap := make(map[contextKey]interface{})
+	dbTrxCtxValue := &gorm.DB{}
 
 	token := ""
 
@@ -62,11 +63,7 @@ func (ts *TestSuite) TestSignUp() {
 				}`,
 					credentials.Username, credentials.Password)
 
-				dbTrx = db
-
-				// var dbTrxKey requesthttputilpkg.ContextKeyType = "db_trx"
-				// contextMap[dbTrxKey] = dbTrx
-				contextMap[*dbTrxCtxKey] = dbTrx
+				dbTrxCtxValue = db
 
 				token = fake.Word()
 
@@ -77,91 +74,82 @@ func (ts *TestSuite) TestSignUp() {
 			StatusCode: http.StatusOK,
 			WantError:  false,
 		},
-		// {
-		// 	Context: "ItShouldFailIfTheDatabaseTransactionFromTheRequestContextIsNull",
-		// 	SetUp: func(t *testing.T) {
-		// 		username := fake.Username()
-		// 		password := fake.Password(true, true, true, false, false, 8)
+		{
+			Context: "ItShouldFailIfTheDatabaseTransactionFromTheRequestContextIsNull",
+			SetUp: func(t *testing.T) {
+				username := fake.Username()
+				password := fake.Password(true, true, true, false, false, 8)
 
-		// 		credentials = security.Credentials{
-		// 			Username: username,
-		// 			Password: password,
-		// 		}
+				credentials = security.Credentials{
+					Username: username,
+					Password: password,
+				}
 
-		// 		dbTrx = nil
+				dbTrxCtxValue = nil
 
-		// 		var dbTrxKey requesthttputilpkg.ContextKeyType = "db_trx"
-		// 		contextMap[dbTrxKey] = dbTrx
+				returnArgs = ReturnArgs{
+					{"", nil},
+				}
 
-		// 		returnArgs = ReturnArgs{
-		// 			{"", nil},
-		// 		}
+				body = ""
+			},
+			StatusCode: http.StatusInternalServerError,
+			WantError:  true,
+		},
+		{
+			Context: "ItShouldFailIfTheRequestBodyIsAnImproperlyFormattedJsonString",
+			SetUp: func(t *testing.T) {
+				username := fake.Username()
+				password := fake.Password(true, true, true, false, false, 8)
 
-		// 		body = ""
-		// 	},
-		// 	StatusCode: http.StatusInternalServerError,
-		// 	WantError:  true,
-		// },
-		// {
-		// 	Context: "ItShouldFailIfTheRequestBodyIsAnImproperlyFormattedJsonString",
-		// 	SetUp: func(t *testing.T) {
-		// 		username := fake.Username()
-		// 		password := fake.Password(true, true, true, false, false, 8)
+				credentials = security.Credentials{
+					Username: username,
+					Password: password,
+				}
 
-		// 		credentials = security.Credentials{
-		// 			Username: username,
-		// 			Password: password,
-		// 		}
+				body = fmt.Sprintf(`
+					"username":"%s",
+					"password":"%s"
+				`,
+					credentials.Username, credentials.Password)
 
-		// 		body = fmt.Sprintf(`
-		// 			"username":"%s",
-		// 			"password":"%s"
-		// 		`,
-		// 			credentials.Username, credentials.Password)
+				dbTrxCtxValue = db
 
-		// 		dbTrx = db
+				returnArgs = ReturnArgs{
+					{"", nil},
+				}
+			},
+			StatusCode: http.StatusBadRequest,
+			WantError:  true,
+		},
+		{
+			Context: "ItShouldFailIfAnErrorOccursWhenRegisteringTheCredentials",
+			SetUp: func(t *testing.T) {
+				username := fake.Username()
+				password := fake.Password(true, true, true, false, false, 8)
 
-		// 		var dbTrxKey requesthttputilpkg.ContextKeyType = "db_trx"
-		// 		contextMap[dbTrxKey] = dbTrx
+				credentials = security.Credentials{
+					Username: username,
+					Password: password,
+				}
 
-		// 		returnArgs = ReturnArgs{
-		// 			{"", nil},
-		// 		}
-		// 	},
-		// 	StatusCode: http.StatusBadRequest,
-		// 	WantError:  true,
-		// },
-		// {
-		// 	Context: "ItShouldFailIfAnErrorOccursWhenRegisteringTheCredentials",
-		// 	SetUp: func(t *testing.T) {
-		// 		username := fake.Username()
-		// 		password := fake.Password(true, true, true, false, false, 8)
+				body = fmt.Sprintf(`
+				{
+					"username":"%s",
+					"password":"%s"
+				}`,
+					credentials.Username, credentials.Password)
 
-		// 		credentials = security.Credentials{
-		// 			Username: username,
-		// 			Password: password,
-		// 		}
+				dbTrxCtxValue = db
 
-		// 		body = fmt.Sprintf(`
-		// 		{
-		// 			"username":"%s",
-		// 			"password":"%s"
-		// 		}`,
-		// 			credentials.Username, credentials.Password)
+				returnArgs = ReturnArgs{
+					{"", customerror.New("failed")},
+				}
 
-		// 		dbTrx = db
-
-		// 		var dbTrxKey requesthttputilpkg.ContextKeyType = "db_trx"
-		// 		contextMap[dbTrxKey] = dbTrx
-
-		// 		returnArgs = ReturnArgs{
-		// 			{"", customerror.New("failed")},
-		// 		}
-
-		// 	},
-		// 	StatusCode: http.StatusInternalServerError,
-		// 	WantError:  true,
-		// },
+			},
+			StatusCode: http.StatusInternalServerError,
+			WantError:  true,
+		},
 	}
 
 	for _, tc := range ts.Cases {
@@ -169,7 +157,7 @@ func (ts *TestSuite) TestSignUp() {
 			tc.SetUp(t)
 
 			authService := new(authmockservice.Service)
-			authService.On("WithDBTrx", dbTrx).Return(authService)
+			authService.On("WithDBTrx", dbTrxCtxValue).Return(authService)
 			authService.On("Register", credentials).Return(returnArgs[0]...)
 
 			authHandler := authhandler.New(authService)
@@ -185,14 +173,15 @@ func (ts *TestSuite) TestSignUp() {
 				Method: route.Method,
 				Target: route.Path,
 				Body:   body,
-				//ContextMap2: contextMap,
 			}
 
 			reqBody := requesthttputilpkg.PrepareRequestBody(requestData.Body)
 
 			req := httptest.NewRequest(requestData.Method, requestData.Target, reqBody)
 
-			requesthttputilpkg.SetRequestContext2(req, requestData.ContextMap)
+			ctx := req.Context()
+			ctx = dbtrxmiddlewarepkg.NewContext(ctx, dbTrxCtxValue)
+			req = req.WithContext(ctx)
 
 			resprec := httptest.NewRecorder()
 
@@ -226,9 +215,8 @@ func (ts *TestSuite) TestSignIn() {
 
 	driver := "postgres"
 	db, _ := NewMockDB(driver)
-	dbTrx := &gorm.DB{}
 
-	contextMap := make(map[interface{}]interface{})
+	dbTrxCtxValue := &gorm.DB{}
 
 	token := ""
 
@@ -253,10 +241,7 @@ func (ts *TestSuite) TestSignIn() {
 				}`,
 					credentials.Username, credentials.Password)
 
-				dbTrx = db
-
-				var dbTrxKey requesthttputilpkg.ContextKeyType = "db_trx"
-				contextMap[dbTrxKey] = dbTrx
+				dbTrxCtxValue = db
 
 				token = fake.Word()
 
@@ -285,10 +270,7 @@ func (ts *TestSuite) TestSignIn() {
 				}`,
 					credentials.Username, credentials.Password)
 
-				dbTrx = nil
-
-				var dbTrxKey requesthttputilpkg.ContextKeyType = "db_trx"
-				contextMap[dbTrxKey] = dbTrx
+				dbTrxCtxValue = nil
 
 				returnArgs = ReturnArgs{
 					{"", nil},
@@ -314,10 +296,7 @@ func (ts *TestSuite) TestSignIn() {
 				`,
 					credentials.Username, credentials.Password)
 
-				dbTrx = db
-
-				var dbTrxKey requesthttputilpkg.ContextKeyType = "db_trx"
-				contextMap[dbTrxKey] = dbTrx
+				dbTrxCtxValue = db
 
 				returnArgs = ReturnArgs{
 					{"", nil},
@@ -344,10 +323,7 @@ func (ts *TestSuite) TestSignIn() {
 				}`,
 					credentials.Username, credentials.Password)
 
-				dbTrx = db
-
-				var dbTrxKey requesthttputilpkg.ContextKeyType = "db_trx"
-				contextMap[dbTrxKey] = dbTrx
+				dbTrxCtxValue = db
 
 				returnArgs = ReturnArgs{
 					{"", customerror.New("failed")},
@@ -363,7 +339,7 @@ func (ts *TestSuite) TestSignIn() {
 			tc.SetUp(t)
 
 			authService := new(authmockservice.Service)
-			authService.On("WithDBTrx", dbTrx).Return(authService)
+			authService.On("WithDBTrx", dbTrxCtxValue).Return(authService)
 			authService.On("LogIn", credentials).Return(returnArgs[0]...)
 
 			authHandler := authhandler.New(authService)
@@ -376,17 +352,18 @@ func (ts *TestSuite) TestSignIn() {
 			}
 
 			requestData := requesthttputilpkg.RequestData{
-				Method:     route.Method,
-				Target:     route.Path,
-				Body:       body,
-				ContextMap: contextMap,
+				Method: route.Method,
+				Target: route.Path,
+				Body:   body,
 			}
 
 			reqBody := requesthttputilpkg.PrepareRequestBody(requestData.Body)
 
 			req := httptest.NewRequest(requestData.Method, requestData.Target, reqBody)
 
-			requesthttputilpkg.SetRequestContext(req, requestData.ContextMap)
+			ctx := req.Context()
+			ctx = dbtrxmiddlewarepkg.NewContext(ctx, dbTrxCtxValue)
+			req = req.WithContext(ctx)
 
 			resprec := httptest.NewRecorder()
 
@@ -416,10 +393,10 @@ func (ts *TestSuite) TestSignIn() {
 func (ts *TestSuite) TestRefreshToken() {
 	auth := domainmodel.Auth{}
 
+	authDetailsCtxValue := domainmodel.Auth{}
+
 	dbTrx := &gorm.DB{}
 	dbTrx = nil
-
-	contextMap := make(map[interface{}]interface{})
 
 	token := ""
 
@@ -437,8 +414,7 @@ func (ts *TestSuite) TestRefreshToken() {
 					UserID: userID,
 				}
 
-				var authDetailsKey requesthttputilpkg.ContextKeyType = "auth_details"
-				contextMap[authDetailsKey] = auth
+				authDetailsCtxValue = auth
 
 				token = fake.Word()
 
@@ -460,8 +436,7 @@ func (ts *TestSuite) TestRefreshToken() {
 					UserID: userID,
 				}
 
-				var authDetailsKey requesthttputilpkg.ContextKeyType = "auth_details"
-				contextMap[authDetailsKey] = nil
+				authDetailsCtxValue = domainmodel.Auth{}
 
 				token = fake.Word()
 
@@ -483,8 +458,7 @@ func (ts *TestSuite) TestRefreshToken() {
 					UserID: userID,
 				}
 
-				var authDetailsKey requesthttputilpkg.ContextKeyType = "auth_details"
-				contextMap[authDetailsKey] = auth
+				authDetailsCtxValue = auth
 
 				returnArgs = ReturnArgs{
 					{"", customerror.New("failed")},
@@ -513,14 +487,15 @@ func (ts *TestSuite) TestRefreshToken() {
 			}
 
 			requestData := requesthttputilpkg.RequestData{
-				Method:     route.Method,
-				Target:     route.Path,
-				ContextMap: contextMap,
+				Method: route.Method,
+				Target: route.Path,
 			}
 
 			req := httptest.NewRequest(requestData.Method, requestData.Target, nil)
 
-			requesthttputilpkg.SetRequestContext(req, requestData.ContextMap)
+			ctx := req.Context()
+			ctx = authmiddlewarepkg.NewContext(ctx, authDetailsCtxValue)
+			req = req.WithContext(ctx)
 
 			resprec := httptest.NewRecorder()
 
@@ -554,10 +529,10 @@ func (ts *TestSuite) TestChangePassword() {
 
 	auth := domainmodel.Auth{}
 
+	authDetailsCtxValue := domainmodel.Auth{}
+
 	dbTrx := &gorm.DB{}
 	dbTrx = nil
-
-	contextMap := make(map[interface{}]interface{})
 
 	message := ""
 
@@ -590,8 +565,7 @@ func (ts *TestSuite) TestChangePassword() {
 					UserID: userID,
 				}
 
-				var authDetailsKey requesthttputilpkg.ContextKeyType = "auth_details"
-				contextMap[authDetailsKey] = auth
+				authDetailsCtxValue = auth
 
 				message = "the password has been updated successfully"
 
@@ -621,8 +595,7 @@ func (ts *TestSuite) TestChangePassword() {
 					UserID: userID,
 				}
 
-				var authDetailsKey requesthttputilpkg.ContextKeyType = "auth_details"
-				contextMap[authDetailsKey] = nil
+				authDetailsCtxValue = domainmodel.Auth{}
 
 				returnArgs = ReturnArgs{
 					{nil},
@@ -656,8 +629,7 @@ func (ts *TestSuite) TestChangePassword() {
 					UserID: userID,
 				}
 
-				var authDetailsKey requesthttputilpkg.ContextKeyType = "auth_details"
-				contextMap[authDetailsKey] = auth
+				authDetailsCtxValue = auth
 
 				returnArgs = ReturnArgs{
 					{nil},
@@ -692,8 +664,7 @@ func (ts *TestSuite) TestChangePassword() {
 					UserID: userID,
 				}
 
-				var authDetailsKey requesthttputilpkg.ContextKeyType = "auth_details"
-				contextMap[authDetailsKey] = auth
+				authDetailsCtxValue = auth
 
 				returnArgs = ReturnArgs{
 					{customerror.New("failed")},
@@ -722,17 +693,18 @@ func (ts *TestSuite) TestChangePassword() {
 			}
 
 			requestData := requesthttputilpkg.RequestData{
-				Method:     route.Method,
-				Target:     route.Path,
-				Body:       body,
-				ContextMap: contextMap,
+				Method: route.Method,
+				Target: route.Path,
+				Body:   body,
 			}
 
 			reqBody := requesthttputilpkg.PrepareRequestBody(requestData.Body)
 
 			req := httptest.NewRequest(requestData.Method, requestData.Target, reqBody)
 
-			requesthttputilpkg.SetRequestContext(req, requestData.ContextMap)
+			ctx := req.Context()
+			ctx = authmiddlewarepkg.NewContext(ctx, authDetailsCtxValue)
+			req = req.WithContext(ctx)
 
 			resprec := httptest.NewRecorder()
 
@@ -762,10 +734,10 @@ func (ts *TestSuite) TestChangePassword() {
 func (ts *TestSuite) TestSignOut() {
 	auth := domainmodel.Auth{}
 
+	authDetailsCtxValue := domainmodel.Auth{}
+
 	dbTrx := &gorm.DB{}
 	dbTrx = nil
-
-	contextMap := make(map[interface{}]interface{})
 
 	message := ""
 
@@ -783,8 +755,7 @@ func (ts *TestSuite) TestSignOut() {
 					UserID: userID,
 				}
 
-				var authDetailsKey requesthttputilpkg.ContextKeyType = "auth_details"
-				contextMap[authDetailsKey] = auth
+				authDetailsCtxValue = auth
 
 				message = "you have logged out successfully"
 
@@ -806,8 +777,7 @@ func (ts *TestSuite) TestSignOut() {
 					UserID: userID,
 				}
 
-				var authDetailsKey requesthttputilpkg.ContextKeyType = "auth_details"
-				contextMap[authDetailsKey] = nil
+				authDetailsCtxValue = domainmodel.Auth{}
 
 				returnArgs = ReturnArgs{
 					{nil},
@@ -827,8 +797,7 @@ func (ts *TestSuite) TestSignOut() {
 					UserID: userID,
 				}
 
-				var authDetailsKey requesthttputilpkg.ContextKeyType = "auth_details"
-				contextMap[authDetailsKey] = auth
+				authDetailsCtxValue = auth
 
 				returnArgs = ReturnArgs{
 					{customerror.New("failed")},
@@ -857,14 +826,15 @@ func (ts *TestSuite) TestSignOut() {
 			}
 
 			requestData := requesthttputilpkg.RequestData{
-				Method:     route.Method,
-				Target:     route.Path,
-				ContextMap: contextMap,
+				Method: route.Method,
+				Target: route.Path,
 			}
 
 			req := httptest.NewRequest(requestData.Method, requestData.Target, nil)
 
-			requesthttputilpkg.SetRequestContext(req, requestData.ContextMap)
+			ctx := req.Context()
+			ctx = authmiddlewarepkg.NewContext(ctx, authDetailsCtxValue)
+			req = req.WithContext(ctx)
 
 			resprec := httptest.NewRecorder()
 

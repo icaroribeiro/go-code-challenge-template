@@ -1,6 +1,7 @@
 package auth_test
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -30,6 +31,68 @@ import (
 
 func TestMiddlewareUnit(t *testing.T) {
 	suite.Run(t, new(TestSuite))
+}
+
+func (ts *TestSuite) TestNewContext() {
+	authDetailsCtxValue := domainmodel.Auth{}
+
+	ctx := context.Background()
+
+	ts.Cases = Cases{
+		{
+			Context: "ItShouldSucceedInCreatingACopyOfAContextWithAnAssociatedValue",
+			SetUp: func(t *testing.T) {
+				authDetailsCtxValue = domainfactorymodel.NewAuth(nil)
+			},
+			WantError: false,
+		},
+	}
+
+	for _, tc := range ts.Cases {
+		ts.T().Run(tc.Context, func(t *testing.T) {
+			tc.SetUp(t)
+
+			returnedCtx := authmiddlewarepkg.NewContext(ctx, authDetailsCtxValue)
+
+			if !tc.WantError {
+				assert.NotEmpty(t, returnedCtx)
+				returnedAuthDetailsCtxValue, ok := authmiddlewarepkg.FromContext(returnedCtx)
+				assert.True(t, ok, "Unexpected type assertion error")
+				assert.Equal(t, authDetailsCtxValue, returnedAuthDetailsCtxValue)
+			}
+		})
+	}
+}
+
+func (ts *TestSuite) TestFromContext() {
+	authDetailsCtxValue := domainmodel.Auth{}
+
+	ctx := context.Background()
+
+	ts.Cases = Cases{
+		{
+			Context: "ItShouldSucceedInGettingAssociatedValueWithAContext",
+			SetUp: func(t *testing.T) {
+				authDetailsCtxValue = domainfactorymodel.NewAuth(nil)
+				ctx = authmiddlewarepkg.NewContext(ctx, authDetailsCtxValue)
+			},
+			WantError: false,
+		},
+	}
+
+	for _, tc := range ts.Cases {
+		ts.T().Run(tc.Context, func(t *testing.T) {
+			tc.SetUp(t)
+
+			returnedAuthDetailsCtxValue, ok := authmiddlewarepkg.FromContext(ctx)
+
+			if !tc.WantError {
+				assert.True(t, ok, "Unexpected type assertion error")
+				assert.NotEmpty(t, returnedAuthDetailsCtxValue)
+				assert.Equal(t, authDetailsCtxValue, returnedAuthDetailsCtxValue)
+			}
+		})
+	}
 }
 
 func (ts *TestSuite) TestAuth() {
