@@ -157,6 +157,8 @@ func (ts *TestSuite) TestDBTrx() {
 						responsehttputilpkg.RespondErrorWithJson(w, customerror.New("failed"))
 						return
 					}
+
+					responsehttputilpkg.RespondWithJson(w, http.StatusOK, messagehttputilpkg.Message{Text: "ok"})
 				}
 			},
 			WantError: true,
@@ -179,6 +181,8 @@ func (ts *TestSuite) TestDBTrx() {
 					if result.Error != nil {
 						responsehttputilpkg.RespondErrorWithJson(w, customerror.New("failed"))
 					}
+
+					responsehttputilpkg.RespondWithJson(w, http.StatusOK, messagehttputilpkg.Message{Text: "ok"})
 				}
 
 				mock.ExpectBegin()
@@ -206,9 +210,11 @@ func (ts *TestSuite) TestDBTrx() {
 					}
 
 					result := dbAux.Create(&userDatastore)
-					if result.Error == nil {
-						responsehttputilpkg.RespondWithJson(w, http.StatusOK, messagehttputilpkg.Message{Text: "ok"})
+					if result.Error != nil {
+						responsehttputilpkg.RespondErrorWithJson(w, customerror.New("failed"))
 					}
+
+					responsehttputilpkg.RespondWithJson(w, http.StatusOK, messagehttputilpkg.Message{Text: "ok"})
 				}
 
 				mock.ExpectBegin()
@@ -236,16 +242,18 @@ func (ts *TestSuite) TestDBTrx() {
 					}
 
 					result := dbAux.Create(&userDatastore)
-					if result.Error == nil {
+					if result.Error != nil {
 						responsehttputilpkg.RespondErrorWithJson(w, customerror.New("failed"))
 					}
+
+					responsehttputilpkg.RespondWithJson(w, http.StatusOK, messagehttputilpkg.Message{Text: "ok"})
 				}
 
 				mock.ExpectBegin()
 
 				mock.ExpectExec(regexp.QuoteMeta(sqlQuery)).
 					WithArgs(sqlmock.AnyArg(), user.Username, sqlmock.AnyArg(), sqlmock.AnyArg()).
-					WillReturnResult(sqlmock.NewResult(1, 1))
+					WillReturnError(customerror.New("failed"))
 
 				mock.ExpectRollback().WillReturnError(customerror.New("failed"))
 			},
@@ -284,7 +292,8 @@ func (ts *TestSuite) TestDBTrx() {
 
 				mock.ExpectRollback()
 			},
-			WantError: true,
+			WantError:   true,
+			ShouldPanic: true,
 		},
 		{
 			Context: "ItShouldFailIfTheDatabaseTransactionPerformedByTheWrappedFunctionFailsAndTheFunctionCallsPanicMethodWithNonErrorParameterToStopItsExecutionImmediately",
@@ -319,7 +328,8 @@ func (ts *TestSuite) TestDBTrx() {
 
 				mock.ExpectRollback()
 			},
-			WantError: true,
+			WantError:   true,
+			ShouldPanic: true,
 		},
 	}
 
@@ -367,11 +377,21 @@ func (ts *TestSuite) TestDBTrx() {
 				assert.Nil(t, err, fmt.Sprintf("Unexpected error: %v", err))
 				assert.NotEmpty(t, returnedMessage.Text)
 			} else {
-				assert.Equal(t, statusCode, resprec.Result().StatusCode)
+				if tc.ShouldPanic {
+					shouldPanic(t, handlerFunc, resprec, req)
+				} else {
+					assert.Equal(t, statusCode, resprec.Result().StatusCode)
+				}
 			}
 
 			err := mock.ExpectationsWereMet()
 			assert.Nil(ts.T(), err, fmt.Sprintf("There were unfulfilled expectations: %v.", err))
 		})
 	}
+}
+
+func shouldPanic(t *testing.T, f func(w http.ResponseWriter, r *http.Request), w http.ResponseWriter, r *http.Request) {
+	defer func() { recover() }()
+	f(w, r)
+	t.Errorf("It should have panicked.")
 }
