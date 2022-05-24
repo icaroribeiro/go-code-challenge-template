@@ -5,6 +5,7 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/icaroribeiro/new-go-code-challenge-template/pkg/customerror"
 	"gorm.io/gorm"
 )
 
@@ -65,7 +66,7 @@ func isStatusCodeInList(statusCode int, statusCodeList []int) bool {
 	return false
 }
 
-// DBTrx is the function that  wraps a http.Handler to enable using a database transaction during an API incoming request.
+// DBTrx is the function that wraps a http.Handler to enable using a database transaction during an API incoming request.
 func DBTrx(db *gorm.DB) func(http.HandlerFunc) http.HandlerFunc {
 	return func(next http.HandlerFunc) http.HandlerFunc {
 		return func(w http.ResponseWriter, r *http.Request) {
@@ -77,7 +78,17 @@ func DBTrx(db *gorm.DB) func(http.HandlerFunc) http.HandlerFunc {
 			dbTrx := db.Begin()
 			defer func() {
 				if r := recover(); r != nil {
+					var err error
+					switch r := r.(type) {
+					case error:
+						err = r
+					default:
+						err = customerror.Newf("%v", r)
+					}
+					w.WriteHeader(http.StatusInternalServerError)
+					log.Printf("Transaction is being rolled back: %s \n", err.Error())
 					dbTrx.Rollback()
+					return
 				}
 			}()
 
@@ -91,12 +102,12 @@ func DBTrx(db *gorm.DB) func(http.HandlerFunc) http.HandlerFunc {
 
 			if isStatusCodeInList(wrapped.Status(), statusCodesList) {
 				if err := dbTrx.Commit().Error; err != nil {
-					log.Panicf("failed to commit database transaction: %s", err.Error())
+					log.Printf("failed to commit database transaction: %s", err.Error())
 				}
 			} else {
-				log.Printf("rolling back database transaction due to status code: %d", wrapped.statusCode)
+				log.Printf("database transaction is being rolled back due to status code: %d", wrapped.statusCode)
 				if err := dbTrx.Rollback().Error; err != nil {
-					log.Panicf("failed to rollback database transaction: %s", err.Error())
+					log.Printf("failed to rollback database transaction: %s", err.Error())
 				}
 			}
 		}

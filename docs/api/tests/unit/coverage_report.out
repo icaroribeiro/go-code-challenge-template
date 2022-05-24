@@ -73,13 +73,13 @@ github.com/icaroribeiro/new-go-code-challenge-template/pkg/middleware/auth/middl
 github.com/icaroribeiro/new-go-code-challenge-template/pkg/middleware/auth/middleware.go:49:						buildAuth			100.0%
 github.com/icaroribeiro/new-go-code-challenge-template/pkg/middleware/auth/middleware.go:78:						Auth				100.0%
 github.com/icaroribeiro/new-go-code-challenge-template/pkg/middleware/auth/middleware.go:109:						AuthRenewal			100.0%
-github.com/icaroribeiro/new-go-code-challenge-template/pkg/middleware/dbtrx/middleware.go:30:						NewContext			100.0%
-github.com/icaroribeiro/new-go-code-challenge-template/pkg/middleware/dbtrx/middleware.go:35:						FromContext			100.0%
-github.com/icaroribeiro/new-go-code-challenge-template/pkg/middleware/dbtrx/middleware.go:40:						wrapResponseWriter		100.0%
-github.com/icaroribeiro/new-go-code-challenge-template/pkg/middleware/dbtrx/middleware.go:44:						Status				100.0%
-github.com/icaroribeiro/new-go-code-challenge-template/pkg/middleware/dbtrx/middleware.go:48:						WriteHeader			100.0%
-github.com/icaroribeiro/new-go-code-challenge-template/pkg/middleware/dbtrx/middleware.go:58:						isStatusCodeInList		100.0%
-github.com/icaroribeiro/new-go-code-challenge-template/pkg/middleware/dbtrx/middleware.go:69:						DBTrx				100.0%
+github.com/icaroribeiro/new-go-code-challenge-template/pkg/middleware/dbtrx/middleware.go:31:						NewContext			100.0%
+github.com/icaroribeiro/new-go-code-challenge-template/pkg/middleware/dbtrx/middleware.go:36:						FromContext			100.0%
+github.com/icaroribeiro/new-go-code-challenge-template/pkg/middleware/dbtrx/middleware.go:41:						wrapResponseWriter		100.0%
+github.com/icaroribeiro/new-go-code-challenge-template/pkg/middleware/dbtrx/middleware.go:45:						Status				100.0%
+github.com/icaroribeiro/new-go-code-challenge-template/pkg/middleware/dbtrx/middleware.go:49:						WriteHeader			100.0%
+github.com/icaroribeiro/new-go-code-challenge-template/pkg/middleware/dbtrx/middleware.go:59:						isStatusCodeInList		100.0%
+github.com/icaroribeiro/new-go-code-challenge-template/pkg/middleware/dbtrx/middleware.go:70:						DBTrx				96.2%
 github.com/icaroribeiro/new-go-code-challenge-template/pkg/middleware/logging/middleware.go:11:						Logging				100.0%
 github.com/icaroribeiro/new-go-code-challenge-template/pkg/security/security.go:11:							New				100.0%
 github.com/icaroribeiro/new-go-code-challenge-template/pkg/security/security.go:16:							HashPassword			100.0%
@@ -93,4 +93,4 @@ github.com/icaroribeiro/new-go-code-challenge-template/pkg/validator/uuid/valida
 github.com/icaroribeiro/new-go-code-challenge-template/pkg/validator/validator.go:14:							New				100.0%
 github.com/icaroribeiro/new-go-code-challenge-template/pkg/validator/validator.go:31:							Validate			100.0%
 github.com/icaroribeiro/new-go-code-challenge-template/pkg/validator/validator.go:36:							ValidateWithTags		100.0%
-total:																	(statements)			100.0%
+total:																	(statements)			99.8%
