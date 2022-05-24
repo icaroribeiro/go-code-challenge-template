@@ -57,7 +57,7 @@ func (ts *TestSuite) TestNewContext() {
 			if !tc.WantError {
 				assert.NotEmpty(t, returnedCtx)
 				returnedAuthDetailsCtxValue, ok := authmiddlewarepkg.FromContext(returnedCtx)
-				assert.True(t, ok, "Unexpected type assertion error")
+				assert.True(t, ok, "Unexpected type assertion error.")
 				assert.Equal(t, authDetailsCtxValue, returnedAuthDetailsCtxValue)
 			}
 		})
@@ -87,7 +87,7 @@ func (ts *TestSuite) TestFromContext() {
 			returnedAuthDetailsCtxValue, ok := authmiddlewarepkg.FromContext(ctx)
 
 			if !tc.WantError {
-				assert.True(t, ok, "Unexpected type assertion error")
+				assert.True(t, ok, "Unexpected type assertion error.")
 				assert.NotEmpty(t, returnedAuthDetailsCtxValue)
 				assert.Equal(t, authDetailsCtxValue, returnedAuthDetailsCtxValue)
 			}

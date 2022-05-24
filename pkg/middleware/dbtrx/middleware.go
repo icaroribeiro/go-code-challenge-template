@@ -76,6 +76,7 @@ func DBTrx(db *gorm.DB) func(http.HandlerFunc) http.HandlerFunc {
 			}
 
 			dbTrx := db.Begin()
+
 			defer func() {
 				if r := recover(); r != nil {
 					var err error

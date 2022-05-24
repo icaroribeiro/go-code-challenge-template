@@ -106,7 +106,7 @@ func (ts *TestSuite) TestGetAll() {
 				assert.Equal(t, resprec.Code, tc.StatusCode)
 				returnedUsers := make(httppresentationmodel.Users, 0)
 				err := json.NewDecoder(resprec.Body).Decode(&returnedUsers)
-				assert.Nil(t, err, fmt.Sprintf("Unexpected error %v.", err))
+				assert.Nil(t, err, fmt.Sprintf("Unexpected error: %v.", err))
 				assert.Equal(t, returnedUsers[0].ID, user.ID)
 				assert.Equal(t, returnedUsers[0].Username, user.Username)
 			} else {

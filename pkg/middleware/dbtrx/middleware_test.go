@@ -10,9 +10,7 @@ import (
 	"testing"
 
 	"github.com/DATA-DOG/go-sqlmock"
-	fake "github.com/brianvoe/gofakeit/v5"
 	"github.com/gorilla/mux"
-	domainmodel "github.com/icaroribeiro/new-go-code-challenge-template/internal/core/domain/model"
 	datastoremodel "github.com/icaroribeiro/new-go-code-challenge-template/internal/infrastructure/storage/datastore/model"
 	"github.com/icaroribeiro/new-go-code-challenge-template/pkg/customerror"
 	adapterhttputilpkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/httputil/adapter"
@@ -21,6 +19,7 @@ import (
 	responsehttputilpkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/httputil/response"
 	routehttputilpkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/httputil/route"
 	dbtrxmiddlewarepkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/middleware/dbtrx"
+	domainfactorymodel "github.com/icaroribeiro/new-go-code-challenge-template/tests/factory/core/domain/model"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/suite"
 	"gorm.io/gorm"
@@ -56,7 +55,7 @@ func (ts *TestSuite) TestNewContext() {
 			if !tc.WantError {
 				assert.NotEmpty(t, returnedCtx)
 				returnedDBTrxCtxValue, ok := dbtrxmiddlewarepkg.FromContext(returnedCtx)
-				assert.True(t, ok, "Unexpected type assertion error")
+				assert.True(t, ok, "Unexpected type assertion error.")
 				assert.Equal(t, dbTrxCtxValue, returnedDBTrxCtxValue)
 			}
 		})
@@ -88,7 +87,7 @@ func (ts *TestSuite) TestFromContext() {
 			returnedDBTrxCtxValue, ok := dbtrxmiddlewarepkg.FromContext(ctx)
 
 			if !tc.WantError {
-				assert.True(t, ok, "Unexpected type assertion error")
+				assert.True(t, ok, "Unexpected type assertion error.")
 				assert.NotEmpty(t, returnedDBTrxCtxValue)
 				assert.Equal(t, dbTrxCtxValue, returnedDBTrxCtxValue)
 			}
@@ -97,17 +96,13 @@ func (ts *TestSuite) TestFromContext() {
 }
 
 func (ts *TestSuite) TestDBTrx() {
-	username := fake.Username()
-
-	user := domainmodel.User{
-		Username: username,
-	}
+	user := domainfactorymodel.NewUser(nil)
 
 	body := fmt.Sprintf(`
 	{
 		"username":"%s",
 	}`,
-		username)
+		user.Username)
 
 	driver := "postgres"
 	db, mock := NewMockDB(driver)
@@ -131,7 +126,7 @@ func (ts *TestSuite) TestDBTrx() {
 					dbAux, _ := dbtrxmiddlewarepkg.FromContext(r.Context())
 
 					userDatastore := datastoremodel.User{
-						Username: username,
+						Username: user.Username,
 					}
 
 					_ = dbAux.Create(&userDatastore)
@@ -177,7 +172,7 @@ func (ts *TestSuite) TestDBTrx() {
 					dbAux, _ := dbtrxmiddlewarepkg.FromContext(r.Context())
 
 					userDatastore := datastoremodel.User{
-						Username: username,
+						Username: user.Username,
 					}
 
 					result := dbAux.Create(&userDatastore)
@@ -207,7 +202,7 @@ func (ts *TestSuite) TestDBTrx() {
 					dbAux, _ := dbtrxmiddlewarepkg.FromContext(r.Context())
 
 					userDatastore := datastoremodel.User{
-						Username: username,
+						Username: user.Username,
 					}
 
 					result := dbAux.Create(&userDatastore)
@@ -237,7 +232,7 @@ func (ts *TestSuite) TestDBTrx() {
 					dbAux, _ := dbtrxmiddlewarepkg.FromContext(r.Context())
 
 					userDatastore := datastoremodel.User{
-						Username: username,
+						Username: user.Username,
 					}
 
 					result := dbAux.Create(&userDatastore)
@@ -257,7 +252,7 @@ func (ts *TestSuite) TestDBTrx() {
 			WantError: true,
 		},
 		{
-			Context: "ItShouldFailIfTheDatabaseTransactionPerformedByTheWrappedFunctionFailsAndTheFunctionCallsPanicMethodToStopItsExecutionImmediately",
+			Context: "ItShouldFailIfTheDatabaseTransactionPerformedByTheWrappedFunctionFailsAndTheFunctionCallsPanicMethodWithErrorParameterToStopItsExecutionImmediately",
 			SetUp: func(t *testing.T) {
 				dbAux = db
 
@@ -267,7 +262,7 @@ func (ts *TestSuite) TestDBTrx() {
 					dbAux, _ := dbtrxmiddlewarepkg.FromContext(r.Context())
 
 					userDatastore := datastoremodel.User{
-						Username: username,
+						Username: user.Username,
 					}
 
 					result := dbAux.Create(&userDatastore)
@@ -279,6 +274,41 @@ func (ts *TestSuite) TestDBTrx() {
 					}
 
 					panic(customerror.New("failed"))
+				}
+
+				mock.ExpectBegin()
+
+				mock.ExpectExec(regexp.QuoteMeta(sqlQuery)).
+					WithArgs(sqlmock.AnyArg(), user.Username, sqlmock.AnyArg(), sqlmock.AnyArg()).
+					WillReturnError(customerror.New("failed"))
+
+				mock.ExpectRollback()
+			},
+			WantError: true,
+		},
+		{
+			Context: "ItShouldFailIfTheDatabaseTransactionPerformedByTheWrappedFunctionFailsAndTheFunctionCallsPanicMethodWithNonErrorParameterToStopItsExecutionImmediately",
+			SetUp: func(t *testing.T) {
+				dbAux = db
+
+				statusCode = http.StatusInternalServerError
+
+				handlerFunc = func(w http.ResponseWriter, r *http.Request) {
+					dbAux, _ := dbtrxmiddlewarepkg.FromContext(r.Context())
+
+					userDatastore := datastoremodel.User{
+						Username: user.Username,
+					}
+
+					result := dbAux.Create(&userDatastore)
+					if result.Error != nil {
+						// It is duplicated only to test the code that evaluates
+						// if the header is already written in the WriteHeader method.
+						responsehttputilpkg.RespondErrorWithJson(w, customerror.New("failed"))
+						responsehttputilpkg.RespondErrorWithJson(w, customerror.New("failed"))
+					}
+
+					panic("failed")
 				}
 
 				mock.ExpectBegin()

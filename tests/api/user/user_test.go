@@ -37,7 +37,7 @@ func (ts *TestSuite) TestGetAll() {
 			Context: "ItShouldSucceedInGettingAllUsers",
 			SetUp: func(t *testing.T) {
 				dbTrx = ts.DB.Begin()
-				assert.Nil(t, dbTrx.Error, fmt.Sprintf("Unexpected error %v.", dbTrx.Error))
+				assert.Nil(t, dbTrx.Error, fmt.Sprintf("Unexpected error: %v.", dbTrx.Error))
 
 				username := fake.Username()
 
@@ -46,7 +46,7 @@ func (ts *TestSuite) TestGetAll() {
 				}
 
 				result := dbTrx.Create(&userDatastore)
-				assert.Nil(t, result.Error, fmt.Sprintf("Unexpected error %v.", result.Error))
+				assert.Nil(t, result.Error, fmt.Sprintf("Unexpected error: %v.", result.Error))
 
 				domainUser := userDatastore.ToDomain()
 				user.FromDomain(domainUser)
@@ -55,17 +55,17 @@ func (ts *TestSuite) TestGetAll() {
 			WantError:  false,
 			TearDown: func(t *testing.T) {
 				result := dbTrx.Rollback()
-				assert.Nil(t, result.Error, fmt.Sprintf("Unexpected error %v.", result.Error))
+				assert.Nil(t, result.Error, fmt.Sprintf("Unexpected error: %v.", result.Error))
 			},
 		},
 		{
 			Context: "ItShouldFailIfTheDatabaseStateIsInconsistent",
 			SetUp: func(t *testing.T) {
 				dbTrx = ts.DB.Begin()
-				assert.Nil(t, dbTrx.Error, fmt.Sprintf("Unexpected error %v.", dbTrx.Error))
+				assert.Nil(t, dbTrx.Error, fmt.Sprintf("Unexpected error: %v.", dbTrx.Error))
 
 				result := dbTrx.Rollback()
-				assert.Nil(t, result.Error, fmt.Sprintf("Unexpected error %v.", result.Error))
+				assert.Nil(t, result.Error, fmt.Sprintf("Unexpected error: %v.", result.Error))
 			},
 			StatusCode: http.StatusInternalServerError,
 			WantError:  true,
@@ -110,7 +110,7 @@ func (ts *TestSuite) TestGetAll() {
 				assert.Equal(t, resprec.Code, tc.StatusCode)
 				returnedUsers := presentationmodel.Users{}
 				err := json.NewDecoder(resprec.Body).Decode(&returnedUsers)
-				assert.Nil(t, err, fmt.Sprintf("Unexpected error %v.", err))
+				assert.Nil(t, err, fmt.Sprintf("Unexpected error: %v.", err))
 				assert.Equal(t, user.ID, returnedUsers[0].ID)
 				assert.Equal(t, user.Username, returnedUsers[0].Username)
 			} else {

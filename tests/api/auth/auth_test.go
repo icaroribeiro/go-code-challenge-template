@@ -49,7 +49,7 @@ func (ts *TestSuite) TestSignUp() {
 			Context: "ItShouldSucceedInSigningUp",
 			SetUp: func(t *testing.T) {
 				dbTrx = ts.DB.Begin()
-				assert.Nil(t, dbTrx.Error, fmt.Sprintf("Unexpected error %v.", dbTrx.Error))
+				assert.Nil(t, dbTrx.Error, fmt.Sprintf("Unexpected error: %v.", dbTrx.Error))
 
 				authN = authpkg.New(ts.RSAKeys)
 
@@ -74,7 +74,7 @@ func (ts *TestSuite) TestSignUp() {
 			WantError:  false,
 			TearDown: func(t *testing.T) {
 				result := dbTrx.Rollback()
-				assert.Nil(t, result.Error, fmt.Sprintf("Unexpected error %v.", result.Error))
+				assert.Nil(t, result.Error, fmt.Sprintf("Unexpected error: %v.", result.Error))
 			},
 		},
 		{
@@ -102,7 +102,7 @@ func (ts *TestSuite) TestSignUp() {
 			Context: "ItShouldFailIfTheRequestBodyIsAnImproperlyFormattedJsonString",
 			SetUp: func(t *testing.T) {
 				dbTrx = ts.DB.Begin()
-				assert.Nil(t, dbTrx.Error, fmt.Sprintf("Unexpected error %v.", dbTrx.Error))
+				assert.Nil(t, dbTrx.Error, fmt.Sprintf("Unexpected error: %v.", dbTrx.Error))
 
 				authN = authpkg.New(ts.RSAKeys)
 
@@ -130,10 +130,10 @@ func (ts *TestSuite) TestSignUp() {
 			Context: "ItShouldFailIfTheDatabaseStateIsInconsistent",
 			SetUp: func(t *testing.T) {
 				dbTrx = ts.DB.Begin()
-				assert.Nil(t, dbTrx.Error, fmt.Sprintf("Unexpected error %v.", dbTrx.Error))
+				assert.Nil(t, dbTrx.Error, fmt.Sprintf("Unexpected error: %v.", dbTrx.Error))
 
 				result := dbTrx.Rollback()
-				assert.Nil(t, result.Error, fmt.Sprintf("Unexpected error %v.", result.Error))
+				assert.Nil(t, result.Error, fmt.Sprintf("Unexpected error: %v.", result.Error))
 
 				authN = authpkg.New(ts.RSAKeys)
 
@@ -210,7 +210,7 @@ func (ts *TestSuite) TestSignUp() {
 				assert.Equal(t, resprec.Code, tc.StatusCode)
 				returnedToken := tokenhttputilpkg.Token{}
 				err := json.NewDecoder(resprec.Body).Decode(&returnedToken)
-				assert.Nil(t, err, fmt.Sprintf("Unexpected error %v.", err))
+				assert.Nil(t, err, fmt.Sprintf("Unexpected error: %v.", err))
 				assert.NotEmpty(t, returnedToken.Text)
 			} else {
 				assert.Equal(t, resprec.Code, tc.StatusCode)
@@ -241,7 +241,7 @@ func (ts *TestSuite) TestSignIn() {
 			Context: "ItShouldSucceedInSigningIn",
 			SetUp: func(t *testing.T) {
 				dbTrx = ts.DB.Begin()
-				assert.Nil(t, dbTrx.Error, fmt.Sprintf("Unexpected error %v.", dbTrx.Error))
+				assert.Nil(t, dbTrx.Error, fmt.Sprintf("Unexpected error: %v.", dbTrx.Error))
 
 				authN = authpkg.New(ts.RSAKeys)
 
@@ -253,7 +253,7 @@ func (ts *TestSuite) TestSignIn() {
 				}
 
 				result := dbTrx.Create(&userDatastore)
-				assert.Nil(t, result.Error, fmt.Sprintf("Unexpected error %v.", result.Error))
+				assert.Nil(t, result.Error, fmt.Sprintf("Unexpected error: %v.", result.Error))
 
 				loginDatastore = datastoremodel.Login{
 					UserID:   userDatastore.ID,
@@ -262,7 +262,7 @@ func (ts *TestSuite) TestSignIn() {
 				}
 
 				result = dbTrx.Create(&loginDatastore)
-				assert.Nil(t, result.Error, fmt.Sprintf("Unexpected error %v.", result.Error))
+				assert.Nil(t, result.Error, fmt.Sprintf("Unexpected error: %v.", result.Error))
 
 				credentials = securitypkg.Credentials{
 					Username: username,
@@ -282,7 +282,7 @@ func (ts *TestSuite) TestSignIn() {
 			WantError:  false,
 			TearDown: func(t *testing.T) {
 				result := dbTrx.Rollback()
-				assert.Nil(t, result.Error, fmt.Sprintf("Unexpected error %v.", result.Error))
+				assert.Nil(t, result.Error, fmt.Sprintf("Unexpected error: %v.", result.Error))
 			},
 		},
 		{
@@ -310,7 +310,7 @@ func (ts *TestSuite) TestSignIn() {
 			Context: "ItShouldFailIfTheRequestBodyIsAnImproperlyFormattedJsonString",
 			SetUp: func(t *testing.T) {
 				dbTrx = ts.DB.Begin()
-				assert.Nil(t, dbTrx.Error, fmt.Sprintf("Unexpected error %v.", dbTrx.Error))
+				assert.Nil(t, dbTrx.Error, fmt.Sprintf("Unexpected error: %v.", dbTrx.Error))
 
 				authN = authpkg.New(ts.RSAKeys)
 
@@ -338,10 +338,10 @@ func (ts *TestSuite) TestSignIn() {
 			Context: "ItShouldFailIfTheDatabaseStateIsInconsistent",
 			SetUp: func(t *testing.T) {
 				dbTrx = ts.DB.Begin()
-				assert.Nil(t, dbTrx.Error, fmt.Sprintf("Unexpected error %v.", dbTrx.Error))
+				assert.Nil(t, dbTrx.Error, fmt.Sprintf("Unexpected error: %v.", dbTrx.Error))
 
 				result := dbTrx.Rollback()
-				assert.Nil(t, result.Error, fmt.Sprintf("Unexpected error %v.", result.Error))
+				assert.Nil(t, result.Error, fmt.Sprintf("Unexpected error: %v.", result.Error))
 
 				authN = authpkg.New(ts.RSAKeys)
 
@@ -418,7 +418,7 @@ func (ts *TestSuite) TestSignIn() {
 				assert.Equal(t, resprec.Code, tc.StatusCode)
 				returnedToken := tokenhttputilpkg.Token{}
 				err := json.NewDecoder(resprec.Body).Decode(&returnedToken)
-				assert.Nil(t, err, fmt.Sprintf("Unexpected error %v.", err))
+				assert.Nil(t, err, fmt.Sprintf("Unexpected error: %v.", err))
 				assert.NotEmpty(t, returnedToken.Text)
 			} else {
 				assert.Equal(t, resprec.Code, tc.StatusCode)
@@ -447,7 +447,7 @@ func (ts *TestSuite) TestRefreshToken() {
 			Context: "ItShouldSucceedInRefreshingTheToken",
 			SetUp: func(t *testing.T) {
 				dbTrx = ts.DB.Begin()
-				assert.Nil(t, dbTrx.Error, fmt.Sprintf("Unexpected error %v.", dbTrx.Error))
+				assert.Nil(t, dbTrx.Error, fmt.Sprintf("Unexpected error: %v.", dbTrx.Error))
 
 				authN = authpkg.New(ts.RSAKeys)
 
@@ -459,7 +459,7 @@ func (ts *TestSuite) TestRefreshToken() {
 				}
 
 				result := dbTrx.Create(&userDatastore)
-				assert.Nil(t, result.Error, fmt.Sprintf("Unexpected error %v.", result.Error))
+				assert.Nil(t, result.Error, fmt.Sprintf("Unexpected error: %v.", result.Error))
 
 				loginDatastore = datastoremodel.Login{
 					UserID:   userDatastore.ID,
@@ -468,14 +468,14 @@ func (ts *TestSuite) TestRefreshToken() {
 				}
 
 				result = dbTrx.Create(&loginDatastore)
-				assert.Nil(t, result.Error, fmt.Sprintf("Unexpected error %v.", result.Error))
+				assert.Nil(t, result.Error, fmt.Sprintf("Unexpected error: %v.", result.Error))
 
 				authDatastore = datastoremodel.Auth{
 					UserID: userDatastore.ID,
 				}
 
 				result = dbTrx.Create(&authDatastore)
-				assert.Nil(t, result.Error, fmt.Sprintf("Unexpected error %v.", result.Error))
+				assert.Nil(t, result.Error, fmt.Sprintf("Unexpected error: %v.", result.Error))
 
 				authDetailsCtxValue = authDatastore.ToDomain()
 			},
@@ -483,14 +483,14 @@ func (ts *TestSuite) TestRefreshToken() {
 			WantError:  false,
 			TearDown: func(t *testing.T) {
 				result := dbTrx.Rollback()
-				assert.Nil(t, result.Error, fmt.Sprintf("Unexpected error %v.", result.Error))
+				assert.Nil(t, result.Error, fmt.Sprintf("Unexpected error: %v.", result.Error))
 			},
 		},
 		{
 			Context: "ItShouldFailIfTheAuthDetailsFromTheRequestContextIsEmpty",
 			SetUp: func(t *testing.T) {
 				dbTrx = ts.DB.Begin()
-				assert.Nil(t, dbTrx.Error, fmt.Sprintf("Unexpected error %v.", dbTrx.Error))
+				assert.Nil(t, dbTrx.Error, fmt.Sprintf("Unexpected error: %v.", dbTrx.Error))
 
 				authN = authpkg.New(ts.RSAKeys)
 
@@ -549,7 +549,7 @@ func (ts *TestSuite) TestRefreshToken() {
 				assert.Equal(t, resprec.Code, tc.StatusCode)
 				returnedToken := tokenhttputilpkg.Token{}
 				err := json.NewDecoder(resprec.Body).Decode(&returnedToken)
-				assert.Nil(t, err, fmt.Sprintf("Unexpected error %v.", err))
+				assert.Nil(t, err, fmt.Sprintf("Unexpected error: %v.", err))
 				assert.NotEmpty(t, returnedToken.Text)
 			} else {
 				assert.Equal(t, resprec.Code, tc.StatusCode)
@@ -584,7 +584,7 @@ func (ts *TestSuite) TestChangePassword() {
 			Context: "ItShouldSucceedInResettingThePassword",
 			SetUp: func(t *testing.T) {
 				dbTrx = ts.DB.Begin()
-				assert.Nil(t, dbTrx.Error, fmt.Sprintf("Unexpected error %v.", dbTrx.Error))
+				assert.Nil(t, dbTrx.Error, fmt.Sprintf("Unexpected error: %v.", dbTrx.Error))
 
 				authN = authpkg.New(ts.RSAKeys)
 
@@ -596,7 +596,7 @@ func (ts *TestSuite) TestChangePassword() {
 				}
 
 				result := dbTrx.Create(&userDatastore)
-				assert.Nil(t, result.Error, fmt.Sprintf("Unexpected error %v.", result.Error))
+				assert.Nil(t, result.Error, fmt.Sprintf("Unexpected error: %v.", result.Error))
 
 				loginDatastore = datastoremodel.Login{
 					UserID:   userDatastore.ID,
@@ -605,14 +605,14 @@ func (ts *TestSuite) TestChangePassword() {
 				}
 
 				result = dbTrx.Create(&loginDatastore)
-				assert.Nil(t, result.Error, fmt.Sprintf("Unexpected error %v.", result.Error))
+				assert.Nil(t, result.Error, fmt.Sprintf("Unexpected error: %v.", result.Error))
 
 				authDatastore = datastoremodel.Auth{
 					UserID: userDatastore.ID,
 				}
 
 				result = dbTrx.Create(&authDatastore)
-				assert.Nil(t, result.Error, fmt.Sprintf("Unexpected error %v.", result.Error))
+				assert.Nil(t, result.Error, fmt.Sprintf("Unexpected error: %v.", result.Error))
 
 				auth = authDatastore.ToDomain()
 
@@ -637,14 +637,14 @@ func (ts *TestSuite) TestChangePassword() {
 			WantError:  false,
 			TearDown: func(t *testing.T) {
 				result := dbTrx.Rollback()
-				assert.Nil(t, result.Error, fmt.Sprintf("Unexpected error %v.", result.Error))
+				assert.Nil(t, result.Error, fmt.Sprintf("Unexpected error: %v.", result.Error))
 			},
 		},
 		{
 			Context: "ItShouldFailIfTheAuthDetailsFromTheRequestContextIsEmpty",
 			SetUp: func(t *testing.T) {
 				dbTrx = ts.DB.Begin()
-				assert.Nil(t, dbTrx.Error, fmt.Sprintf("Unexpected error %v.", dbTrx.Error))
+				assert.Nil(t, dbTrx.Error, fmt.Sprintf("Unexpected error: %v.", dbTrx.Error))
 
 				authN = authpkg.New(ts.RSAKeys)
 
@@ -658,7 +658,7 @@ func (ts *TestSuite) TestChangePassword() {
 			Context: "ItShouldFailIfTheRequestBodyIsAnImproperlyFormattedJsonString",
 			SetUp: func(t *testing.T) {
 				dbTrx = ts.DB.Begin()
-				assert.Nil(t, dbTrx.Error, fmt.Sprintf("Unexpected error %v.", dbTrx.Error))
+				assert.Nil(t, dbTrx.Error, fmt.Sprintf("Unexpected error: %v.", dbTrx.Error))
 
 				authN = authpkg.New(ts.RSAKeys)
 
@@ -670,7 +670,7 @@ func (ts *TestSuite) TestChangePassword() {
 				}
 
 				result := dbTrx.Create(&userDatastore)
-				assert.Nil(t, result.Error, fmt.Sprintf("Unexpected error %v.", result.Error))
+				assert.Nil(t, result.Error, fmt.Sprintf("Unexpected error: %v.", result.Error))
 
 				loginDatastore = datastoremodel.Login{
 					UserID:   userDatastore.ID,
@@ -679,14 +679,14 @@ func (ts *TestSuite) TestChangePassword() {
 				}
 
 				result = dbTrx.Create(&loginDatastore)
-				assert.Nil(t, result.Error, fmt.Sprintf("Unexpected error %v.", result.Error))
+				assert.Nil(t, result.Error, fmt.Sprintf("Unexpected error: %v.", result.Error))
 
 				authDatastore = datastoremodel.Auth{
 					UserID: userDatastore.ID,
 				}
 
 				result = dbTrx.Create(&authDatastore)
-				assert.Nil(t, result.Error, fmt.Sprintf("Unexpected error %v.", result.Error))
+				assert.Nil(t, result.Error, fmt.Sprintf("Unexpected error: %v.", result.Error))
 
 				auth = authDatastore.ToDomain()
 
@@ -714,10 +714,10 @@ func (ts *TestSuite) TestChangePassword() {
 			Context: "ItShouldFailIfTheDatabaseStateIsInconsistent",
 			SetUp: func(t *testing.T) {
 				dbTrx = ts.DB.Begin()
-				assert.Nil(t, dbTrx.Error, fmt.Sprintf("Unexpected error %v.", dbTrx.Error))
+				assert.Nil(t, dbTrx.Error, fmt.Sprintf("Unexpected error: %v.", dbTrx.Error))
 
 				result := dbTrx.Rollback()
-				assert.Nil(t, result.Error, fmt.Sprintf("Unexpected error %v.", result.Error))
+				assert.Nil(t, result.Error, fmt.Sprintf("Unexpected error: %v.", result.Error))
 
 				authN = authpkg.New(ts.RSAKeys)
 
@@ -796,7 +796,7 @@ func (ts *TestSuite) TestChangePassword() {
 				assert.Equal(t, resprec.Code, tc.StatusCode)
 				returnedMessage := messagehttputilpkg.Message{}
 				err := json.NewDecoder(resprec.Body).Decode(&returnedMessage)
-				assert.Nil(t, err, fmt.Sprintf("Unexpected error %v.", err))
+				assert.Nil(t, err, fmt.Sprintf("Unexpected error: %v.", err))
 				assert.NotEmpty(t, returnedMessage.Text)
 			} else {
 				assert.Equal(t, resprec.Code, tc.StatusCode)
@@ -827,7 +827,7 @@ func (ts *TestSuite) TestSignOut() {
 			Context: "ItShouldSucceedInSigningOut",
 			SetUp: func(t *testing.T) {
 				dbTrx = ts.DB.Begin()
-				assert.Nil(t, dbTrx.Error, fmt.Sprintf("Unexpected error %v.", dbTrx.Error))
+				assert.Nil(t, dbTrx.Error, fmt.Sprintf("Unexpected error: %v.", dbTrx.Error))
 
 				authN = authpkg.New(ts.RSAKeys)
 
@@ -839,7 +839,7 @@ func (ts *TestSuite) TestSignOut() {
 				}
 
 				result := dbTrx.Create(&userDatastore)
-				assert.Nil(t, result.Error, fmt.Sprintf("Unexpected error %v.", result.Error))
+				assert.Nil(t, result.Error, fmt.Sprintf("Unexpected error: %v.", result.Error))
 
 				loginDatastore = datastoremodel.Login{
 					UserID:   userDatastore.ID,
@@ -848,14 +848,14 @@ func (ts *TestSuite) TestSignOut() {
 				}
 
 				result = dbTrx.Create(&loginDatastore)
-				assert.Nil(t, result.Error, fmt.Sprintf("Unexpected error %v.", result.Error))
+				assert.Nil(t, result.Error, fmt.Sprintf("Unexpected error: %v.", result.Error))
 
 				authDatastore = datastoremodel.Auth{
 					UserID: userDatastore.ID,
 				}
 
 				result = dbTrx.Create(&authDatastore)
-				assert.Nil(t, result.Error, fmt.Sprintf("Unexpected error %v.", result.Error))
+				assert.Nil(t, result.Error, fmt.Sprintf("Unexpected error: %v.", result.Error))
 
 				auth = authDatastore.ToDomain()
 
@@ -865,14 +865,14 @@ func (ts *TestSuite) TestSignOut() {
 			WantError:  false,
 			TearDown: func(t *testing.T) {
 				result := dbTrx.Rollback()
-				assert.Nil(t, result.Error, fmt.Sprintf("Unexpected error %v.", result.Error))
+				assert.Nil(t, result.Error, fmt.Sprintf("Unexpected error: %v.", result.Error))
 			},
 		},
 		{
 			Context: "ItShouldFailIfTheAuthDetailsFromTheRequestContextIsInvalid",
 			SetUp: func(t *testing.T) {
 				dbTrx = ts.DB.Begin()
-				assert.Nil(t, dbTrx.Error, fmt.Sprintf("Unexpected error %v.", dbTrx.Error))
+				assert.Nil(t, dbTrx.Error, fmt.Sprintf("Unexpected error: %v.", dbTrx.Error))
 
 				authN = authpkg.New(ts.RSAKeys)
 
@@ -886,10 +886,10 @@ func (ts *TestSuite) TestSignOut() {
 			Context: "ItShouldFailIfTheDatabaseStateIsInconsistent",
 			SetUp: func(t *testing.T) {
 				dbTrx = ts.DB.Begin()
-				assert.Nil(t, dbTrx.Error, fmt.Sprintf("Unexpected error %v.", dbTrx.Error))
+				assert.Nil(t, dbTrx.Error, fmt.Sprintf("Unexpected error: %v.", dbTrx.Error))
 
 				result := dbTrx.Rollback()
-				assert.Nil(t, result.Error, fmt.Sprintf("Unexpected error %v.", result.Error))
+				assert.Nil(t, result.Error, fmt.Sprintf("Unexpected error: %v.", result.Error))
 
 				authN = authpkg.New(ts.RSAKeys)
 
@@ -950,7 +950,7 @@ func (ts *TestSuite) TestSignOut() {
 				assert.Equal(t, resprec.Code, tc.StatusCode)
 				returnedMessage := messagehttputilpkg.Message{}
 				err := json.NewDecoder(resprec.Body).Decode(&returnedMessage)
-				assert.Nil(t, err, fmt.Sprintf("Unexpected error %v.", err))
+				assert.Nil(t, err, fmt.Sprintf("Unexpected error: %v.", err))
 				assert.NotEmpty(t, returnedMessage.Text)
 			} else {
 				assert.Equal(t, resprec.Code, tc.StatusCode)

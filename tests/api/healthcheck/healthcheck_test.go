@@ -93,7 +93,7 @@ func (ts *TestSuite) TestGetStatus() {
 				assert.Equal(t, resprec.Code, tc.StatusCode)
 				returnedMessage := messagehttputilpkg.Message{}
 				err := json.NewDecoder(resprec.Body).Decode(&returnedMessage)
-				assert.Nil(t, err, fmt.Sprintf("Unexpected error %v.", err))
+				assert.Nil(t, err, fmt.Sprintf("Unexpected error: %v.", err))
 				assert.Equal(t, message.Text, returnedMessage.Text)
 			} else {
 				assert.Equal(t, resprec.Code, tc.StatusCode)

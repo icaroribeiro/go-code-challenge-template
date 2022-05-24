@@ -198,7 +198,7 @@ func (ts *TestSuite) TestSignUp() {
 				assert.Equal(t, resprec.Code, tc.StatusCode)
 				returnedToken := tokenhttputilpkg.Token{}
 				err := json.NewDecoder(resprec.Body).Decode(&returnedToken)
-				assert.Nil(t, err, fmt.Sprintf("Unexpected error %v.", err))
+				assert.Nil(t, err, fmt.Sprintf("Unexpected error: %v.", err))
 				assert.NotEmpty(t, returnedToken.Text)
 				assert.Equal(t, tokenhttputilpkg.Token{Text: token}, returnedToken)
 			} else {
@@ -380,7 +380,7 @@ func (ts *TestSuite) TestSignIn() {
 				assert.Equal(t, resprec.Code, tc.StatusCode)
 				returnedToken := tokenhttputilpkg.Token{}
 				err := json.NewDecoder(resprec.Body).Decode(&returnedToken)
-				assert.Nil(t, err, fmt.Sprintf("Unexpected error %v.", err))
+				assert.Nil(t, err, fmt.Sprintf("Unexpected error: %v.", err))
 				assert.NotEmpty(t, returnedToken.Text)
 				assert.Equal(t, tokenhttputilpkg.Token{Text: token}, returnedToken)
 			} else {
@@ -512,7 +512,7 @@ func (ts *TestSuite) TestRefreshToken() {
 				assert.Equal(t, resprec.Code, tc.StatusCode)
 				returnedToken := tokenhttputilpkg.Token{}
 				err := json.NewDecoder(resprec.Body).Decode(&returnedToken)
-				assert.Nil(t, err, fmt.Sprintf("Unexpected error %v.", err))
+				assert.Nil(t, err, fmt.Sprintf("Unexpected error: %v.", err))
 				assert.NotEmpty(t, returnedToken.Text)
 				assert.Equal(t, tokenhttputilpkg.Token{Text: token}, returnedToken)
 			} else {
@@ -721,7 +721,7 @@ func (ts *TestSuite) TestChangePassword() {
 				assert.Equal(t, resprec.Code, tc.StatusCode)
 				returnedMessage := messagehttputilpkg.Message{}
 				err := json.NewDecoder(resprec.Body).Decode(&returnedMessage)
-				assert.Nil(t, err, fmt.Sprintf("Unexpected error %v.", err))
+				assert.Nil(t, err, fmt.Sprintf("Unexpected error: %v.", err))
 				assert.NotEmpty(t, returnedMessage.Text)
 				assert.Equal(t, messagehttputilpkg.Message{Text: message}, returnedMessage)
 			} else {
@@ -851,7 +851,7 @@ func (ts *TestSuite) TestSignOut() {
 				assert.Equal(t, resprec.Code, tc.StatusCode)
 				returnedMessage := messagehttputilpkg.Message{}
 				err := json.NewDecoder(resprec.Body).Decode(&returnedMessage)
-				assert.Nil(t, err, fmt.Sprintf("Unexpected error %v.", err))
+				assert.Nil(t, err, fmt.Sprintf("Unexpected error: %v.", err))
 				assert.NotEmpty(t, returnedMessage.Text)
 				assert.Equal(t, messagehttputilpkg.Message{Text: message}, returnedMessage)
 			} else {
