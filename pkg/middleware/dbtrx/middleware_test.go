@@ -71,7 +71,7 @@ func (ts *TestSuite) TestFromContext() {
 
 	ts.Cases = Cases{
 		{
-			Context: "ItShouldSucceedInGettingAssociatedValueWithAContext",
+			Context: "ItShouldSucceedInGettingAnAssociatedValueFromAContext",
 			SetUp: func(t *testing.T) {
 				dbTrxCtxValue = db
 				ctx = dbtrxmiddlewarepkg.NewContext(ctx, dbTrxCtxValue)

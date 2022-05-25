@@ -11,6 +11,7 @@ import (
 	"testing"
 
 	"github.com/DATA-DOG/go-sqlmock"
+	fake "github.com/brianvoe/gofakeit/v5"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gorilla/mux"
 	domainmodel "github.com/icaroribeiro/new-go-code-challenge-template/internal/core/domain/model"
@@ -71,7 +72,7 @@ func (ts *TestSuite) TestFromContext() {
 
 	ts.Cases = Cases{
 		{
-			Context: "ItShouldSucceedInGettingAssociatedValueWithAContext",
+			Context: "ItShouldSucceedInGettingAnAssociatedValueFromAContext",
 			SetUp: func(t *testing.T) {
 				authDetailsCtxValue = domainfactorymodel.NewAuth(nil)
 				ctx = authmiddlewarepkg.NewContext(ctx, authDetailsCtxValue)
@@ -98,9 +99,10 @@ func (ts *TestSuite) TestFromContext() {
 func (ts *TestSuite) TestAuth() {
 	driver := "postgres"
 	db, mock := NewMockDB(driver)
+
 	bearerToken := []string{"", ""}
 
-	var token *jwt.Token
+	token := &jwt.Token{}
 
 	headers := make(map[string][]string)
 
@@ -113,7 +115,7 @@ func (ts *TestSuite) TestAuth() {
 		{
 			Context: "ItShouldSucceedInWrappingAFunctionWithAuthenticationMiddleware",
 			SetUp: func(t *testing.T) {
-				bearerToken = []string{"Bearer", "token"}
+				bearerToken = []string{"Bearer", fake.Word()}
 
 				key := "Authorization"
 				value := strings.Join(bearerToken[:], " ")
@@ -192,7 +194,7 @@ func (ts *TestSuite) TestAuth() {
 		{
 			Context: "ItShouldFailIfTheTokenIsNotDecoded",
 			SetUp: func(t *testing.T) {
-				bearerToken = []string{"Bearer", "token"}
+				bearerToken = []string{"Bearer", fake.Word()}
 
 				key := "Authorization"
 				value := strings.Join(bearerToken[:], " ")
@@ -212,7 +214,7 @@ func (ts *TestSuite) TestAuth() {
 		{
 			Context: "ItShouldFailIfTheAuthIsNotFetchedFromTheToken",
 			SetUp: func(t *testing.T) {
-				bearerToken = []string{"Bearer", "token"}
+				bearerToken = []string{"Bearer", fake.Word()}
 
 				key := "Authorization"
 				value := strings.Join(bearerToken[:], " ")
@@ -233,7 +235,7 @@ func (ts *TestSuite) TestAuth() {
 		{
 			Context: "ItShouldFailIfAnErrorOccursWhenTryingToFindTheAuthInTheDatabase",
 			SetUp: func(t *testing.T) {
-				bearerToken = []string{"Bearer", "token"}
+				bearerToken = []string{"Bearer", fake.Word()}
 
 				key := "Authorization"
 				value := strings.Join(bearerToken[:], " ")
@@ -267,7 +269,7 @@ func (ts *TestSuite) TestAuth() {
 		{
 			Context: "ItShouldFailIfTheAuthIsNotFoundInTheDatabase",
 			SetUp: func(t *testing.T) {
-				bearerToken = []string{"Bearer", "token"}
+				bearerToken = []string{"Bearer", fake.Word()}
 
 				key := "Authorization"
 				value := strings.Join(bearerToken[:], " ")
@@ -301,7 +303,7 @@ func (ts *TestSuite) TestAuth() {
 		{
 			Context: "ItShouldFailIfTheUserIDFromTokenDoesNotMatchWithTheUserIDFromAuthRecordFromTheDatabase",
 			SetUp: func(t *testing.T) {
-				bearerToken = []string{"Bearer", "token"}
+				bearerToken = []string{"Bearer", fake.Word()}
 
 				key := "Authorization"
 				value := strings.Join(bearerToken[:], " ")
@@ -405,7 +407,8 @@ func (ts *TestSuite) TestAuthRenewal() {
 	db, mock := NewMockDB(driver)
 	bearerToken := []string{"", ""}
 
-	var token *jwt.Token
+	token := &jwt.Token{}
+
 	timeBeforeTokenExpTimeInSec := 0
 
 	headers := make(map[string][]string)
@@ -419,7 +422,7 @@ func (ts *TestSuite) TestAuthRenewal() {
 		{
 			Context: "ItShouldSucceedInWrappingAFunctionWithAuthRenewalMiddleware",
 			SetUp: func(t *testing.T) {
-				bearerToken = []string{"Bearer", "token"}
+				bearerToken = []string{"Bearer", fake.Word()}
 
 				key := "Authorization"
 				value := strings.Join(bearerToken[:], " ")
@@ -498,7 +501,7 @@ func (ts *TestSuite) TestAuthRenewal() {
 		{
 			Context: "ItShouldFailIfTheTokenIsNotValidForRenewal",
 			SetUp: func(t *testing.T) {
-				bearerToken = []string{"Bearer", "token"}
+				bearerToken = []string{"Bearer", fake.Word()}
 
 				key := "Authorization"
 				value := strings.Join(bearerToken[:], " ")
@@ -518,7 +521,7 @@ func (ts *TestSuite) TestAuthRenewal() {
 		{
 			Context: "ItShouldFailIfTheAuthIsNotFetchedFromTheToken",
 			SetUp: func(t *testing.T) {
-				bearerToken = []string{"Bearer", "token"}
+				bearerToken = []string{"Bearer", fake.Word()}
 
 				key := "Authorization"
 				value := strings.Join(bearerToken[:], " ")
@@ -539,7 +542,7 @@ func (ts *TestSuite) TestAuthRenewal() {
 		{
 			Context: "ItShouldFailIfAnErrorOccursWhenTryingToFindTheAuthInTheDatabase",
 			SetUp: func(t *testing.T) {
-				bearerToken = []string{"Bearer", "token"}
+				bearerToken = []string{"Bearer", fake.Word()}
 
 				key := "Authorization"
 				value := strings.Join(bearerToken[:], " ")
@@ -573,7 +576,7 @@ func (ts *TestSuite) TestAuthRenewal() {
 		{
 			Context: "ItShouldFailIfTheAuthIsNotFoundInTheDatabase",
 			SetUp: func(t *testing.T) {
-				bearerToken = []string{"Bearer", "token"}
+				bearerToken = []string{"Bearer", fake.Word()}
 
 				key := "Authorization"
 				value := strings.Join(bearerToken[:], " ")
@@ -607,7 +610,7 @@ func (ts *TestSuite) TestAuthRenewal() {
 		{
 			Context: "ItShouldFailIfTheUserIDFromTokenDoesNotMatchWithTheUserIDFromAuthRecordFromTheDatabase",
 			SetUp: func(t *testing.T) {
-				bearerToken = []string{"Bearer", "token"}
+				bearerToken = []string{"Bearer", fake.Word()}
 
 				key := "Authorization"
 				value := strings.Join(bearerToken[:], " ")
