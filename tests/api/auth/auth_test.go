@@ -491,7 +491,10 @@ func (ts *TestSuite) TestRefreshToken() {
 			},
 			StatusCode: http.StatusInternalServerError,
 			WantError:  true,
-			TearDown:   func(t *testing.T) {},
+			TearDown: func(t *testing.T) {
+				result := dbTrx.Rollback()
+				assert.Nil(t, result.Error, fmt.Sprintf("Unexpected error: %v.", result.Error))
+			},
 		},
 	}
 
