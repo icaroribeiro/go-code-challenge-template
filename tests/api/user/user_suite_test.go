@@ -7,7 +7,7 @@ import (
 	datastorepkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/datastore"
 	envpkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/env"
 	validatorpkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/validator"
-	uuidvalidator "github.com/icaroribeiro/new-go-code-challenge-template/pkg/validator/uuid"
+	uuidvalidatorpkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/validator/uuid"
 	"github.com/stretchr/testify/suite"
 	validatorv2 "gopkg.in/validator.v2"
 	"gorm.io/gorm"
@@ -73,7 +73,7 @@ func (ts *TestSuite) SetupSuite() {
 	}
 
 	validationFuncs := map[string]validatorv2.ValidationFunc{
-		"uuid": uuidvalidator.Validate,
+		"uuid": uuidvalidatorpkg.Validate,
 	}
 
 	ts.Validator, err = validatorpkg.New(validationFuncs)

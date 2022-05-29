@@ -22,8 +22,8 @@ import (
 	responsehttputilpkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/httputil/response"
 	routehttputilpkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/httputil/route"
 	authmiddlewarepkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/middleware/auth"
-	domainfactorymodel "github.com/icaroribeiro/new-go-code-challenge-template/tests/factory/core/domain/model"
-	datastorefactorymodel "github.com/icaroribeiro/new-go-code-challenge-template/tests/factory/infrastructure/storage/datastore/model"
+	domainmodelfactory "github.com/icaroribeiro/new-go-code-challenge-template/tests/factory/core/domain/model"
+	datastoremodelfactory "github.com/icaroribeiro/new-go-code-challenge-template/tests/factory/infrastructure/storage/datastore/model"
 	mockauthpkg "github.com/icaroribeiro/new-go-code-challenge-template/tests/mocks/pkg/mockauth"
 	uuid "github.com/satori/go.uuid"
 	"github.com/stretchr/testify/assert"
@@ -43,7 +43,7 @@ func (ts *TestSuite) TestNewContext() {
 		{
 			Context: "ItShouldSucceedInCreatingACopyOfAContextWithAnAssociatedValue",
 			SetUp: func(t *testing.T) {
-				authDetailsCtxValue = domainfactorymodel.NewAuth(nil)
+				authDetailsCtxValue = domainmodelfactory.NewAuth(nil)
 			},
 			WantError: false,
 		},
@@ -74,7 +74,7 @@ func (ts *TestSuite) TestFromContext() {
 		{
 			Context: "ItShouldSucceedInGettingAnAssociatedValueFromAContext",
 			SetUp: func(t *testing.T) {
-				authDetailsCtxValue = domainfactorymodel.NewAuth(nil)
+				authDetailsCtxValue = domainmodelfactory.NewAuth(nil)
 				ctx = authmiddlewarepkg.NewContext(ctx, authDetailsCtxValue)
 			},
 			WantError: false,
@@ -138,12 +138,12 @@ func (ts *TestSuite) TestAuth() {
 
 				returnArgs = ReturnArgs{
 					{token, nil},
-					{domainfactorymodel.NewAuth(args), nil},
+					{domainmodelfactory.NewAuth(args), nil},
 				}
 
 				sqlQuery := `SELECT * FROM "auths" WHERE id=$1`
 
-				authDatastore := datastorefactorymodel.NewAuth(args)
+				authDatastore := datastoremodelfactory.NewAuth(args)
 
 				rows := sqlmock.
 					NewRows([]string{"id", "user_id", "created_at"}).
@@ -255,7 +255,7 @@ func (ts *TestSuite) TestAuth() {
 
 				returnArgs = ReturnArgs{
 					{token, nil},
-					{domainfactorymodel.NewAuth(args), nil},
+					{domainmodelfactory.NewAuth(args), nil},
 				}
 
 				sqlQuery := `SELECT * FROM "auths" WHERE id=$1`
@@ -289,7 +289,7 @@ func (ts *TestSuite) TestAuth() {
 
 				returnArgs = ReturnArgs{
 					{token, nil},
-					{domainfactorymodel.NewAuth(args), nil},
+					{domainmodelfactory.NewAuth(args), nil},
 				}
 
 				sqlQuery := `SELECT * FROM "auths" WHERE id=$1`
@@ -323,12 +323,12 @@ func (ts *TestSuite) TestAuth() {
 
 				returnArgs = ReturnArgs{
 					{token, nil},
-					{domainfactorymodel.NewAuth(args), nil},
+					{domainmodelfactory.NewAuth(args), nil},
 				}
 
 				sqlQuery := `SELECT * FROM "auths" WHERE id=$1`
 
-				authDatastore := datastorefactorymodel.NewAuth(args)
+				authDatastore := datastoremodelfactory.NewAuth(args)
 
 				rows := sqlmock.
 					NewRows([]string{"id", "user_id", "created_at"}).
@@ -445,12 +445,12 @@ func (ts *TestSuite) TestAuthRenewal() {
 
 				returnArgs = ReturnArgs{
 					{token, nil},
-					{domainfactorymodel.NewAuth(args), nil},
+					{domainmodelfactory.NewAuth(args), nil},
 				}
 
 				sqlQuery := `SELECT * FROM "auths" WHERE id=$1`
 
-				authDatastore := datastorefactorymodel.NewAuth(args)
+				authDatastore := datastoremodelfactory.NewAuth(args)
 
 				rows := sqlmock.
 					NewRows([]string{"id", "user_id", "created_at"}).
@@ -562,7 +562,7 @@ func (ts *TestSuite) TestAuthRenewal() {
 
 				returnArgs = ReturnArgs{
 					{token, nil},
-					{domainfactorymodel.NewAuth(args), nil},
+					{domainmodelfactory.NewAuth(args), nil},
 				}
 
 				sqlQuery := `SELECT * FROM "auths" WHERE id=$1`
@@ -596,7 +596,7 @@ func (ts *TestSuite) TestAuthRenewal() {
 
 				returnArgs = ReturnArgs{
 					{token, nil},
-					{domainfactorymodel.NewAuth(args), nil},
+					{domainmodelfactory.NewAuth(args), nil},
 				}
 
 				sqlQuery := `SELECT * FROM "auths" WHERE id=$1`
@@ -630,12 +630,12 @@ func (ts *TestSuite) TestAuthRenewal() {
 
 				returnArgs = ReturnArgs{
 					{token, nil},
-					{domainfactorymodel.NewAuth(args), nil},
+					{domainmodelfactory.NewAuth(args), nil},
 				}
 
 				sqlQuery := `SELECT * FROM "auths" WHERE id=$1`
 
-				authDatastore := datastorefactorymodel.NewAuth(args)
+				authDatastore := datastoremodelfactory.NewAuth(args)
 
 				rows := sqlmock.
 					NewRows([]string{"id", "user_id", "created_at"}).

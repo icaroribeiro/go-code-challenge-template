@@ -19,7 +19,8 @@ import (
 	tokenhttputilpkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/httputil/token"
 	authmiddlewarepkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/middleware/auth"
 	dbtrxmiddlewarepkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/middleware/dbtrx"
-	"github.com/icaroribeiro/new-go-code-challenge-template/pkg/security"
+	securitypkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/security"
+	securitypkgfactory "github.com/icaroribeiro/new-go-code-challenge-template/tests/factory/pkg/security"
 	uuid "github.com/satori/go.uuid"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/suite"
@@ -31,7 +32,7 @@ func TestHandlerUnit(t *testing.T) {
 }
 
 func (ts *TestSuite) TestSignUp() {
-	credentials := security.Credentials{}
+	credentials := securitypkg.Credentials{}
 
 	body := ""
 
@@ -40,7 +41,7 @@ func (ts *TestSuite) TestSignUp() {
 
 	dbTrxCtxValue := &gorm.DB{}
 
-	token := ""
+	tokenString := ""
 
 	returnArgs := ReturnArgs{}
 
@@ -48,13 +49,7 @@ func (ts *TestSuite) TestSignUp() {
 		{
 			Context: "ItShouldSucceedInSigningUp",
 			SetUp: func(t *testing.T) {
-				username := fake.Username()
-				password := fake.Password(true, true, true, false, false, 8)
-
-				credentials = security.Credentials{
-					Username: username,
-					Password: password,
-				}
+				credentials = securitypkgfactory.NewCredentials(nil)
 
 				body = fmt.Sprintf(`
 				{
@@ -65,10 +60,10 @@ func (ts *TestSuite) TestSignUp() {
 
 				dbTrxCtxValue = db
 
-				token = fake.Word()
+				tokenString = fake.Word()
 
 				returnArgs = ReturnArgs{
-					{token, nil},
+					{tokenString, nil},
 				}
 			},
 			StatusCode: http.StatusOK,
@@ -77,13 +72,7 @@ func (ts *TestSuite) TestSignUp() {
 		{
 			Context: "ItShouldFailIfTheDatabaseTransactionFromTheRequestContextIsNull",
 			SetUp: func(t *testing.T) {
-				username := fake.Username()
-				password := fake.Password(true, true, true, false, false, 8)
-
-				credentials = security.Credentials{
-					Username: username,
-					Password: password,
-				}
+				credentials = securitypkgfactory.NewCredentials(nil)
 
 				dbTrxCtxValue = nil
 
@@ -99,13 +88,7 @@ func (ts *TestSuite) TestSignUp() {
 		{
 			Context: "ItShouldFailIfTheRequestBodyIsAnImproperlyFormattedJsonString",
 			SetUp: func(t *testing.T) {
-				username := fake.Username()
-				password := fake.Password(true, true, true, false, false, 8)
-
-				credentials = security.Credentials{
-					Username: username,
-					Password: password,
-				}
+				credentials = securitypkgfactory.NewCredentials(nil)
 
 				body = fmt.Sprintf(`
 					"username":"%s",
@@ -125,13 +108,7 @@ func (ts *TestSuite) TestSignUp() {
 		{
 			Context: "ItShouldFailIfAnErrorOccursWhenRegisteringTheCredentials",
 			SetUp: func(t *testing.T) {
-				username := fake.Username()
-				password := fake.Password(true, true, true, false, false, 8)
-
-				credentials = security.Credentials{
-					Username: username,
-					Password: password,
-				}
+				credentials = securitypkgfactory.NewCredentials(nil)
 
 				body = fmt.Sprintf(`
 				{
@@ -200,7 +177,7 @@ func (ts *TestSuite) TestSignUp() {
 				err := json.NewDecoder(resprec.Body).Decode(&returnedToken)
 				assert.Nil(t, err, fmt.Sprintf("Unexpected error: %v.", err))
 				assert.NotEmpty(t, returnedToken.Text)
-				assert.Equal(t, tokenhttputilpkg.Token{Text: token}, returnedToken)
+				assert.Equal(t, tokenhttputilpkg.Token{Text: tokenString}, returnedToken)
 			} else {
 				assert.Equal(t, resprec.Code, tc.StatusCode)
 			}
@@ -209,7 +186,7 @@ func (ts *TestSuite) TestSignUp() {
 }
 
 func (ts *TestSuite) TestSignIn() {
-	credentials := security.Credentials{}
+	credentials := securitypkg.Credentials{}
 
 	body := ""
 
@@ -218,18 +195,18 @@ func (ts *TestSuite) TestSignIn() {
 
 	dbTrxCtxValue := &gorm.DB{}
 
-	token := ""
+	tokenString := ""
 
 	returnArgs := ReturnArgs{}
 
 	ts.Cases = Cases{
 		{
-			Context: "ItShouldSucceedInLoggingIn",
+			Context: "ItShouldSucceedInSigningIn",
 			SetUp: func(t *testing.T) {
 				username := fake.Username()
 				password := fake.Password(true, true, true, false, false, 8)
 
-				credentials = security.Credentials{
+				credentials = securitypkg.Credentials{
 					Username: username,
 					Password: password,
 				}
@@ -243,10 +220,10 @@ func (ts *TestSuite) TestSignIn() {
 
 				dbTrxCtxValue = db
 
-				token = fake.Word()
+				tokenString = fake.Word()
 
 				returnArgs = ReturnArgs{
-					{token, nil},
+					{tokenString, nil},
 				}
 			},
 			StatusCode: http.StatusOK,
@@ -258,7 +235,7 @@ func (ts *TestSuite) TestSignIn() {
 				username := fake.Username()
 				password := fake.Password(true, true, true, false, false, 8)
 
-				credentials = security.Credentials{
+				credentials = securitypkg.Credentials{
 					Username: username,
 					Password: password,
 				}
@@ -285,7 +262,7 @@ func (ts *TestSuite) TestSignIn() {
 				username := fake.Username()
 				password := fake.Password(true, true, true, false, false, 8)
 
-				credentials = security.Credentials{
+				credentials = securitypkg.Credentials{
 					Username: username,
 					Password: password,
 				}
@@ -311,7 +288,7 @@ func (ts *TestSuite) TestSignIn() {
 				username := fake.Username()
 				password := fake.Password(true, true, true, false, false, 8)
 
-				credentials = security.Credentials{
+				credentials = securitypkg.Credentials{
 					Username: username,
 					Password: password,
 				}
@@ -382,7 +359,7 @@ func (ts *TestSuite) TestSignIn() {
 				err := json.NewDecoder(resprec.Body).Decode(&returnedToken)
 				assert.Nil(t, err, fmt.Sprintf("Unexpected error: %v.", err))
 				assert.NotEmpty(t, returnedToken.Text)
-				assert.Equal(t, tokenhttputilpkg.Token{Text: token}, returnedToken)
+				assert.Equal(t, tokenhttputilpkg.Token{Text: tokenString}, returnedToken)
 			} else {
 				assert.Equal(t, resprec.Code, tc.StatusCode)
 			}
@@ -398,7 +375,7 @@ func (ts *TestSuite) TestRefreshToken() {
 	dbTrx := &gorm.DB{}
 	dbTrx = nil
 
-	token := ""
+	tokenString := ""
 
 	returnArgs := ReturnArgs{}
 
@@ -416,10 +393,10 @@ func (ts *TestSuite) TestRefreshToken() {
 
 				authDetailsCtxValue = auth
 
-				token = fake.Word()
+				tokenString = fake.Word()
 
 				returnArgs = ReturnArgs{
-					{token, nil},
+					{tokenString, nil},
 				}
 			},
 			StatusCode: http.StatusOK,
@@ -438,10 +415,10 @@ func (ts *TestSuite) TestRefreshToken() {
 
 				authDetailsCtxValue = domainmodel.Auth{}
 
-				token = fake.Word()
+				tokenString = fake.Word()
 
 				returnArgs = ReturnArgs{
-					{token, nil},
+					{tokenString, nil},
 				}
 			},
 			StatusCode: http.StatusInternalServerError,
@@ -475,7 +452,7 @@ func (ts *TestSuite) TestRefreshToken() {
 
 			authService := new(authmockservice.Service)
 			authService.On("WithDBTrx", dbTrx).Return(authService)
-			authService.On("RenewToken", auth).Return(returnArgs[0]...)
+			authService.On("RenewToken", authDetailsCtxValue).Return(returnArgs[0]...)
 
 			authHandler := authhandler.New(authService)
 
@@ -514,7 +491,7 @@ func (ts *TestSuite) TestRefreshToken() {
 				err := json.NewDecoder(resprec.Body).Decode(&returnedToken)
 				assert.Nil(t, err, fmt.Sprintf("Unexpected error: %v.", err))
 				assert.NotEmpty(t, returnedToken.Text)
-				assert.Equal(t, tokenhttputilpkg.Token{Text: token}, returnedToken)
+				assert.Equal(t, tokenhttputilpkg.Token{Text: tokenString}, returnedToken)
 			} else {
 				assert.Equal(t, resprec.Code, tc.StatusCode)
 			}
@@ -523,7 +500,7 @@ func (ts *TestSuite) TestRefreshToken() {
 }
 
 func (ts *TestSuite) TestChangePassword() {
-	passwords := security.Passwords{}
+	passwords := securitypkg.Passwords{}
 
 	body := ""
 
@@ -545,7 +522,7 @@ func (ts *TestSuite) TestChangePassword() {
 				currentPassword := fake.Password(true, true, true, false, false, 8)
 				newPassword := fake.Password(true, true, true, false, false, 8)
 
-				passwords = security.Passwords{
+				passwords = securitypkg.Passwords{
 					CurrentPassword: currentPassword,
 					NewPassword:     newPassword,
 				}
@@ -582,7 +559,7 @@ func (ts *TestSuite) TestChangePassword() {
 				currentPassword := fake.Password(true, true, true, false, false, 8)
 				newPassword := fake.Password(true, true, true, false, false, 8)
 
-				passwords = security.Passwords{
+				passwords = securitypkg.Passwords{
 					CurrentPassword: currentPassword,
 					NewPassword:     newPassword,
 				}
@@ -610,7 +587,7 @@ func (ts *TestSuite) TestChangePassword() {
 				currentPassword := fake.Password(true, true, true, false, false, 8)
 				newPassword := fake.Password(true, true, true, false, false, 8)
 
-				passwords = security.Passwords{
+				passwords = securitypkg.Passwords{
 					CurrentPassword: currentPassword,
 					NewPassword:     newPassword,
 				}
@@ -644,7 +621,7 @@ func (ts *TestSuite) TestChangePassword() {
 				currentPassword := fake.Password(true, true, true, false, false, 8)
 				newPassword := fake.Password(true, true, true, false, false, 8)
 
-				passwords = security.Passwords{
+				passwords = securitypkg.Passwords{
 					CurrentPassword: currentPassword,
 					NewPassword:     newPassword,
 				}

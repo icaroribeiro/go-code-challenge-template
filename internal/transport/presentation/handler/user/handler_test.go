@@ -7,7 +7,6 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	fake "github.com/brianvoe/gofakeit/v5"
 	"github.com/gorilla/mux"
 	domainmodel "github.com/icaroribeiro/new-go-code-challenge-template/internal/core/domain/model"
 	usermockservice "github.com/icaroribeiro/new-go-code-challenge-template/internal/core/ports/application/mockservice/user"
@@ -16,7 +15,7 @@ import (
 	"github.com/icaroribeiro/new-go-code-challenge-template/pkg/customerror"
 	requesthttputilpkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/httputil/request"
 	routehttputilpkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/httputil/route"
-	uuid "github.com/satori/go.uuid"
+	domainmodelfactory "github.com/icaroribeiro/new-go-code-challenge-template/tests/factory/core/domain/model"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/suite"
 	"gorm.io/gorm"
@@ -38,13 +37,7 @@ func (ts *TestSuite) TestGetAll() {
 		{
 			Context: "ItShouldSucceedInGettingAllUsers",
 			SetUp: func(t *testing.T) {
-				id := uuid.NewV4()
-				username := fake.Username()
-
-				user = domainmodel.User{
-					ID:       id,
-					Username: username,
-				}
+				user = domainmodelfactory.NewUser(nil)
 
 				returnArgs = ReturnArgs{
 					{domainmodel.Users{user}, nil},
@@ -107,8 +100,8 @@ func (ts *TestSuite) TestGetAll() {
 				returnedUsers := make(httppresentationmodel.Users, 0)
 				err := json.NewDecoder(resprec.Body).Decode(&returnedUsers)
 				assert.Nil(t, err, fmt.Sprintf("Unexpected error: %v.", err))
-				assert.Equal(t, returnedUsers[0].ID, user.ID)
-				assert.Equal(t, returnedUsers[0].Username, user.Username)
+				assert.Equal(t, user.ID, returnedUsers[0].ID)
+				assert.Equal(t, user.Username, returnedUsers[0].Username)
 			} else {
 				assert.Equal(t, resprec.Code, tc.StatusCode)
 			}

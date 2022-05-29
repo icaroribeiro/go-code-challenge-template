@@ -9,13 +9,12 @@ import (
 	"github.com/dgrijalva/jwt-go"
 	authpkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/auth"
 	datastorepkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/datastore"
-	"github.com/icaroribeiro/new-go-code-challenge-template/pkg/env"
 	envpkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/env"
 	securitypkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/security"
 	validatorpkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/validator"
-	passwordvalidator "github.com/icaroribeiro/new-go-code-challenge-template/pkg/validator/password"
-	usernamevalidator "github.com/icaroribeiro/new-go-code-challenge-template/pkg/validator/username"
-	uuidvalidator "github.com/icaroribeiro/new-go-code-challenge-template/pkg/validator/uuid"
+	passwordvalidatorpkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/validator/password"
+	usernamevalidatorpkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/validator/username"
+	uuidvalidatorpkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/validator/uuid"
 	"github.com/stretchr/testify/suite"
 	validatorv2 "gopkg.in/validator.v2"
 	"gorm.io/gorm"
@@ -42,10 +41,10 @@ type TestSuite struct {
 }
 
 var (
-	publicKeyPath  = env.GetEnvWithDefaultValue("RSA_PUBLIC_KEY_PATH", "../../../tests/configs/auth/rsa_keys/rsa.public")
-	privateKeyPath = env.GetEnvWithDefaultValue("RSA_PRIVATE_KEY_PATH", "../../../tests/configs/auth/rsa_keys/rsa.private")
+	publicKeyPath  = envpkg.GetEnvWithDefaultValue("RSA_PUBLIC_KEY_PATH", "../../../tests/configs/auth/rsa_keys/rsa.public")
+	privateKeyPath = envpkg.GetEnvWithDefaultValue("RSA_PRIVATE_KEY_PATH", "../../../tests/configs/auth/rsa_keys/rsa.private")
 
-	tokenExpTimeInSecStr = env.GetEnvWithDefaultValue("TOKEN_EXP_TIME_IN_SEC", "120")
+	tokenExpTimeInSecStr = envpkg.GetEnvWithDefaultValue("TOKEN_EXP_TIME_IN_SEC", "120")
 
 	dbDriver   = envpkg.GetEnvWithDefaultValue("DB_DRIVER", "postgres")
 	dbUser     = envpkg.GetEnvWithDefaultValue("DB_USER", "postgres")
@@ -119,9 +118,9 @@ func (ts *TestSuite) SetupSuite() {
 	}
 
 	validationFuncs := map[string]validatorv2.ValidationFunc{
-		"uuid":     uuidvalidator.Validate,
-		"username": usernamevalidator.Validate,
-		"password": passwordvalidator.Validate,
+		"uuid":     uuidvalidatorpkg.Validate,
+		"username": usernamevalidatorpkg.Validate,
+		"password": passwordvalidatorpkg.Validate,
 	}
 
 	ts.Validator, err = validatorpkg.New(validationFuncs)

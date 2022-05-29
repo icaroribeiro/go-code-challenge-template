@@ -19,7 +19,7 @@ import (
 	responsehttputilpkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/httputil/response"
 	routehttputilpkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/httputil/route"
 	dbtrxmiddlewarepkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/middleware/dbtrx"
-	domainfactorymodel "github.com/icaroribeiro/new-go-code-challenge-template/tests/factory/core/domain/model"
+	domainmodelfactory "github.com/icaroribeiro/new-go-code-challenge-template/tests/factory/core/domain/model"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/suite"
 	"gorm.io/gorm"
@@ -96,7 +96,7 @@ func (ts *TestSuite) TestFromContext() {
 }
 
 func (ts *TestSuite) TestDBTrx() {
-	user := domainfactorymodel.NewUser(nil)
+	user := domainmodelfactory.NewUser(nil)
 
 	body := fmt.Sprintf(`
 	{

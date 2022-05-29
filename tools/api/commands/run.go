@@ -40,9 +40,9 @@ import (
 	securitypkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/security"
 	serverpkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/server"
 	validatorpkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/validator"
-	passwordvalidator "github.com/icaroribeiro/new-go-code-challenge-template/pkg/validator/password"
-	usernamevalidator "github.com/icaroribeiro/new-go-code-challenge-template/pkg/validator/username"
-	uuidvalidator "github.com/icaroribeiro/new-go-code-challenge-template/pkg/validator/uuid"
+	passwordvalidatorpkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/validator/password"
+	usernamevalidatorpkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/validator/username"
+	uuidvalidatorpkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/validator/uuid"
 	"github.com/spf13/cobra"
 	httpswaggerpkg "github.com/swaggo/http-swagger"
 	validatorv2 "gopkg.in/validator.v2"
@@ -117,9 +117,9 @@ func execRunCmd(cmd *cobra.Command, args []string) {
 	userDatastoreRepository := userdatastorerepository.New(db)
 
 	validationFuncs := map[string]validatorv2.ValidationFunc{
-		"uuid":     uuidvalidator.Validate,
-		"username": usernamevalidator.Validate,
-		"password": passwordvalidator.Validate,
+		"uuid":     uuidvalidatorpkg.Validate,
+		"username": usernamevalidatorpkg.Validate,
+		"password": passwordvalidatorpkg.Validate,
 	}
 
 	validator, err := validatorpkg.New(validationFuncs)

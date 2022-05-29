@@ -29,7 +29,7 @@ import (
 	"gorm.io/gorm"
 )
 
-func TestAuthInt(t *testing.T) {
+func TestAuthInteg(t *testing.T) {
 	suite.Run(t, new(TestSuite))
 }
 
@@ -165,10 +165,8 @@ func (ts *TestSuite) TestSignUp() {
 			tc.SetUp(t)
 
 			authDatastoreRepository := authdatastorerepository.New(dbTrx)
-
-			userDatastoreRepository := userdatastorerepository.New(dbTrx)
-
 			loginDatastoreRepository := logindatastorerepository.New(dbTrx)
+			userDatastoreRepository := userdatastorerepository.New(dbTrx)
 
 			authService := authservice.New(authDatastoreRepository, loginDatastoreRepository, userDatastoreRepository,
 				authN, ts.Security, ts.Validator, ts.TokenExpTimeInSec)
@@ -226,9 +224,8 @@ func (ts *TestSuite) TestSignIn() {
 
 	var authN authpkg.IAuth
 
-	userDatastore := datastoremodel.User{}
-
 	loginDatastore := datastoremodel.Login{}
+	userDatastore := datastoremodel.User{}
 
 	credentials := securitypkg.Credentials{}
 
@@ -373,10 +370,8 @@ func (ts *TestSuite) TestSignIn() {
 			tc.SetUp(t)
 
 			authDatastoreRepository := authdatastorerepository.New(dbTrx)
-
-			userDatastoreRepository := userdatastorerepository.New(dbTrx)
-
 			loginDatastoreRepository := logindatastorerepository.New(dbTrx)
+			userDatastoreRepository := userdatastorerepository.New(dbTrx)
 
 			authService := authservice.New(authDatastoreRepository, loginDatastoreRepository, userDatastoreRepository,
 				authN, ts.Security, ts.Validator, ts.TokenExpTimeInSec)
@@ -434,11 +429,9 @@ func (ts *TestSuite) TestRefreshToken() {
 
 	var authN authpkg.IAuth
 
-	userDatastore := datastoremodel.User{}
-
-	loginDatastore := datastoremodel.Login{}
-
 	authDatastore := datastoremodel.Auth{}
+	loginDatastore := datastoremodel.Login{}
+	userDatastore := datastoremodel.User{}
 
 	authDetailsCtxValue := domainmodel.Auth{}
 
@@ -507,10 +500,8 @@ func (ts *TestSuite) TestRefreshToken() {
 			tc.SetUp(t)
 
 			authDatastoreRepository := authdatastorerepository.New(dbTrx)
-
-			userDatastoreRepository := userdatastorerepository.New(dbTrx)
-
 			loginDatastoreRepository := logindatastorerepository.New(dbTrx)
+			userDatastoreRepository := userdatastorerepository.New(dbTrx)
 
 			authService := authservice.New(authDatastoreRepository, loginDatastoreRepository, userDatastoreRepository,
 				authN, ts.Security, ts.Validator, ts.TokenExpTimeInSec)
@@ -565,11 +556,9 @@ func (ts *TestSuite) TestChangePassword() {
 
 	var authN authpkg.IAuth
 
-	userDatastore := datastoremodel.User{}
-
-	loginDatastore := datastoremodel.Login{}
-
 	authDatastore := datastoremodel.Auth{}
+	loginDatastore := datastoremodel.Login{}
+	userDatastore := datastoremodel.User{}
 
 	auth := domainmodel.Auth{}
 
@@ -751,10 +740,8 @@ func (ts *TestSuite) TestChangePassword() {
 			tc.SetUp(t)
 
 			authDatastoreRepository := authdatastorerepository.New(dbTrx)
-
-			userDatastoreRepository := userdatastorerepository.New(dbTrx)
-
 			loginDatastoreRepository := logindatastorerepository.New(dbTrx)
+			userDatastoreRepository := userdatastorerepository.New(dbTrx)
 
 			authService := authservice.New(authDatastoreRepository, loginDatastoreRepository, userDatastoreRepository,
 				authN, ts.Security, ts.Validator, ts.TokenExpTimeInSec)
@@ -812,11 +799,9 @@ func (ts *TestSuite) TestSignOut() {
 
 	var authN authpkg.IAuth
 
-	userDatastore := datastoremodel.User{}
-
-	loginDatastore := datastoremodel.Login{}
-
 	authDatastore := datastoremodel.Auth{}
+	loginDatastore := datastoremodel.Login{}
+	userDatastore := datastoremodel.User{}
 
 	auth := domainmodel.Auth{}
 
@@ -908,10 +893,8 @@ func (ts *TestSuite) TestSignOut() {
 			tc.SetUp(t)
 
 			authDatastoreRepository := authdatastorerepository.New(dbTrx)
-
-			userDatastoreRepository := userdatastorerepository.New(dbTrx)
-
 			loginDatastoreRepository := logindatastorerepository.New(dbTrx)
+			userDatastoreRepository := userdatastorerepository.New(dbTrx)
 
 			authService := authservice.New(authDatastoreRepository, loginDatastoreRepository, userDatastoreRepository,
 				authN, ts.Security, ts.Validator, ts.TokenExpTimeInSec)
