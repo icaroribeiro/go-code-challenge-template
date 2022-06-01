@@ -19,7 +19,19 @@ This project consists of the development of a **REST API** using **Go** programm
 
 ## Architecture
 
-The architecture of the project was designed using the concepts of [Domain Driven Design](), [Clean Architecture]() and [Hexagonal Architecture](https://alistair.cockburn.us/hexagonal-architecture/).
+The architecture of the project was designed according to my understanding of the concepts of [Domain Driven Design](), [Clean Architecture]() and [Hexagonal Architecture](https://alistair.cockburn.us/hexagonal-architecture/).
+
+### Domain Driven Design
+
+To be defined.
+
+### Clean Architecture
+
+To be defined.
+
+### Hexagonal Architecture
+
+To be defined.
 
 ## Database
 
@@ -167,107 +179,106 @@ Notes:
 
 - The **coverage.out** file contains only **unit** test execution statistics. (There are no statistics on the execution of the **integration** tests.)
 
-
-
-
-
-
 ## Deployment
 
-The project was deployed as a container on **Heroku** hosting service using **Terraform** tool.
+The project was deployed as a Docker container on the **Heroku** hosting service using the infrastructure tool as code **Terraform**.
 
-To do this, they were created a **heroku.yml** manifest file and a **Dockerfile** in the **deployments/heroku** directory that was used for the building of the project as a Docker container, in addition to some infrastructure resource components via code defined in the **deployments/heroku/terraform** directory. 
+The API endpoints can be accessed from the hosted project using the following base URL:
 
-The **Dockerfile** was designed using a Docker's multi-stage image build feature that allows creating multiple images in the same Dockerfile:
+```
+https://icaroribeiro-<something>.api.herokuapp.com
+```
 
-In summary, the first FROM statement is related to an image that uses an alias "as builder" name to be referred later in the file and generates the intermediate layer where the Golang compilation happens and the second FROM statement is directed to an image from alpine where we simply copy "--from=builder" to get the executable from the intermediate layer.
+For example, to check API documentation through your web browser, go to the following URL:
 
-The goal of this scheme is to build a final image to be provided to the end users that is as lean as possible, in other words, with a reduced size, containing only the binary application and the base operating system needed to run it. This way, it can be deployed quickly even in slow network conditions.
+```
+Method: HTTP GET
+URL: https://icaroribeiro-<something>.api.herokuapp.com/swagger/index.html
+```
 
-### How to deploy the project?
+To validate the application status, check the result of the request to the following API endpoint:
 
-To deploy the project it was necessary to have a Heroku account and the Heroku CLI and Terraform softwares installed on the machine.
+```
+Method: HTTP GET
+URL: https://icaroribeiro-<something>.api.herokuapp.com/status
+```
 
-For more information on how to download and configure them, please check the official websites: 
+## How to deploy the project?
 
-- Heroku CLI - https://devcenter.heroku.com/articles/heroku-cli
+Below there are the procedures used to deploy the project.
 
-- Terraform - https://www.terraform.io/downloads.html
+Note:
 
-After that, it was needed to create a setup_env.sh file.
+- To proceed with the deployment process it is necessary to have a Heroku account and the [Heroku CLI](https://devcenter.heroku.com/articles/heroku-cli) and [Terraform](https://www.terraform.io/downloads.html) softwares installed on the local machine.
 
-Then, configure some environment variables in the **deployments/heroku/scripts/setup_env.sh** file that are related to others defined in **deployments/heroku/terraform/variables.tf** file:
+First, it were created a manifest file called **heroku.yml** and a file named **Dockerfile.multistage** in the **deployments/heroku/app** directory that was used to build the project as a Docker container.
 
-The first and the second variables are related to Heroku Platform API settings and refer to the Heroku email address and a Heroku API key, respectivelly. The third one variable refers to the Heroku application name.
+The Docker file was designed using a Docker stages feature that allows creating multiple images in the same Dockerfile (Docker's multi-stage image):
+
+In summary, the first **FROM** statement of this file is related to an image that uses an alternative name "as constructor" to be referred to later in the file and the respective code contains the generation of the middle layer where the compilation of Go takes place; and the second **FROM** statement is directed to an image of [**alpine**](https://hub.docker.com/_/alpine) where simply the instruction "--from=builder" is defined to get the executable from the intermediate layer.
+
+The objective of this approach is to build a final image that is as lean as possible, that is, with reduced size, containing only the binary application and the base operating system necessary to run it. This way, the application could be deployed quickly, even under slow network conditions.
+
+Next, it was needed to create a file called **deployments/heroku/scripts/setup_env.sh** that have the following environment variables:
 
 ```sh
 #!/bin/bash
 
-# Heroku platform settings.
-export TF_VAR_heroku_email=
-export TF_VAR_heroku_api_key=
+#
+# Heroku platform settings
+#
+export TF_VAR_heroku_email=<heroku_email>
+export TF_VAR_heroku_api_key=<heroku_api_key>
 
-# Heroku application settings.
-export TF_VAR_heroku_app_name=
-```
-
-```
-TF_VAR_heroku_email=<HEROKU_EMAIL>
-```
-
-```
-TF_VAR_heroku_api_key=<HEROKU_API_KEY>
+#
+# Heroku application settings
+#
+export TF_VAR_heroku_app_name=<heroku_app_name>
 ```
 
-```
-TF_VAR_heroku_app_name=<HEROKU_APP_NAME>
-```
+The first and second variables above are related to the Heroku Platform API settings and refer to the email address of Heroku account and a Heroku API key, respectively. The third variable refers to the name of the application that will be hosted on Heroku.
 
-In order to get a Heroku API key, execute the Heroku CLI command:
+After installing the Heroku CLI software, to get a Heroku API key, run the Heroku CLI command:
 
 ```
 heroku login
 ```
 
-This way, you wil be redirected to the browser so that you can perform login to Heroku.
-
-After that, execute the command:
+This way, you will be redirected to the web browser so that you can login to the Heroku website. After that, run the command to get the Heroku API key:
 
 ```
 heroku auth:token
 ```
 
-After configuring these variables, it was possible to execute the commands located in the Makefile for the deployment:
+After obtaining the Heroku API key, configure the values ​​of the environment variables defined in the **setup_env.sh** file.
 
-To initialize everything Terraform require to provision the infrastructure, execute the command:
+Then, run the below commands located in the Makefile file.
 
-```
-make init/deploy
-```
-
-For example, it downloads the Heroku's provider plugin and stores it in a **.terraform** hidden folder.
-
-The infrastructure resource components were defined in the **deployments/heroku/terraform/resources.tf** file and they refer to the API and the associated Heroku Postgres database.
-
-To obtain the detail about what will happen in the infrastructure without making any change on it, execute the command:
+To initialize everything Terraform requires to provision the infrastructure, run the command:
 
 ```
-make plan/deploy
+make init-deploy
 ```
 
-To make changes required in order to reach the desired state of the configuration, execute the command:
+The previous command downloads the plugin from the Heroku provider and stores it in a hidden .terraform folder.
+
+The infrastructure resources referring to the API were defined in the **deployments/heroku/terraform/resources.tf** file.
+
+Then, for details on what will happen to the infrastructure without making any changes to it, run the command:
 
 ```
-make apply/deploy
+make plan-deploy
 ```
 
-After applying the changes, it was possible to create the database tables by means of CLI Heroku commands:
+To make the necessary changes to reach the desired state of the configuration, run the command:
 
 ```
-heroku pg:psql -a=<HEROKU_APP_NAME> <HEROKU_POSTGRES> < database/postgres/scripts/1-create_tables.sql
+make apply-deploy
 ```
 
-To identify what is the identifier of the Heroku Postgres database, execute the command:
+After applying the changes, it is possible to set up the database tables by means of CLI Heroku commands.
+
+Firstly, to identify what is the identifier of the Heroku Postgres database, execute the command:
 
 ```
 heroku pg:info -a=<HEROKU_APP_NAME>
@@ -281,46 +292,27 @@ The output should look something like this:
 Add-on: <HEROKU_POSTGRES>
 ```
 
-Lastly, in order to terminate all the provisioned infrastructure components, execute the command:
+Then, to create the database tables, run the command:
 
 ```
-make destroy/deploy
+heroku pg:psql -a=<HEROKU_APP_NAME> <HEROKU_POSTGRES> < database/postgres/scripts/1-create_tables.sql
 ```
 
-### API endpoints
-
-After deploying the changes, the API **endpoints** can be accessed from the hosted application using the following base URL:
+Finally, in order to terminate all the provisioned infrastructure components, run the command:
 
 ```
-https://icaroribeiro-templateapi.herokuapp.com
-```
-
-For example, in order to check the API documentation via web browser, access the following URL:
-
-```
-Method: HTTP GET
-URL: https://icaroribeiro-templateapi.herokuapp.com/swagger/index.html
+make destroy-deploy
 ```
 
 ### Accessing remote Postgres database locally
 
-It is possible to verify the data generated in Heroku using **pgAdmin** tool.
+It is possible to verify the data generated in Heroku using [pgAdmin](https://www.pgadmin.org/) tool.
 
-To achieve this, access the database Heroku web site in order to check the datastore settings.
+To achieve this, firstly access the Heroku website in order to check the datastore settings.
 
-In the Settings tab, click the View Credentials... button and take note of the following credentials: Host, Database, User, Port and Password.
+In the Settings tab, click the View Credentials... button and take note of the following data: **Host**, **Database**, **User**, **Port** and **Password**.
 
-After that, it is necessary to configure a remote server in pgAdmin by means of the values of the previous credentials of the Postgres database on Heroku as follows:
-
-```
-Host:
-Database:
-User:
-Port:
-Password:
-```
-
-In what follows, there are the steps to establish access to the Postgres database:
+In what follows, there are the steps to configure a remote server in pgAdmin and to establish access to the Postgres database using the previous data:
 
 In pgAdmin, right click Server(s) icon, and then navigate to Create and Server options.
 
@@ -328,22 +320,24 @@ After that, it is necessary to fill out the following parameters:
 
 In the General tab, name the server whatever you want.
 
-Under the Connection tab, inform the Host name/address. It is the one configured like ...amazonaws.com. Keep the port at 5432. In Maintenance database, type the Database field from the credentials and do the same procedure to fill out the values of the Username and Password fields.
+Under the Connection tab, inform the Host name and port. The Host name is the one configured like ...amazonaws.com and the port is 5432. In Maintenance database, informe the Database name from the previous data and do the same procedure to fill out the Username and Password fields.
 
 In the SSL tab, mark SSL mode as Require.
 
-Before finalising it is necessary to apply one more configuration:
+Before finalising, it is necessary to apply one more configuration:
 
-The database needs to be informed in a "desired database list" in order to avoid parsing many other databases that are not cared about. (This has to do with how Heroku configures their servers.)
+The database name needs to be informed in a "desired database list" in order to avoid parsing many other databases that are not cared about. (This has to do with how Heroku configures their servers.)
 
-In this regard, go to the Advanced tab and under DB restriction copy the Database name (it's the same value as the Maintenance database field filled earlier), and then click Save button.
+In this regard, go to the Advanced tab and under DB restriction copy the Database name (It's the same value filled in the Maintenance database field earlier), and then click Save button.
 
-Navigate through the options structure: Databases, database name, Schemas, public and inside Tables, finally, check the tables. (In case of the tables are not displayed, try right click the related Server created and then click Refresh option.)
+Finally, navigate through the options structure: Databases, database name, Schemas, public and inside Tables, check the tables. (In case of the tables are not displayed, try right click the related Server created and then click Refresh option.)
 
 **Note**
 
-The project was configured with a Heroku Postgres database resource in a **Free plan** (Hobby Dev - Free). Because of that, the database will only support a limited number of records (10.000 rows). Therefore, please evaluate the operations to be carried out before using the application in this way.
+This project was configured with a Heroku Postgres database resource in a **Free plan** (Hobby Dev - Free). Because of that, the database will only support a limited number of records (10.000 rows). Therefore, please evaluate the operations to be carried out before using the application in this way.
 
 ## References
 
-https://medium.com/wesionary-team/implement-database-transactions-with-repository-pattern-golang-gin-and-gorm-application-907517fd0743
+Database Transaction
+
+- https://medium.com/wesionary-team/implement-database-transactions-with-repository-pattern-golang-gin-and-gorm-application-907517fd0743
