@@ -19,19 +19,39 @@ This project consists of the development of a **REST API** using **Go** programm
 
 ## Architecture
 
-The architecture of the project was designed according to my understanding of the concepts of [Domain Driven Design](), [Clean Architecture]() and [Hexagonal Architecture](https://alistair.cockburn.us/hexagonal-architecture/).
+The architecture of the project was designed according to my understanding based on my reasearch of the concepts of **Domain Driven Design** and **Hexagonal Architecture**.
 
 ### Domain Driven Design
 
-To be defined.
+The **Domain Driven Design** (DDD) approach is intended to simplify the complexity developers face by connecting the implementation to an evolving model.
 
-### Clean Architecture
+To do it, the implementation is basically divided up into the following essential layers in order to have a separation of interests by arranging responsibilities:
 
-To be defined.
+#### Application
+
+This layer is responsible for serving the application purposes. It contains services that are used to implement the business logic acting as intermediaries between the repositories and handlers. For example, it includes the validation of the input parameter values from the API requests payloads.
+
+#### Core/Domain
+
+This layer is resposible for holding the domain and business logic. It contains the schema of the "models" based on structs and properties used by the database actions.
+
+#### Infrastructure
+
+This layer is responsible for serving as a supporting layer for other layers. It contains the procedures to establish connection to the database and the repositories to interact with the database by retrieving and/or modifing records.
+
+#### Interfaces
+
+This layer is responsible for the interaction with user by accepting API requests, calling out the relevant services and then delivering the response. It contains the handling of API requests, as well as the elaboration of API responses, the logging and authentication actions that mediate the access to the API **endpoints** and a router that exposes the routes associated with each one of them.
 
 ### Hexagonal Architecture
 
 To be defined.
+
+A Arquitetura Hexagonal permitiu criar uma aplicação onde a lógica de negócio está em um núcleo (*core*) e não existe dependência de sistemas externos, facilitando assim, o desenvolvimento de testes de regressão. Ela foi pensada de forma que adaptadores (*adapters*) possam ser "plugados" (*dependency injection*) no sistema a partir de portas (*ports*), não afetando a lógica de negócio que foi definida no núcleo do sistema.
+
+It enabled the use of Ports represented as interfaces (implemented by services and repositories placed in application and infrastructure layers, respectively).
+
+Dependency injection is a technique that can be used to inject the dependencies of a class into the class. It helped to keep the code simple and easy to understand. Also, it facilitated the development of tests by mocking dependencies.
 
 ## Database
 
