@@ -19,39 +19,53 @@ This project consists of the development of a **REST API** using **Go** programm
 
 ## Architecture
 
-The architecture of the project was designed according to my understanding based on my reasearch of the concepts of **Domain Driven Design** and **Hexagonal Architecture**.
+The architecture of the project was designed according to my understanding and my code structuring decisions based on my research of the concepts of **Domain Driven Design** and **Hexagonal Architecture**.
 
 ### Domain Driven Design
 
-The **Domain Driven Design** (DDD) approach is intended to simplify the complexity developers face by connecting the implementation to an evolving model.
+This approach is intended to simplify the complexity developers face by connecting the implementation to an evolving model.
 
 To do it, the implementation is basically divided up into the following essential layers in order to have a separation of interests by arranging responsibilities:
 
 #### Application
 
-This layer is responsible for serving the application purposes. It contains services that are used to implement the business logic acting as intermediaries between the repositories and handlers. For example, it includes the validation of the input parameter values from the API requests payloads.
+This layer is responsible for serving the application purposes. It contains services (or use cases) that are used to implement the business logic acting as intermediaries for communication between the repositories and handlers.
+
+In this way, the services represent the implementation of business logic, regardless of the type of database used, or how the service will be exposed externally (http or grpc, for example).
+
+Also, they include the validation of the input parameter values from the API requests payloads.
 
 #### Core/Domain
 
-This layer is resposible for holding the domain and business logic. It contains the schema of the "models" based on structs and properties used by the database actions.
+This layer is resposible for holding the schema of entities and ports used for the communication between the handlers and services, as well as between the services and repositories.
 
 #### Infrastructure
 
-This layer is responsible for serving as a supporting layer for other layers. It contains the procedures to establish connection to the database and the repositories to interact with the database by retrieving and/or modifing records.
+This layer is responsible for serving as a supporting layer for other layers.
+
+It contains the procedures to establish connection to the database and the implementation of repositories that interact with the database by retrieving and/or modifing records.
 
 #### Interfaces
 
-This layer is responsible for the interaction with user by accepting API requests, calling out the relevant services and then delivering the response. It contains the handling of API requests, as well as the elaboration of API responses, the logging and authentication actions that mediate the access to the API **endpoints** and a router that exposes the routes associated with each one of them.
+This layer is responsible for the interaction with user by accepting API requests, calling out the relevant services and then delivering the response.
+
+It contains the handling of requests by exposing the routes associated with each API endpoints, applying authentication actions when needed that mediate the access to them, as well as the elaboration of API responses.
 
 ### Hexagonal Architecture
 
-To be defined.
+This approach (also known as Ports and Adapters pattern) allows creating an application where the business logic is in a core (*core*) and there is no dependence on external systems, thus facilitating the development of regression tests.
 
-A Arquitetura Hexagonal permitiu criar uma aplicação onde a lógica de negócio está em um núcleo (*core*) e não existe dependência de sistemas externos, facilitando assim, o desenvolvimento de testes de regressão. Ela foi pensada de forma que adaptadores (*adapters*) possam ser "plugados" (*dependency injection*) no sistema a partir de portas (*ports*), não afetando a lógica de negócio que foi definida no núcleo do sistema.
+It was designed in such a way that adapters (*adapters*) can be "plugged" (*dependency injection*) into the system from ports (*ports*), not affecting the business logic that was defined in the system's core.
 
-It enabled the use of Ports represented as interfaces (implemented by services and repositories placed in application and infrastructure layers, respectively).
+Dependency injection is a technique where adapters are plugged in with their respective ports and that can be used to inject the dependencies of a class into the class. It helped to keep the code simple and easy to understand. Also, it facilitates the development of tests by mocking dependencies.
 
-Dependency injection is a technique that can be used to inject the dependencies of a class into the class. It helped to keep the code simple and easy to understand. Also, it facilitated the development of tests by mocking dependencies.
+In this context, it was enabled the use of Ports represented as interfaces that contain the signatures of the methods that are used by the adapters, in order to perform the desired operations.
+
+Essentially, the interfaces are implemented by services and repositories placed in application and infrastructure layers, respectively, that belong to the nucleus and define how the communication between the nucleus and actors that want to interact with it are carried out; and adapters that were responsible for translating the information between the core and these actors.
+
+Adapters are implemented in the infrastructure (known as repositories) and interface layers (known as handlers) and are responsible for http communication and database communication, respectively.
+
+Such structuring of the code makes it possible to focus on the implementation of business logic, since it can be developed completely independently from the rest of the system, as well as on the separation of dependencies, the ease of changing the infrastructure (such as a change of a database), and even allows tests in isolation to be carried out in a simple way.
 
 ## Database
 
@@ -357,6 +371,22 @@ Finally, navigate through the options structure: Databases, database name, Schem
 This project was configured with a Heroku Postgres database resource in a **Free plan** (Hobby Dev - Free). Because of that, the database will only support a limited number of records (10.000 rows). Therefore, please evaluate the operations to be carried out before using the application in this way.
 
 ## References
+
+Project layout:
+
+- https://github.com/golang-standards/project-layout
+
+Domain Driven Design
+
+- https://dev.to/stevensunflash/using-domain-driven-design-ddd-in-golang-3ee5
+
+Hexagonal Architecture
+
+- https://medium.com/avenue-tech/arquitetura-hexagonal-com-golang-c344411aa940
+
+Dependency Injection
+
+- https://medium.com/avenue-tech/dependency-injection-in-go-35293ef7b6
 
 Database Transaction
 
