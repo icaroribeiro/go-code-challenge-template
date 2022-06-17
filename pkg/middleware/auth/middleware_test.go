@@ -14,7 +14,7 @@ import (
 	fake "github.com/brianvoe/gofakeit/v5"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gorilla/mux"
-	domainmodel "github.com/icaroribeiro/new-go-code-challenge-template/internal/core/domain/model"
+	domainmodel "github.com/icaroribeiro/new-go-code-challenge-template/internal/core/domain/entity"
 	"github.com/icaroribeiro/new-go-code-challenge-template/pkg/customerror"
 	adapterhttputilpkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/httputil/adapter"
 	messagehttputilpkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/httputil/message"
@@ -22,8 +22,8 @@ import (
 	responsehttputilpkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/httputil/response"
 	routehttputilpkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/httputil/route"
 	authmiddlewarepkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/middleware/auth"
-	domainmodelfactory "github.com/icaroribeiro/new-go-code-challenge-template/tests/factory/core/domain/model"
-	datastoremodelfactory "github.com/icaroribeiro/new-go-code-challenge-template/tests/factory/infrastructure/storage/datastore/model"
+	domainmodelfactory "github.com/icaroribeiro/new-go-code-challenge-template/tests/factory/core/domain/entity"
+	datastoreentityfactory "github.com/icaroribeiro/new-go-code-challenge-template/tests/factory/infrastructure/storage/datastore/entity"
 	mockauthpkg "github.com/icaroribeiro/new-go-code-challenge-template/tests/mocks/pkg/mockauth"
 	uuid "github.com/satori/go.uuid"
 	"github.com/stretchr/testify/assert"
@@ -143,7 +143,7 @@ func (ts *TestSuite) TestAuth() {
 
 				sqlQuery := `SELECT * FROM "auths" WHERE id=$1`
 
-				authDatastore := datastoremodelfactory.NewAuth(args)
+				authDatastore := datastoreentityfactory.NewAuth(args)
 
 				rows := sqlmock.
 					NewRows([]string{"id", "user_id", "created_at"}).
@@ -328,7 +328,7 @@ func (ts *TestSuite) TestAuth() {
 
 				sqlQuery := `SELECT * FROM "auths" WHERE id=$1`
 
-				authDatastore := datastoremodelfactory.NewAuth(args)
+				authDatastore := datastoreentityfactory.NewAuth(args)
 
 				rows := sqlmock.
 					NewRows([]string{"id", "user_id", "created_at"}).
@@ -450,7 +450,7 @@ func (ts *TestSuite) TestAuthRenewal() {
 
 				sqlQuery := `SELECT * FROM "auths" WHERE id=$1`
 
-				authDatastore := datastoremodelfactory.NewAuth(args)
+				authDatastore := datastoreentityfactory.NewAuth(args)
 
 				rows := sqlmock.
 					NewRows([]string{"id", "user_id", "created_at"}).
@@ -635,7 +635,7 @@ func (ts *TestSuite) TestAuthRenewal() {
 
 				sqlQuery := `SELECT * FROM "auths" WHERE id=$1`
 
-				authDatastore := datastoremodelfactory.NewAuth(args)
+				authDatastore := datastoreentityfactory.NewAuth(args)
 
 				rows := sqlmock.
 					NewRows([]string{"id", "user_id", "created_at"}).

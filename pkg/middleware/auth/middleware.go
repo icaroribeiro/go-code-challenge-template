@@ -6,7 +6,7 @@ import (
 	"strings"
 
 	"github.com/dgrijalva/jwt-go"
-	domainmodel "github.com/icaroribeiro/new-go-code-challenge-template/internal/core/domain/model"
+	domainentity "github.com/icaroribeiro/new-go-code-challenge-template/internal/core/domain/entity"
 	authpkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/auth"
 	"github.com/icaroribeiro/new-go-code-challenge-template/pkg/customerror"
 	responsehttputilpkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/httputil/response"
@@ -20,13 +20,13 @@ type contextKey struct {
 }
 
 // NewContext is the function that returns a new Context that carries auth_details value.
-func NewContext(ctx context.Context, auth domainmodel.Auth) context.Context {
+func NewContext(ctx context.Context, auth domainentity.Auth) context.Context {
 	return context.WithValue(ctx, authDetailsCtxKey, auth)
 }
 
 // FromContext is the function that returns the auth_details value stored in context, if any.
-func FromContext(ctx context.Context) (domainmodel.Auth, bool) {
-	raw, ok := ctx.Value(authDetailsCtxKey).(domainmodel.Auth)
+func FromContext(ctx context.Context) (domainentity.Auth, bool) {
+	raw, ok := ctx.Value(authDetailsCtxKey).(domainentity.Auth)
 	return raw, ok
 }
 
@@ -46,29 +46,29 @@ func extractTokenString(w http.ResponseWriter, r *http.Request) (string, error) 
 	return bearerToken[1], nil
 }
 
-func buildAuth(db *gorm.DB, authN authpkg.IAuth, token *jwt.Token) (domainmodel.Auth, error) {
+func buildAuth(db *gorm.DB, authN authpkg.IAuth, token *jwt.Token) (domainentity.Auth, error) {
 	auth, err := authN.FetchAuthFromToken(token)
 	if err != nil {
-		return domainmodel.Auth{}, err
+		return domainentity.Auth{}, err
 	}
 
 	// Before proceeding is necessary to check if the user who is performing operations is logged
 	// based on the authentication details inserted within in the token.
-	authAux := domainmodel.Auth{}
+	authAux := domainentity.Auth{}
 
 	result := db.Find(&authAux, "id=?", auth.ID)
 	if result.Error != nil {
-		return domainmodel.Auth{}, result.Error
+		return domainentity.Auth{}, result.Error
 	}
 
 	if authAux.IsEmpty() {
 		errorMessage := "you are not logged in, then perform a login to get a token before proceeding"
-		return domainmodel.Auth{}, customerror.BadRequest.New(errorMessage)
+		return domainentity.Auth{}, customerror.BadRequest.New(errorMessage)
 	}
 
 	if auth.UserID.String() != authAux.UserID.String() {
 		errorMessage := "the token's auth_id and user_id are not associated"
-		return domainmodel.Auth{}, customerror.BadRequest.New(errorMessage)
+		return domainentity.Auth{}, customerror.BadRequest.New(errorMessage)
 	}
 
 	return auth, nil

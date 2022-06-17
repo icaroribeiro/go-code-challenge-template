@@ -8,14 +8,14 @@ import (
 	"testing"
 
 	"github.com/gorilla/mux"
-	domainmodel "github.com/icaroribeiro/new-go-code-challenge-template/internal/core/domain/model"
+	domainentity "github.com/icaroribeiro/new-go-code-challenge-template/internal/core/domain/entity"
 	usermockservice "github.com/icaroribeiro/new-go-code-challenge-template/internal/core/ports/application/mockservice/user"
 	userhandler "github.com/icaroribeiro/new-go-code-challenge-template/internal/transport/presentation/handler/user"
 	httppresentationmodel "github.com/icaroribeiro/new-go-code-challenge-template/internal/transport/presentation/model"
 	"github.com/icaroribeiro/new-go-code-challenge-template/pkg/customerror"
 	requesthttputilpkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/httputil/request"
 	routehttputilpkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/httputil/route"
-	domainmodelfactory "github.com/icaroribeiro/new-go-code-challenge-template/tests/factory/core/domain/model"
+	domainentityfactory "github.com/icaroribeiro/new-go-code-challenge-template/tests/factory/core/domain/entity"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/suite"
 	"gorm.io/gorm"
@@ -26,7 +26,7 @@ func TestHandlerUnit(t *testing.T) {
 }
 
 func (ts *TestSuite) TestGetAll() {
-	user := domainmodel.User{}
+	user := domainentity.User{}
 
 	dbTrx := &gorm.DB{}
 	dbTrx = nil
@@ -37,10 +37,10 @@ func (ts *TestSuite) TestGetAll() {
 		{
 			Context: "ItShouldSucceedInGettingAllUsers",
 			SetUp: func(t *testing.T) {
-				user = domainmodelfactory.NewUser(nil)
+				user = domainentityfactory.NewUser(nil)
 
 				returnArgs = ReturnArgs{
-					{domainmodel.Users{user}, nil},
+					{domainentity.Users{user}, nil},
 				}
 			},
 			StatusCode: http.StatusOK,
@@ -50,7 +50,7 @@ func (ts *TestSuite) TestGetAll() {
 			Context: "ItShouldFailIfAnErrorOccursWhenGettingAllUsers",
 			SetUp: func(t *testing.T) {
 				returnArgs = ReturnArgs{
-					{domainmodel.Users{}, customerror.New("failed")},
+					{domainentity.Users{}, customerror.New("failed")},
 				}
 			},
 			StatusCode: http.StatusInternalServerError,

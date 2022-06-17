@@ -10,7 +10,7 @@ import (
 	fake "github.com/brianvoe/gofakeit/v5"
 	"github.com/gorilla/mux"
 	userservice "github.com/icaroribeiro/new-go-code-challenge-template/internal/application/service/user"
-	datastoremodel "github.com/icaroribeiro/new-go-code-challenge-template/internal/infrastructure/storage/datastore/model"
+	datastoreentity "github.com/icaroribeiro/new-go-code-challenge-template/internal/infrastructure/storage/datastore/entity"
 	userdatastorerepository "github.com/icaroribeiro/new-go-code-challenge-template/internal/infrastructure/storage/datastore/repository/user"
 	userhandler "github.com/icaroribeiro/new-go-code-challenge-template/internal/transport/presentation/handler/user"
 	presentationmodel "github.com/icaroribeiro/new-go-code-challenge-template/internal/transport/presentation/model"
@@ -28,7 +28,7 @@ func TestUserInteg(t *testing.T) {
 func (ts *TestSuite) TestGetAll() {
 	dbTrx := &gorm.DB{}
 
-	userDatastore := datastoremodel.User{}
+	userDatastore := datastoreentity.User{}
 
 	user := presentationmodel.User{}
 
@@ -41,7 +41,7 @@ func (ts *TestSuite) TestGetAll() {
 
 				username := fake.Username()
 
-				userDatastore = datastoremodel.User{
+				userDatastore = datastoreentity.User{
 					Username: username,
 				}
 

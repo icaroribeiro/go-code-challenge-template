@@ -7,12 +7,12 @@ import (
 
 	"github.com/DATA-DOG/go-sqlmock"
 	fake "github.com/brianvoe/gofakeit/v5"
-	domainmodel "github.com/icaroribeiro/new-go-code-challenge-template/internal/core/domain/model"
+	domainmodel "github.com/icaroribeiro/new-go-code-challenge-template/internal/core/domain/entity"
 	logindatastorerepository "github.com/icaroribeiro/new-go-code-challenge-template/internal/infrastructure/storage/datastore/repository/login"
 	"github.com/icaroribeiro/new-go-code-challenge-template/pkg/customerror"
 	securitypkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/security"
-	domainmodelfactory "github.com/icaroribeiro/new-go-code-challenge-template/tests/factory/core/domain/model"
-	datastoremodelfactory "github.com/icaroribeiro/new-go-code-challenge-template/tests/factory/infrastructure/storage/datastore/model"
+	domainmodelfactory "github.com/icaroribeiro/new-go-code-challenge-template/tests/factory/core/domain/entity"
+	datastoreentityfactory "github.com/icaroribeiro/new-go-code-challenge-template/tests/factory/infrastructure/storage/datastore/entity"
 	uuid "github.com/satori/go.uuid"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/suite"
@@ -156,7 +156,7 @@ func (ts *TestSuite) TestGetByUsername() {
 					"username": username,
 				}
 
-				loginDatastore := datastoremodelfactory.NewLogin(args)
+				loginDatastore := datastoreentityfactory.NewLogin(args)
 				login = loginDatastore.ToDomain()
 
 				rows := sqlmock.
@@ -252,7 +252,7 @@ func (ts *TestSuite) TestGetByUserID() {
 					"userID": userID,
 				}
 
-				loginDatastore := datastoremodelfactory.NewLogin(args)
+				loginDatastore := datastoreentityfactory.NewLogin(args)
 				login = loginDatastore.ToDomain()
 
 				rows := sqlmock.
@@ -359,7 +359,7 @@ func (ts *TestSuite) TestUpdate() {
 					"userID": login.UserID,
 				}
 
-				updatedDatastoreLogin := datastoremodelfactory.NewLogin(args)
+				updatedDatastoreLogin := datastoreentityfactory.NewLogin(args)
 				updatedLogin = updatedDatastoreLogin.ToDomain()
 
 				mock.ExpectBegin()
@@ -532,7 +532,7 @@ func (ts *TestSuite) TestDelete() {
 					"id": id,
 				}
 
-				loginDatastore := datastoremodelfactory.NewLogin(args)
+				loginDatastore := datastoreentityfactory.NewLogin(args)
 				login = loginDatastore.ToDomain()
 
 				rows := sqlmock.
@@ -588,7 +588,7 @@ func (ts *TestSuite) TestDelete() {
 					"id": id,
 				}
 
-				loginDatastore := datastoremodelfactory.NewLogin(args)
+				loginDatastore := datastoreentityfactory.NewLogin(args)
 				login = loginDatastore.ToDomain()
 
 				rows := sqlmock.
@@ -620,7 +620,7 @@ func (ts *TestSuite) TestDelete() {
 					"id": id,
 				}
 
-				loginDatastore := datastoremodelfactory.NewLogin(args)
+				loginDatastore := datastoreentityfactory.NewLogin(args)
 				login = loginDatastore.ToDomain()
 
 				rows := sqlmock.

@@ -6,11 +6,11 @@ import (
 	"testing"
 
 	"github.com/DATA-DOG/go-sqlmock"
-	domainmodel "github.com/icaroribeiro/new-go-code-challenge-template/internal/core/domain/model"
+	domainmodel "github.com/icaroribeiro/new-go-code-challenge-template/internal/core/domain/entity"
 	authdatastorerepository "github.com/icaroribeiro/new-go-code-challenge-template/internal/infrastructure/storage/datastore/repository/auth"
 	"github.com/icaroribeiro/new-go-code-challenge-template/pkg/customerror"
-	domainmodelfactory "github.com/icaroribeiro/new-go-code-challenge-template/tests/factory/core/domain/model"
-	datastoremodelfactory "github.com/icaroribeiro/new-go-code-challenge-template/tests/factory/infrastructure/storage/datastore/model"
+	domainmodelfactory "github.com/icaroribeiro/new-go-code-challenge-template/tests/factory/core/domain/entity"
+	datastoreentityfactory "github.com/icaroribeiro/new-go-code-challenge-template/tests/factory/infrastructure/storage/datastore/entity"
 	uuid "github.com/satori/go.uuid"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/suite"
@@ -113,7 +113,7 @@ func (ts *TestSuite) TestCreate() {
 					"userID": userID,
 				}
 
-				login := datastoremodelfactory.NewLogin(args)
+				login := datastoreentityfactory.NewLogin(args)
 
 				rows := sqlmock.
 					NewRows([]string{"id", "user_id", "username", "password", "created_at", "updated_at"}).
@@ -230,7 +230,7 @@ func (ts *TestSuite) TestGetByUserID() {
 					"userID": userID,
 				}
 
-				authDatastore := datastoremodelfactory.NewAuth(args)
+				authDatastore := datastoreentityfactory.NewAuth(args)
 				auth = authDatastore.ToDomain()
 
 				rows := sqlmock.
@@ -306,7 +306,7 @@ func (ts *TestSuite) TestDelete() {
 					"id": id,
 				}
 
-				authDatastore := datastoremodelfactory.NewAuth(args)
+				authDatastore := datastoreentityfactory.NewAuth(args)
 				auth = authDatastore.ToDomain()
 
 				rows := sqlmock.
@@ -362,7 +362,7 @@ func (ts *TestSuite) TestDelete() {
 					"id": id,
 				}
 
-				authDatastore := datastoremodelfactory.NewAuth(args)
+				authDatastore := datastoreentityfactory.NewAuth(args)
 				auth = authDatastore.ToDomain()
 
 				rows := sqlmock.
@@ -394,7 +394,7 @@ func (ts *TestSuite) TestDelete() {
 					"id": id,
 				}
 
-				authDatastore := datastoremodelfactory.NewAuth(args)
+				authDatastore := datastoreentityfactory.NewAuth(args)
 				auth = authDatastore.ToDomain()
 
 				rows := sqlmock.

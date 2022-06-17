@@ -1,15 +1,15 @@
-package model
+package entity
 
 import (
 	"github.com/bluele/factory-go/factory"
-	domainmodel "github.com/icaroribeiro/new-go-code-challenge-template/internal/core/domain/model"
+	domainentity "github.com/icaroribeiro/new-go-code-challenge-template/internal/core/domain/entity"
 	uuid "github.com/satori/go.uuid"
 )
 
-// NewAuth is the function that returns an instance of the auth's domain model for performing tests.
-func NewAuth(args map[string]interface{}) domainmodel.Auth {
+// NewAuth is the function that returns an instance of the auth's domain entity for performing tests.
+func NewAuth(args map[string]interface{}) domainentity.Auth {
 	authFactory := factory.NewFactory(
-		domainmodel.Auth{},
+		domainentity.Auth{},
 	).Attr("ID", func(fArgs factory.Args) (interface{}, error) {
 		id := uuid.NewV4()
 
@@ -28,5 +28,5 @@ func NewAuth(args map[string]interface{}) domainmodel.Auth {
 		return userID, nil
 	})
 
-	return authFactory.MustCreate().(domainmodel.Auth)
+	return authFactory.MustCreate().(domainentity.Auth)
 }

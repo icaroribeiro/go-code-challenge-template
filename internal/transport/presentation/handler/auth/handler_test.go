@@ -9,7 +9,7 @@ import (
 
 	fake "github.com/brianvoe/gofakeit/v5"
 	"github.com/gorilla/mux"
-	domainmodel "github.com/icaroribeiro/new-go-code-challenge-template/internal/core/domain/model"
+	domainmodel "github.com/icaroribeiro/new-go-code-challenge-template/internal/core/domain/entity"
 	authmockservice "github.com/icaroribeiro/new-go-code-challenge-template/internal/core/ports/application/mockservice/auth"
 	authhandler "github.com/icaroribeiro/new-go-code-challenge-template/internal/transport/presentation/handler/auth"
 	"github.com/icaroribeiro/new-go-code-challenge-template/pkg/customerror"
