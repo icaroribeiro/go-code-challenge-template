@@ -4,7 +4,7 @@ import (
 	"net/http"
 
 	userservice "github.com/icaroribeiro/new-go-code-challenge-template/internal/core/ports/application/service/user"
-	httppresentationmodel "github.com/icaroribeiro/new-go-code-challenge-template/internal/transport/presentation/model"
+	presentationentity "github.com/icaroribeiro/new-go-code-challenge-template/internal/transport/presentation/entity"
 	responsehttputilpkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/httputil/response"
 )
 
@@ -37,7 +37,7 @@ func (h *Handler) GetAll(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	users := httppresentationmodel.Users{}
+	users := presentationentity.Users{}
 	users.FromDomain(domainUsers)
 
 	responsehttputilpkg.RespondWithJson(w, http.StatusOK, users)

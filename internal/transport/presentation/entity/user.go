@@ -1,4 +1,4 @@
-package model
+package entity
 
 import (
 	domainentity "github.com/icaroribeiro/new-go-code-challenge-template/internal/core/domain/entity"

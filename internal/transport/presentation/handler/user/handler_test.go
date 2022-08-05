@@ -10,8 +10,8 @@ import (
 	"github.com/gorilla/mux"
 	domainentity "github.com/icaroribeiro/new-go-code-challenge-template/internal/core/domain/entity"
 	usermockservice "github.com/icaroribeiro/new-go-code-challenge-template/internal/core/ports/application/mockservice/user"
+	presentationentity "github.com/icaroribeiro/new-go-code-challenge-template/internal/transport/presentation/entity"
 	userhandler "github.com/icaroribeiro/new-go-code-challenge-template/internal/transport/presentation/handler/user"
-	httppresentationmodel "github.com/icaroribeiro/new-go-code-challenge-template/internal/transport/presentation/model"
 	"github.com/icaroribeiro/new-go-code-challenge-template/pkg/customerror"
 	requesthttputilpkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/httputil/request"
 	routehttputilpkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/httputil/route"
@@ -97,7 +97,7 @@ func (ts *TestSuite) TestGetAll() {
 
 			if !tc.WantError {
 				assert.Equal(t, resprec.Code, tc.StatusCode)
-				returnedUsers := make(httppresentationmodel.Users, 0)
+				returnedUsers := make(presentationentity.Users, 0)
 				err := json.NewDecoder(resprec.Body).Decode(&returnedUsers)
 				assert.Nil(t, err, fmt.Sprintf("Unexpected error: %v.", err))
 				assert.Equal(t, user.ID, returnedUsers[0].ID)
