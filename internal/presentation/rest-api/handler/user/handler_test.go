@@ -7,69 +7,54 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	fake "github.com/brianvoe/gofakeit/v5"
 	"github.com/gorilla/mux"
-	userservice "github.com/icaroribeiro/new-go-code-challenge-template/internal/application/service/user"
-	datastoreentity "github.com/icaroribeiro/new-go-code-challenge-template/internal/infrastructure/storage/datastore/entity"
-	userdatastorerepository "github.com/icaroribeiro/new-go-code-challenge-template/internal/infrastructure/storage/datastore/repository/user"
-	presentationmodel "github.com/icaroribeiro/new-go-code-challenge-template/internal/presentation/rest-api/entity"
+	domainentity "github.com/icaroribeiro/new-go-code-challenge-template/internal/core/domain/entity"
+	usermockservice "github.com/icaroribeiro/new-go-code-challenge-template/internal/core/ports/application/mockservice/user"
+	presentationentity "github.com/icaroribeiro/new-go-code-challenge-template/internal/presentation/rest-api/entity"
 	userhandler "github.com/icaroribeiro/new-go-code-challenge-template/internal/presentation/rest-api/handler/user"
+	"github.com/icaroribeiro/new-go-code-challenge-template/pkg/customerror"
 	requesthttputilpkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/httputil/request"
 	routehttputilpkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/httputil/route"
+	domainentityfactory "github.com/icaroribeiro/new-go-code-challenge-template/tests/factory/core/domain/entity"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/suite"
 	"gorm.io/gorm"
 )
 
-func TestUserInteg(t *testing.T) {
+func TestHandlerUnit(t *testing.T) {
 	suite.Run(t, new(TestSuite))
 }
 
 func (ts *TestSuite) TestGetAll() {
+	user := domainentity.User{}
+
 	dbTrx := &gorm.DB{}
+	dbTrx = nil
 
-	userDatastore := datastoreentity.User{}
-
-	user := presentationmodel.User{}
+	returnArgs := ReturnArgs{}
 
 	ts.Cases = Cases{
 		{
 			Context: "ItShouldSucceedInGettingAllUsers",
 			SetUp: func(t *testing.T) {
-				dbTrx = ts.DB.Begin()
-				assert.Nil(t, dbTrx.Error, fmt.Sprintf("Unexpected error: %v.", dbTrx.Error))
+				user = domainentityfactory.NewUser(nil)
 
-				username := fake.Username()
-
-				userDatastore = datastoreentity.User{
-					Username: username,
+				returnArgs = ReturnArgs{
+					{domainentity.Users{user}, nil},
 				}
-
-				result := dbTrx.Create(&userDatastore)
-				assert.Nil(t, result.Error, fmt.Sprintf("Unexpected error: %v.", result.Error))
-
-				domainUser := userDatastore.ToDomain()
-				user.FromDomain(domainUser)
 			},
 			StatusCode: http.StatusOK,
 			WantError:  false,
-			TearDown: func(t *testing.T) {
-				result := dbTrx.Rollback()
-				assert.Nil(t, result.Error, fmt.Sprintf("Unexpected error: %v.", result.Error))
-			},
 		},
 		{
-			Context: "ItShouldFailIfTheDatabaseStateIsInconsistent",
+			Context: "ItShouldFailIfAnErrorOccursWhenGettingAllUsers",
 			SetUp: func(t *testing.T) {
-				dbTrx = ts.DB.Begin()
-				assert.Nil(t, dbTrx.Error, fmt.Sprintf("Unexpected error: %v.", dbTrx.Error))
-
-				result := dbTrx.Rollback()
-				assert.Nil(t, result.Error, fmt.Sprintf("Unexpected error: %v.", result.Error))
+				returnArgs = ReturnArgs{
+					{domainentity.Users{}, customerror.New("failed")},
+				}
 			},
 			StatusCode: http.StatusInternalServerError,
 			WantError:  true,
-			TearDown:   func(t *testing.T) {},
 		},
 	}
 
@@ -77,8 +62,10 @@ func (ts *TestSuite) TestGetAll() {
 		ts.T().Run(tc.Context, func(t *testing.T) {
 			tc.SetUp(t)
 
-			userDatastoreRepository := userdatastorerepository.New(dbTrx)
-			userService := userservice.New(userDatastoreRepository, ts.Validator)
+			userService := new(usermockservice.Service)
+			userService.On("WithDBTrx", dbTrx).Return(userService)
+			userService.On("GetAll").Return(returnArgs[0]...)
+
 			userHandler := userhandler.New(userService)
 
 			route := routehttputilpkg.Route{
@@ -95,6 +82,8 @@ func (ts *TestSuite) TestGetAll() {
 
 			req := httptest.NewRequest(requestData.Method, requestData.Target, nil)
 
+			requesthttputilpkg.SetRequestHeaders(req, requestData.Headers)
+
 			resprec := httptest.NewRecorder()
 
 			router := mux.NewRouter()
@@ -108,7 +97,7 @@ func (ts *TestSuite) TestGetAll() {
 
 			if !tc.WantError {
 				assert.Equal(t, resprec.Code, tc.StatusCode)
-				returnedUsers := presentationmodel.Users{}
+				returnedUsers := make(presentationentity.Users, 0)
 				err := json.NewDecoder(resprec.Body).Decode(&returnedUsers)
 				assert.Nil(t, err, fmt.Sprintf("Unexpected error: %v.", err))
 				assert.Equal(t, user.ID, returnedUsers[0].ID)
@@ -116,8 +105,6 @@ func (ts *TestSuite) TestGetAll() {
 			} else {
 				assert.Equal(t, resprec.Code, tc.StatusCode)
 			}
-
-			tc.TearDown(t)
 		})
 	}
 }

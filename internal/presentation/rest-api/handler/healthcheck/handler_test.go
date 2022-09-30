@@ -8,52 +8,47 @@ import (
 	"testing"
 
 	"github.com/gorilla/mux"
-	healthcheckservice "github.com/icaroribeiro/new-go-code-challenge-template/internal/application/service/healthcheck"
+	healthcheckmockservice "github.com/icaroribeiro/new-go-code-challenge-template/internal/core/ports/application/mockservice/healthcheck"
 	healthcheckhandler "github.com/icaroribeiro/new-go-code-challenge-template/internal/presentation/rest-api/handler/healthcheck"
-	"github.com/icaroribeiro/new-go-code-challenge-template/pkg/httputil/message"
+	"github.com/icaroribeiro/new-go-code-challenge-template/pkg/customerror"
 	messagehttputilpkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/httputil/message"
 	requesthttputilpkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/httputil/request"
 	routehttputilpkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/httputil/route"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/suite"
-	"gorm.io/gorm"
 )
 
-func TestHealthCheckInteg(t *testing.T) {
+func TestHandlerUnit(t *testing.T) {
 	suite.Run(t, new(TestSuite))
 }
 
 func (ts *TestSuite) TestGetStatus() {
-	db := &gorm.DB{}
+	text := "everything is up and running"
 
-	message := message.Message{}
+	message := messagehttputilpkg.Message{Text: text}
 
-	var connPool gorm.ConnPool
+	returnArgs := ReturnArgs{}
 
 	ts.Cases = Cases{
 		{
-			Context: "ItShouldSucceedInGettingTheStatus",
+			Context: "ItShouldSucceedInGettingStatus",
 			SetUp: func(t *testing.T) {
-				db = ts.DB
-
-				message = messagehttputilpkg.Message{Text: "everything is up and running"}
+				returnArgs = ReturnArgs{
+					{nil},
+				}
 			},
 			StatusCode: http.StatusOK,
 			WantError:  false,
-			TearDown:   func(t *testing.T) {},
 		},
 		{
-			Context: "ItShouldFailIfTheDatabaseConnectionPoolIsInvalid",
+			Context: "ItShouldFailIfItAnErrorOccursWhenGettingTheStatus",
 			SetUp: func(t *testing.T) {
-				connPool = ts.DB.ConnPool
-				ts.DB.ConnPool = nil
-				db = ts.DB
+				returnArgs = ReturnArgs{
+					{customerror.New("failed")},
+				}
 			},
 			StatusCode: http.StatusInternalServerError,
 			WantError:  true,
-			TearDown: func(t *testing.T) {
-				ts.DB.ConnPool = connPool
-			},
 		},
 	}
 
@@ -61,12 +56,14 @@ func (ts *TestSuite) TestGetStatus() {
 		ts.T().Run(tc.Context, func(t *testing.T) {
 			tc.SetUp(t)
 
-			healthCheckService := healthcheckservice.New(db)
+			healthCheckService := new(healthcheckmockservice.Service)
+			healthCheckService.On("GetStatus").Return(returnArgs[0]...)
+
 			healthCheckHandler := healthcheckhandler.New(healthCheckService)
 
 			route := routehttputilpkg.Route{
 				Name:        "GetStatus",
-				Method:      "GET",
+				Method:      http.MethodGet,
 				Path:        "/status",
 				HandlerFunc: healthCheckHandler.GetStatus,
 			}
@@ -93,13 +90,11 @@ func (ts *TestSuite) TestGetStatus() {
 				assert.Equal(t, resprec.Code, tc.StatusCode)
 				returnedMessage := messagehttputilpkg.Message{}
 				err := json.NewDecoder(resprec.Body).Decode(&returnedMessage)
-				assert.Nil(t, err, fmt.Sprintf("Unexpected error: %v.", err))
-				assert.Equal(t, message.Text, returnedMessage.Text)
+				assert.Nil(t, err, fmt.Sprintf("Unexpected error: %v", err))
+				assert.Equal(t, returnedMessage.Text, message.Text)
 			} else {
 				assert.Equal(t, resprec.Code, tc.StatusCode)
 			}
-
-			tc.TearDown(t)
 		})
 	}
 }

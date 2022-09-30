@@ -3,7 +3,7 @@
 #
 # HTTP server settings
 #
-export HTTP_PORT="8080"
+export HTTP_PORT="8081"
 
 #
 # RSA Keys
@@ -12,7 +12,7 @@ export RSA_PUBLIC_KEY_PATH="../../../tests/configs/auth/rsa_keys/rsa.public"
 export RSA_PRIVATE_KEY_PATH="../../../tests/configs/auth/rsa_keys/rsa.private"
 
 #
-# JWT settings
+# Authentication settings
 #
 export TOKEN_EXP_TIME_IN_SEC="120"
 export TIME_BEFORE_TOKEN_EXP_TIME_IN_SEC="30"
