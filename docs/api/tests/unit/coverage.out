@@ -116,11 +116,6 @@ github.com/icaroribeiro/new-go-code-challenge-template/internal/infrastructure/s
 github.com/icaroribeiro/new-go-code-challenge-template/internal/infrastructure/storage/datastore/repository/login/repository.go:115.85,116.18 1 1
 github.com/icaroribeiro/new-go-code-challenge-template/internal/infrastructure/storage/datastore/repository/login/repository.go:121.2,122.10 2 1
 github.com/icaroribeiro/new-go-code-challenge-template/internal/infrastructure/storage/datastore/repository/login/repository.go:116.18,119.3 2 1
-github.com/icaroribeiro/new-go-code-challenge-template/internal/presentation/rest-api/handler/user/handler.go:16.53,20.2 1 1
-github.com/icaroribeiro/new-go-code-challenge-template/internal/presentation/rest-api/handler/user/handler.go:33.66,35.16 2 1
-github.com/icaroribeiro/new-go-code-challenge-template/internal/presentation/rest-api/handler/user/handler.go:40.2,43.62 3 1
-github.com/icaroribeiro/new-go-code-challenge-template/internal/presentation/rest-api/handler/user/handler.go:35.16,38.3 2 1
-github.com/icaroribeiro/new-go-code-challenge-template/internal/presentation/rest-api/router/healthcheck/router.go:12.142,22.2 1 1
 github.com/icaroribeiro/new-go-code-challenge-template/internal/presentation/rest-api/router/auth/router.go:12.128,50.2 1 1
 github.com/icaroribeiro/new-go-code-challenge-template/internal/application/service/auth/service.go:33.46,44.2 1 1
 github.com/icaroribeiro/new-go-code-challenge-template/internal/application/service/auth/service.go:47.81,48.58 1 1
@@ -175,5 +170,10 @@ github.com/icaroribeiro/new-go-code-challenge-template/internal/application/serv
 github.com/icaroribeiro/new-go-code-challenge-template/internal/application/service/auth/service.go:194.2,196.12 2 1
 github.com/icaroribeiro/new-go-code-challenge-template/internal/application/service/auth/service.go:190.74,192.3 1 1
 github.com/icaroribeiro/new-go-code-challenge-template/internal/application/service/auth/service.go:200.66,208.2 4 1
+github.com/icaroribeiro/new-go-code-challenge-template/internal/presentation/rest-api/router/healthcheck/router.go:12.142,22.2 1 1
+github.com/icaroribeiro/new-go-code-challenge-template/internal/presentation/rest-api/handler/user/handler.go:16.53,20.2 1 1
+github.com/icaroribeiro/new-go-code-challenge-template/internal/presentation/rest-api/handler/user/handler.go:33.66,35.16 2 1
+github.com/icaroribeiro/new-go-code-challenge-template/internal/presentation/rest-api/handler/user/handler.go:40.2,43.62 3 1
+github.com/icaroribeiro/new-go-code-challenge-template/internal/presentation/rest-api/handler/user/handler.go:35.16,38.3 2 1
 github.com/icaroribeiro/new-go-code-challenge-template/internal/presentation/rest-api/router/user/router.go:10.128,20.2 1 1
 github.com/icaroribeiro/new-go-code-challenge-template/internal/presentation/rest-api/router/swagger/router.go:11.127,21.2 1 1
