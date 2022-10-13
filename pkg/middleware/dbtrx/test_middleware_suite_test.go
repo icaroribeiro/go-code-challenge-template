@@ -67,3 +67,7 @@ func NewMockDB(driver string) (*gorm.DB, sqlmock.Sqlmock) {
 
 	return db, mock
 }
+
+func TestMiddlewareSuite(t *testing.T) {
+	suite.Run(t, new(TestSuite))
+}
