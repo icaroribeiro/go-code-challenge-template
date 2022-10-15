@@ -1,4 +1,4 @@
-package username_test
+package security_test
 
 import (
 	"testing"
@@ -9,17 +9,19 @@ import (
 type Case struct {
 	Context   string
 	SetUp     func(t *testing.T)
-	Inf       interface{}
-	Param     string
 	WantError bool
 	TearDown  func(t *testing.T)
 }
 
 type Cases []Case
 
-type Foo struct{}
+type ReturnArgs [][]interface{}
 
 type TestSuite struct {
 	suite.Suite
 	Cases Cases
+}
+
+func TestSecuritySuite(t *testing.T) {
+	suite.Run(t, new(TestSuite))
 }

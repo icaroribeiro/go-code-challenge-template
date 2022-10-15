@@ -23,6 +23,6 @@ type TestSuite struct {
 	Cases Cases
 }
 
-func TestHandlerUnit(t *testing.T) {
+func TestHandlerSuite(t *testing.T) {
 	suite.Run(t, new(TestSuite))
 }

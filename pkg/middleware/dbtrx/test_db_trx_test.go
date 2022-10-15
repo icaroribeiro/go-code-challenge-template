@@ -1,7 +1,6 @@
 package dbtrx_test
 
 import (
-	"context"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -21,79 +20,8 @@ import (
 	dbtrxmiddlewarepkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/middleware/dbtrx"
 	domainmodelfactory "github.com/icaroribeiro/new-go-code-challenge-template/tests/factory/core/domain/entity"
 	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/suite"
 	"gorm.io/gorm"
 )
-
-func TestMiddlewareUnit(t *testing.T) {
-	suite.Run(t, new(TestSuite))
-}
-
-func (ts *TestSuite) TestNewContext() {
-	driver := "postgres"
-	db, _ := NewMockDB(driver)
-	dbTrxCtxValue := &gorm.DB{}
-
-	ctx := context.Background()
-
-	ts.Cases = Cases{
-		{
-			Context: "ItShouldSucceedInCreatingACopyOfAContextWithAnAssociatedValue",
-			SetUp: func(t *testing.T) {
-				dbTrxCtxValue = db
-			},
-			WantError: false,
-		},
-	}
-
-	for _, tc := range ts.Cases {
-		ts.T().Run(tc.Context, func(t *testing.T) {
-			tc.SetUp(t)
-
-			returnedCtx := dbtrxmiddlewarepkg.NewContext(ctx, dbTrxCtxValue)
-
-			if !tc.WantError {
-				assert.NotEmpty(t, returnedCtx)
-				returnedDBTrxCtxValue, ok := dbtrxmiddlewarepkg.FromContext(returnedCtx)
-				assert.True(t, ok, "Unexpected type assertion error.")
-				assert.Equal(t, dbTrxCtxValue, returnedDBTrxCtxValue)
-			}
-		})
-	}
-}
-
-func (ts *TestSuite) TestFromContext() {
-	driver := "postgres"
-	db, _ := NewMockDB(driver)
-	dbTrxCtxValue := &gorm.DB{}
-
-	ctx := context.Background()
-
-	ts.Cases = Cases{
-		{
-			Context: "ItShouldSucceedInGettingAnAssociatedValueFromAContext",
-			SetUp: func(t *testing.T) {
-				dbTrxCtxValue = db
-				ctx = dbtrxmiddlewarepkg.NewContext(ctx, dbTrxCtxValue)
-			},
-			WantError: false,
-		},
-	}
-
-	for _, tc := range ts.Cases {
-		ts.T().Run(tc.Context, func(t *testing.T) {
-			tc.SetUp(t)
-
-			returnedDBTrxCtxValue, ok := dbtrxmiddlewarepkg.FromContext(ctx)
-
-			if !tc.WantError {
-				assert.True(t, ok, "Unexpected type assertion error.")
-				assert.NotEmpty(t, returnedDBTrxCtxValue)
-				assert.Equal(t, dbTrxCtxValue, returnedDBTrxCtxValue)
-			}
-		})
-	}
-}
 
 func (ts *TestSuite) TestDBTrx() {
 	user := domainmodelfactory.NewUser(nil)

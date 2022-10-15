@@ -12,12 +12,7 @@ import (
 	routehttputilpkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/httputil/route"
 	loggingmiddlewarepkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/middleware/logging"
 	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/suite"
 )
-
-func TestMiddlewareUnit(t *testing.T) {
-	suite.Run(t, new(TestSuite))
-}
 
 func (ts *TestSuite) TestLogging() {
 	handler := func(w http.ResponseWriter, r *http.Request) {}

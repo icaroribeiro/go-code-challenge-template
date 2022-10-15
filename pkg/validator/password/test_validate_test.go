@@ -7,12 +7,7 @@ import (
 	fake "github.com/brianvoe/gofakeit/v5"
 	passwordvalidatorpkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/validator/password"
 	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/suite"
 )
-
-func TestPasswordUnit(t *testing.T) {
-	suite.Run(t, new(TestSuite))
-}
 
 func (ts *TestSuite) TestValidate() {
 	ts.Cases = Cases{

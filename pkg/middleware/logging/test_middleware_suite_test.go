@@ -1,4 +1,4 @@
-package server_test
+package logging_test
 
 import (
 	"testing"
@@ -18,4 +18,8 @@ type Cases []Case
 type TestSuite struct {
 	suite.Suite
 	Cases Cases
+}
+
+func TestMiddlewareSuite(t *testing.T) {
+	suite.Run(t, new(TestSuite))
 }

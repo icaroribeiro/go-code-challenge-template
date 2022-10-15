@@ -6,12 +6,7 @@ import (
 
 	usernamevalidatorpkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/validator/username"
 	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/suite"
 )
-
-func TestUsernameUnit(t *testing.T) {
-	suite.Run(t, new(TestSuite))
-}
 
 func (ts *TestSuite) TestValidate() {
 	ts.Cases = Cases{
