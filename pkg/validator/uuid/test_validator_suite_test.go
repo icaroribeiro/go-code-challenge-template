@@ -23,3 +23,7 @@ type TestSuite struct {
 	suite.Suite
 	Cases Cases
 }
+
+func TestValidatorSuite(t *testing.T) {
+	suite.Run(t, new(TestSuite))
+}
