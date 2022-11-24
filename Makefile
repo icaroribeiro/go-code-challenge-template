@@ -44,12 +44,7 @@ start-deps:
 test-app:
 	docker build -t apitest -f ./tests/Dockerfile.test .; \
 	docker run --name apitest_container --env-file ./tests/.env.test -d -p 5001:5001 --restart on-failure apitest; \
-	docker network connect testapp_network apitest_container; \
-	docker exec --env-file ./tests/.env.test apitest_container poetry run pytest; \
-	docker network disconnect testapp_network apitest_container; \
-	docker stop apitest_container; \
- 	docker rm apitest_container; \
- 	docker rmi apitest
+	docker network connect testapp_network apitest_container
 
 finish-deps:
 	docker network disconnect testapp_network postgrestestdb_container; \

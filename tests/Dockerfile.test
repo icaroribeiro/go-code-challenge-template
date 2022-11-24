@@ -23,13 +23,13 @@ RUN cd cmd/api && go build -o api .
 
 # Command to run the application.
 # SIM
-CMD ./cmd/api/api run
+# CMD ./cmd/api/api run
 # NÃO
 # CMD ["./cmd/api/api run"]
 # SIM
 #CMD ["./cmd/api/api", "run"]
 # SIM
-#CMD ["sh", "-c", "./cmd/api/api run"]
+CMD ["sh", "-c", "./cmd/api/api run"]
 # NÃO
 # CMD ["echo $DB_NAME"]
 # NÃO
