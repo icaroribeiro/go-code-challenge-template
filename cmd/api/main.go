@@ -3,7 +3,6 @@ package main
 import (
 	"context"
 	"fmt"
-	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
@@ -12,7 +11,6 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/dgrijalva/jwt-go"
 	"github.com/gorilla/mux"
 	_ "github.com/icaroribeiro/new-go-code-challenge-template/docs/api/swagger"
 	authservice "github.com/icaroribeiro/new-go-code-challenge-template/internal/application/service/auth"
@@ -194,29 +192,29 @@ func setupHttpPort() string {
 
 // setupRSAKeys is the function that configures the RSA keys.
 func setupRSAKeys() (authpkg.RSAKeys, error) {
-	publicKey, err := ioutil.ReadFile(publicKeyPath)
-	if err != nil {
-		return authpkg.RSAKeys{}, fmt.Errorf("failed to read the RSA public key file: %s", err.Error())
-	}
+	// publicKey, err := ioutil.ReadFile(publicKeyPath)
+	// if err != nil {
+	// 	return authpkg.RSAKeys{}, fmt.Errorf("failed to read the RSA public key file: %s", err.Error())
+	// }
 
-	rsaPublicKey, err := jwt.ParseRSAPublicKeyFromPEM(publicKey)
-	if err != nil {
-		return authpkg.RSAKeys{}, fmt.Errorf("failed to parse the RSA public key: %s", err.Error())
-	}
+	// rsaPublicKey, err := jwt.ParseRSAPublicKeyFromPEM(publicKey)
+	// if err != nil {
+	// 	return authpkg.RSAKeys{}, fmt.Errorf("failed to parse the RSA public key: %s", err.Error())
+	// }
 
-	privateKey, err := ioutil.ReadFile(privateKeyPath)
-	if err != nil {
-		return authpkg.RSAKeys{}, fmt.Errorf("failed to read the RSA private key file: %s", err.Error())
-	}
+	// privateKey, err := ioutil.ReadFile(privateKeyPath)
+	// if err != nil {
+	// 	return authpkg.RSAKeys{}, fmt.Errorf("failed to read the RSA private key file: %s", err.Error())
+	// }
 
-	rsaPrivateKey, err := jwt.ParseRSAPrivateKeyFromPEM(privateKey)
-	if err != nil {
-		return authpkg.RSAKeys{}, fmt.Errorf("failed to parse the RSA private key: %s", err.Error())
-	}
+	// rsaPrivateKey, err := jwt.ParseRSAPrivateKeyFromPEM(privateKey)
+	// if err != nil {
+	// 	return authpkg.RSAKeys{}, fmt.Errorf("failed to parse the RSA private key: %s", err.Error())
+	// }
 
 	return authpkg.RSAKeys{
-		PublicKey:  rsaPublicKey,
-		PrivateKey: rsaPrivateKey,
+		PublicKey:  nil,
+		PrivateKey: nil,
 	}, nil
 }
 
