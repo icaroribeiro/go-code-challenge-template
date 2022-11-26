@@ -42,9 +42,14 @@ start-deps:
 	docker network connect testapp_network postgrestestdb_container
 
 test-app:
-	docker build -t apitest -f ./tests/Dockerfile.test .; \
-	docker run --name apitest_container --env-file ./tests/.env.test -d -p 5001:5001 --restart on-failure apitest; \
-	docker network connect testapp_network apitest_container
+	docker build -t apitest -f ./Dockerfile.test .; \
+	docker run --name apitest_container --env-file ./.env.test -d -p 5001:5001 --restart on-failure apitest; \
+	docker network connect testapp_network apitest_container; \
+	docker exec --env-file ./.env.test apitest_container go test ./...; \
+	docker network disconnect testapp_network apitest_container; \
+	docker stop apitest_container; \
+ 	docker rm apitest_container; \
+ 	docker rmi apitest
 
 finish-deps:
 	docker network disconnect testapp_network postgrestestdb_container; \
