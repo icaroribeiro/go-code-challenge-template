@@ -187,7 +187,7 @@ Note:
 
 It is possible to run the tests of the applicatinon locally or even with Docker containers.
 
-### Local machine
+### Local Machine
 
 If you are intended to execute them locally, it is firstly necessary to install postgreSQL database and set up the tables informed in the file **database/postgres/scripts/1-create_tables.sql**.
 
@@ -207,7 +207,7 @@ Notes:
 
 - The **coverage.out** file contains only **unit** test execution statistics. (There are no statistics on the execution of the **integration** tests.)
 
-### Docker containers
+### Docker Containers
 
 Before executing the application tests, it is needed to start up the Docker container named **postgrestestdb_container** that is necessary to execute the integration tests:
 
@@ -235,14 +235,14 @@ make destroy-app
 
 ## References
 
-Project layout:
+### Project layout
 
 - https://github.com/golang-standards/project-layout
 
-Domain Driven Design
+### Domain Driven Design
 
 - https://dev.to/stevensunflash/using-domain-driven-design-ddd-in-golang-3ee5
 
-Database Transaction
+### Database transaction
 
 - https://medium.com/wesionary-team/implement-database-transactions-with-repository-pattern-golang-gin-and-gorm-application-907517fd0743
