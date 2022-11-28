@@ -57,10 +57,6 @@ finish-deps:
 	docker stop postgrestestdb_container; \
 	docker rm postgrestestdb_container; \
 	docker rmi postgrestestdb; \
-	docker network disconnect testapp_network apitest_container; \
-	docker stop apitest_container; \
- 	docker rm apitest_container; \
- 	docker rmi apitest
 	docker network rm testapp_network
 
 #
