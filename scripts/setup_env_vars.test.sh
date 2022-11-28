@@ -8,8 +8,8 @@ export HTTP_PORT="8081"
 #
 # RSA Keys
 #
-export RSA_PUBLIC_KEY_PATH="../../../tests/configs/auth/rsa_keys/rsa.public"
-export RSA_PRIVATE_KEY_PATH="../../../tests/configs/auth/rsa_keys/rsa.private"
+export RSA_PUBLIC_KEY_INTEG_PATH="./../../configs/auth/rsa_keys/rsa.public"
+export RSA_PRIVATE_KEY_INTEG_PATH="./../../configs/auth/rsa_keys/rsa.private"
 
 #
 # Authentication settings

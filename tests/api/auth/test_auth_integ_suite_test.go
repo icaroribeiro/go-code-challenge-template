@@ -1,8 +1,8 @@
 package auth_test
 
 import (
-	"io/ioutil"
 	"log"
+	"os"
 	"strconv"
 	"testing"
 
@@ -41,8 +41,8 @@ type TestSuite struct {
 }
 
 var (
-	publicKeyPath  = envpkg.GetEnvWithDefaultValue("RSA_PUBLIC_KEY_PATH", "../../../tests/configs/auth/rsa_keys/rsa.public")
-	privateKeyPath = envpkg.GetEnvWithDefaultValue("RSA_PRIVATE_KEY_PATH", "../../../tests/configs/auth/rsa_keys/rsa.private")
+	publicKeyPath  = envpkg.GetEnvWithDefaultValue("RSA_PUBLIC_KEY_INTEG_PATH", "./../../configs/auth/rsa_keys/rsa.public")
+	privateKeyPath = envpkg.GetEnvWithDefaultValue("RSA_PRIVATE_KEY_INTEG_PATH", "./../../configs/auth/rsa_keys/rsa.private")
 
 	tokenExpTimeInSecStr = envpkg.GetEnvWithDefaultValue("TOKEN_EXP_TIME_IN_SEC", "120")
 
@@ -68,7 +68,7 @@ func setupDBConfig() (map[string]string, error) {
 }
 
 func (ts *TestSuite) SetupSuite() {
-	publicKey, err := ioutil.ReadFile(publicKeyPath)
+	publicKey, err := os.ReadFile(publicKeyPath)
 	if err != nil {
 		log.Panicf("%s", err.Error())
 	}
@@ -78,7 +78,7 @@ func (ts *TestSuite) SetupSuite() {
 		log.Panicf("%s", err.Error())
 	}
 
-	privateKey, err := ioutil.ReadFile(privateKeyPath)
+	privateKey, err := os.ReadFile(privateKeyPath)
 	if err != nil {
 		log.Panicf("%s", err.Error())
 	}

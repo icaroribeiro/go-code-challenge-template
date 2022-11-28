@@ -26,9 +26,6 @@ RUN cd cmd/api && CGO_ENABLED=0 GOOS=linux go build -a -o api .
 # Second stage started from the lastest alpine base image.
 FROM alpine:latest
 
-# Set the environment variable that deals with the application deployment in Heroku Platform.
-ENV DEPLOY=YES
-
 # Set the working directory inside the container.
 WORKDIR /app
 

@@ -47,8 +47,6 @@ import (
 )
 
 var (
-	deploy = envpkg.GetEnvWithDefaultValue("DEPLOY", "NO")
-
 	httpPort = envpkg.GetEnvWithDefaultValue("HTTP_PORT", "8080")
 
 	publicKeyPath                  = envpkg.GetEnvWithDefaultValue("RSA_PUBLIC_KEY_PATH", "./configs/auth/rsa_keys/rsa.public")
@@ -182,12 +180,6 @@ func main() {
 
 // setupHttpPort is the function that configures the port address used by the server.
 func setupHttpPort() string {
-	if deploy == "YES" {
-		if httpPort = os.Getenv("PORT"); httpPort == "" {
-			log.Panicf("failed to read the PORT env variable to the application deployment")
-		}
-	}
-
 	return httpPort
 }
 
@@ -222,12 +214,6 @@ func setupRSAKeys() (authpkg.RSAKeys, error) {
 // setupDBConfig is the function that configures a map of parameters used to connect to the database.
 func setupDBConfig() (map[string]string, error) {
 	dbURL := ""
-
-	if deploy == "YES" {
-		if dbURL = os.Getenv("DATABASE_URL"); dbURL == "" {
-			return nil, fmt.Errorf("failed to read the DATABASE_URL environment variable to the application deployment")
-		}
-	}
 
 	dbConfig := map[string]string{
 		"DRIVER":   dbDriver,

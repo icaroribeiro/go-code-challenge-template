@@ -37,20 +37,23 @@ test-api:
 #
 start-deps:
 	docker network create testapp_network; \
-	docker build -t postgrestestdb -f ./database/postgres/Dockerfile .; \
-	docker run --name postgrestestdb_container --env-file ./database/postgres/.env.test -d -p 5434:5432 -v postgrestestdb-data:/var/lib/postgresql/data --restart on-failure postgrestestdb; \
+	cd ./database/postgres; \
+	docker build -t postgrestestdb --no-cache -f Dockerfile .; \
+	docker run --name postgrestestdb_container --env-file .env.test -d -p 5434:5432 -v postgrestestdb-data:/var/lib/postgresql/data --restart on-failure postgrestestdb; \
 	docker network connect testapp_network postgrestestdb_container
 
-test-app:
-	docker build -t apitest -f ./Dockerfile.test .; \
+init-app:
+	docker build -t apitest -f Dockerfile.test .; \
 	docker run --name apitest_container --env-file ./.env.test -d -p 8080:8080 --restart on-failure apitest; \
-	docker network connect testapp_network apitest_container;
-	
-test-app2:
-	docker network disconnect testapp_network apitest_container; \
+	docker network connect testapp_network apitest_container
+
+test-app:
+	docker exec --env-file ./.env.test apitest_container go test ./...; \
+
+destroy-app:
 	docker stop apitest_container; \
- 	docker rm apitest_container; \
- 	docker rmi apitest
+	docker rm apitest_container; \
+	docker rmi apitest
 
 finish-deps:
 	docker network disconnect testapp_network postgrestestdb_container; \
