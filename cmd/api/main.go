@@ -3,7 +3,6 @@ package main
 import (
 	"context"
 	"fmt"
-	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
@@ -194,7 +193,7 @@ func setupHttpPort() string {
 
 // setupRSAKeys is the function that configures the RSA keys.
 func setupRSAKeys() (authpkg.RSAKeys, error) {
-	publicKey, err := ioutil.ReadFile(publicKeyPath)
+	publicKey, err := os.ReadFile(publicKeyPath)
 	if err != nil {
 		return authpkg.RSAKeys{}, fmt.Errorf("failed to read the RSA public key file: %s", err.Error())
 	}
@@ -204,7 +203,7 @@ func setupRSAKeys() (authpkg.RSAKeys, error) {
 		return authpkg.RSAKeys{}, fmt.Errorf("failed to parse the RSA public key: %s", err.Error())
 	}
 
-	privateKey, err := ioutil.ReadFile(privateKeyPath)
+	privateKey, err := os.ReadFile(privateKeyPath)
 	if err != nil {
 		return authpkg.RSAKeys{}, fmt.Errorf("failed to read the RSA private key file: %s", err.Error())
 	}
