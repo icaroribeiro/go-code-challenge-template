@@ -43,7 +43,7 @@ This layer is responsible for serving as a supporting layer for other layers.
 
 It contains the procedures to establish connection to the database and the implementation of repositories that interact with the database by retrieving and/or modifing records.
 
-#### Interfaces
+#### Presentation
 
 This layer is responsible for the interaction with user by accepting API requests, calling out the relevant services and then delivering the response.
 
