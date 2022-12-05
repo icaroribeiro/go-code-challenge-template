@@ -3,7 +3,6 @@ package auth
 import (
 	"context"
 	"net/http"
-	"strings"
 
 	"github.com/dgrijalva/jwt-go"
 	domainentity "github.com/icaroribeiro/new-go-code-challenge-template/internal/core/domain/entity"
@@ -28,22 +27,6 @@ func NewContext(ctx context.Context, auth domainentity.Auth) context.Context {
 func FromContext(ctx context.Context) (domainentity.Auth, bool) {
 	raw, ok := ctx.Value(authDetailsCtxKey).(domainentity.Auth)
 	return raw, ok
-}
-
-func extractTokenString(w http.ResponseWriter, r *http.Request) (string, error) {
-	hdrAuth := r.Header.Get("Authorization")
-	if len(hdrAuth) == 0 {
-		errorMessage := "the auth header must be informed along with the token"
-		return "", customerror.BadRequest.New(errorMessage)
-	}
-
-	bearerToken := strings.Split(hdrAuth, " ")
-	if len(bearerToken) != 2 {
-		errorMessage := "the token must be associated with the auth header"
-		return "", customerror.BadRequest.New(errorMessage)
-	}
-
-	return bearerToken[1], nil
 }
 
 func buildAuth(db *gorm.DB, authN authpkg.IAuth, token *jwt.Token) (domainentity.Auth, error) {
@@ -78,7 +61,9 @@ func buildAuth(db *gorm.DB, authN authpkg.IAuth, token *jwt.Token) (domainentity
 func Auth(db *gorm.DB, authN authpkg.IAuth) func(http.HandlerFunc) http.HandlerFunc {
 	return func(next http.HandlerFunc) http.HandlerFunc {
 		return func(w http.ResponseWriter, r *http.Request) {
-			tokenString, err := authN.ExtractTokenString(w, r)
+			authHeaderString := r.Header.Get("Authorization")
+
+			tokenString, err := authN.ExtractTokenString(authHeaderString)
 			if err != nil {
 				responsehttputilpkg.RespondErrorWithJson(w, err)
 				return
@@ -109,7 +94,9 @@ func Auth(db *gorm.DB, authN authpkg.IAuth) func(http.HandlerFunc) http.HandlerF
 func AuthRenewal(db *gorm.DB, authN authpkg.IAuth, timeBeforeTokenExpTimeInSec int) func(http.HandlerFunc) http.HandlerFunc {
 	return func(next http.HandlerFunc) http.HandlerFunc {
 		return func(w http.ResponseWriter, r *http.Request) {
-			tokenString, err := authN.ExtractTokenString(w, r)
+			authHeaderString := r.Header.Get("Authorization")
+
+			tokenString, err := authN.ExtractTokenString(authHeaderString)
 			if err != nil {
 				responsehttputilpkg.RespondErrorWithJson(w, err)
 				return

@@ -66,7 +66,7 @@ func (a *Auth) ExtractTokenString(authHeaderString string) (string, error) {
 	}
 
 	bearerToken := strings.Split(authHeaderString, " ")
-	if len(bearerToken) != 2 {
+	if bearerToken[1] == "" {
 		errorMessage := "the token must be associated with the auth header"
 		return "", customerror.BadRequest.New(errorMessage)
 	}
@@ -96,7 +96,7 @@ func (a *Auth) DecodeToken(tokenString string) (*jwt.Token, error) {
 func (a *Auth) ValidateTokenRenewal(token *jwt.Token, timeBeforeTokenExpTimeInSec int) (*jwt.Token, error) {
 	claims, _ := token.Claims.(jwt.MapClaims)
 
-	expiredAt, _ := claims["exp"].(float64)
+	expiredAt, _ := claims["exp"].(int64)
 
 	duration := time.Second * time.Duration(timeBeforeTokenExpTimeInSec)
 
