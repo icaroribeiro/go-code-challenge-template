@@ -13,7 +13,7 @@ import (
 
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gorilla/mux"
-	_ "github.com/icaroribeiro/new-go-code-challenge-template/docs/api/swagger"
+	_ "github.com/icaroribeiro/new-go-code-challenge-template/docs/rest-api/swagger"
 	authservice "github.com/icaroribeiro/new-go-code-challenge-template/internal/application/service/auth"
 	healthcheckservice "github.com/icaroribeiro/new-go-code-challenge-template/internal/application/service/healthcheck"
 	userservice "github.com/icaroribeiro/new-go-code-challenge-template/internal/application/service/user"
