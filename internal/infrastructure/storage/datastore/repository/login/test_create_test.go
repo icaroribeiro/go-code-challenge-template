@@ -25,7 +25,7 @@ func (ts *TestSuite) TestCreate() {
 
 	errorType := customerror.NoType
 
-	stmt := `INSERT INTO "logins" ("id","user_id","username","password","created_at","updated_at") VALUES ($1,$2,$3,$4,$5,$6)`
+	sqlQuery := `INSERT INTO "logins" ("user_id","username","password","created_at","updated_at","id") VALUES ($1,$2,$3,$4,$5,$6) RETURNING "id"`
 
 	ts.Cases = Cases{
 		{
@@ -47,9 +47,9 @@ func (ts *TestSuite) TestCreate() {
 
 				mock.ExpectBegin()
 
-				mock.ExpectExec(regexp.QuoteMeta(stmt)).
-					WithArgs(sqlmock.AnyArg(), login.UserID, login.Username, sqlmock.AnyArg(), sqlmock.AnyArg(), sqlmock.AnyArg()).
-					WillReturnResult(sqlmock.NewResult(1, 1))
+				mock.ExpectQuery(regexp.QuoteMeta(sqlQuery)).
+					WithArgs(login.UserID, login.Username, sqlmock.AnyArg(), sqlmock.AnyArg(), sqlmock.AnyArg(), sqlmock.AnyArg()).
+					WillReturnRows(sqlmock.NewRows([]string{"id"}).AddRow(uuid.NewV4()))
 
 				mock.ExpectCommit()
 			},
@@ -66,8 +66,8 @@ func (ts *TestSuite) TestCreate() {
 
 				mock.ExpectBegin()
 
-				mock.ExpectExec(regexp.QuoteMeta(stmt)).
-					WithArgs(sqlmock.AnyArg(), login.UserID, login.Username, sqlmock.AnyArg(), sqlmock.AnyArg(), sqlmock.AnyArg()).
+				mock.ExpectQuery(regexp.QuoteMeta(sqlQuery)).
+					WithArgs(login.UserID, login.Username, sqlmock.AnyArg(), sqlmock.AnyArg(), sqlmock.AnyArg(), sqlmock.AnyArg()).
 					WillReturnError(customerror.New("failed"))
 
 				mock.ExpectRollback()
@@ -87,8 +87,8 @@ func (ts *TestSuite) TestCreate() {
 
 				mock.ExpectBegin()
 
-				mock.ExpectExec(regexp.QuoteMeta(stmt)).
-					WithArgs(sqlmock.AnyArg(), login.UserID, login.Username, sqlmock.AnyArg(), sqlmock.AnyArg(), sqlmock.AnyArg()).
+				mock.ExpectQuery(regexp.QuoteMeta(sqlQuery)).
+					WithArgs(login.UserID, login.Username, sqlmock.AnyArg(), sqlmock.AnyArg(), sqlmock.AnyArg(), sqlmock.AnyArg()).
 					WillReturnError(customerror.Conflict.New("logins_user_id_key"))
 
 				mock.ExpectRollback()
