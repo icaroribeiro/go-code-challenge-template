@@ -5,7 +5,7 @@ import (
 	"testing"
 
 	fake "github.com/brianvoe/gofakeit/v5"
-	"github.com/dgrijalva/jwt-go"
+	"github.com/golang-jwt/jwt"
 	authpkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/auth"
 	"github.com/icaroribeiro/new-go-code-challenge-template/pkg/customerror"
 	uuid "github.com/satori/go.uuid"

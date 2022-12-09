@@ -5,7 +5,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/dgrijalva/jwt-go"
+	"github.com/golang-jwt/jwt"
 	domainentity "github.com/icaroribeiro/new-go-code-challenge-template/internal/core/domain/entity"
 	"github.com/icaroribeiro/new-go-code-challenge-template/pkg/customerror"
 	uuid "github.com/satori/go.uuid"

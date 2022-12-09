@@ -11,7 +11,7 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/dgrijalva/jwt-go"
+	"github.com/golang-jwt/jwt"
 	"github.com/gorilla/mux"
 	_ "github.com/icaroribeiro/new-go-code-challenge-template/docs/rest-api/swagger"
 	authservice "github.com/icaroribeiro/new-go-code-challenge-template/internal/application/service/auth"

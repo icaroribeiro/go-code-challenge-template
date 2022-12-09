@@ -6,7 +6,7 @@ import (
 	"strconv"
 	"testing"
 
-	"github.com/dgrijalva/jwt-go"
+	"github.com/golang-jwt/jwt"
 	authpkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/auth"
 	datastorepkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/datastore"
 	envpkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/env"

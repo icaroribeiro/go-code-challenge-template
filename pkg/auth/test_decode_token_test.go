@@ -6,7 +6,7 @@ import (
 	"time"
 
 	fake "github.com/brianvoe/gofakeit/v5"
-	"github.com/dgrijalva/jwt-go"
+	"github.com/golang-jwt/jwt"
 	domainentity "github.com/icaroribeiro/new-go-code-challenge-template/internal/core/domain/entity"
 	authpkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/auth"
 	"github.com/icaroribeiro/new-go-code-challenge-template/pkg/customerror"
