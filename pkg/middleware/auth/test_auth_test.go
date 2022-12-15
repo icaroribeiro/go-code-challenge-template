@@ -65,6 +65,7 @@ func (ts *TestSuite) TestAuth() {
 				token = &jwt.Token{}
 
 				statusCode = http.StatusOK
+
 				payload = messagehttputilpkg.Message{Text: "ok"}
 
 				id := uuid.NewV4()
