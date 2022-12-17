@@ -99,30 +99,6 @@ func (ts *TestSuite) TestAuthRenewal() {
 			WantError: false,
 		},
 		{
-			Context: "ItShouldFailIfTheAuthorizationHeaderIsNotSetInTheRequestHeader",
-			SetUp: func(t *testing.T) {
-				tokenString = ""
-
-				bearerToken = []string{"", tokenString}
-
-				authHeaderString = ""
-
-				headers = map[string][]string{}
-
-				token = &jwt.Token{}
-
-				statusCode = http.StatusInternalServerError
-
-				returnArgs = ReturnArgs{
-					{tokenString, nil},
-					{token, nil},
-					{token, nil},
-					{domainmodel.Auth{}, nil},
-				}
-			},
-			WantError: true,
-		},
-		{
 			Context: "ItShouldFailIfTheAuthenticationTokenIsNotSetInAuthorizationHeader",
 			SetUp: func(t *testing.T) {
 				tokenString = ""
@@ -143,6 +119,33 @@ func (ts *TestSuite) TestAuthRenewal() {
 				returnArgs = ReturnArgs{
 					{tokenString, customerror.New("failed")},
 					{token, nil},
+					{token, nil},
+					{domainmodel.Auth{}, nil},
+				}
+			},
+			WantError: true,
+		},
+		{
+			Context: "ItShouldFailIfTheTokenIsNotDecodedFromTokenString",
+			SetUp: func(t *testing.T) {
+				tokenString = fake.Word()
+
+				bearerToken = []string{"Bearer", tokenString}
+
+				key := "Authorization"
+				value := strings.Join(bearerToken[:], " ")
+				authHeaderString = value
+				headers = map[string][]string{
+					key: {value},
+				}
+
+				token = &jwt.Token{}
+
+				statusCode = http.StatusUnauthorized
+
+				returnArgs = ReturnArgs{
+					{tokenString, nil},
+					{token, customerror.New("failed")},
 					{token, nil},
 					{domainmodel.Auth{}, nil},
 				}
@@ -200,129 +203,6 @@ func (ts *TestSuite) TestAuthRenewal() {
 					{token, nil},
 					{domainmodel.Auth{}, customerror.New("failed")},
 				}
-			},
-			WantError: true,
-		},
-		{
-			Context: "ItShouldFailIfAnErrorOccursWhenTryingToFindTheAuthInTheDatabase",
-			SetUp: func(t *testing.T) {
-				tokenString = fake.Word()
-
-				bearerToken = []string{"Bearer", tokenString}
-
-				key := "Authorization"
-				value := strings.Join(bearerToken[:], " ")
-				authHeaderString = value
-				headers = map[string][]string{
-					key: {value},
-				}
-
-				token = &jwt.Token{}
-
-				statusCode = http.StatusInternalServerError
-
-				id := uuid.NewV4()
-
-				args := map[string]interface{}{
-					"id": id,
-				}
-
-				returnArgs = ReturnArgs{
-					{tokenString, nil},
-					{token, nil},
-					{token, nil},
-					{domainmodelfactory.NewAuth(args), nil},
-				}
-
-				sqlQuery := `SELECT * FROM "auths" WHERE id=$1`
-
-				mock.ExpectQuery(regexp.QuoteMeta(sqlQuery)).
-					WithArgs(id).
-					WillReturnError(customerror.New("failed"))
-			},
-			WantError: true,
-		},
-		{
-			Context: "ItShouldFailIfTheAuthIsNotFoundInTheDatabase",
-			SetUp: func(t *testing.T) {
-				tokenString = fake.Word()
-
-				bearerToken = []string{"Bearer", tokenString}
-
-				key := "Authorization"
-				value := strings.Join(bearerToken[:], " ")
-				authHeaderString = value
-				headers = map[string][]string{
-					key: {value},
-				}
-
-				token = &jwt.Token{}
-
-				statusCode = http.StatusBadRequest
-
-				id := uuid.NewV4()
-
-				args := map[string]interface{}{
-					"id": id,
-				}
-
-				returnArgs = ReturnArgs{
-					{tokenString, nil},
-					{token, nil},
-					{token, nil},
-					{domainmodelfactory.NewAuth(args), nil},
-				}
-
-				sqlQuery := `SELECT * FROM "auths" WHERE id=$1`
-
-				mock.ExpectQuery(regexp.QuoteMeta(sqlQuery)).
-					WithArgs(id).
-					WillReturnRows(&sqlmock.Rows{})
-			},
-			WantError: true,
-		},
-		{
-			Context: "ItShouldFailIfTheUserIDFromTokenDoesNotMatchWithTheUserIDFromAuthRecordFromTheDatabase",
-			SetUp: func(t *testing.T) {
-				tokenString = fake.Word()
-
-				bearerToken = []string{"Bearer", tokenString}
-
-				key := "Authorization"
-				value := strings.Join(bearerToken[:], " ")
-				authHeaderString = value
-				headers = map[string][]string{
-					key: {value},
-				}
-
-				token = &jwt.Token{}
-
-				statusCode = http.StatusBadRequest
-
-				id := uuid.NewV4()
-
-				args := map[string]interface{}{
-					"id": id,
-				}
-
-				returnArgs = ReturnArgs{
-					{tokenString, nil},
-					{token, nil},
-					{token, nil},
-					{domainmodelfactory.NewAuth(args), nil},
-				}
-
-				sqlQuery := `SELECT * FROM "auths" WHERE id=$1`
-
-				authDatastore := datastoreentityfactory.NewAuth(args)
-
-				rows := sqlmock.
-					NewRows([]string{"id", "user_id", "created_at"}).
-					AddRow(authDatastore.ID, authDatastore.UserID, authDatastore.CreatedAt)
-
-				mock.ExpectQuery(regexp.QuoteMeta(sqlQuery)).
-					WithArgs(id).
-					WillReturnRows(rows)
 			},
 			WantError: true,
 		},
