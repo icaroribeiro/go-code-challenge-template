@@ -13,7 +13,6 @@ import (
 	datastoremodel "github.com/icaroribeiro/new-go-code-challenge-template/internal/infrastructure/storage/datastore/entity"
 	"github.com/icaroribeiro/new-go-code-challenge-template/pkg/customerror"
 	adapterhttputilpkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/httputil/adapter"
-	messagehttputilpkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/httputil/message"
 	requesthttputilpkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/httputil/request"
 	responsehttputilpkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/httputil/response"
 	routehttputilpkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/httputil/route"
@@ -60,7 +59,7 @@ func (ts *TestSuite) TestDBTrx() {
 
 					_ = dbAux.Create(&userDatastore)
 
-					responsehttputilpkg.RespondWithJson(w, http.StatusOK, messagehttputilpkg.Message{Text: "ok"})
+					responsehttputilpkg.RespondWithJSON(w, http.StatusOK, responsehttputilpkg.Message{Text: "ok"})
 				}
 
 				mock.ExpectBegin()
@@ -83,11 +82,11 @@ func (ts *TestSuite) TestDBTrx() {
 				handlerFunc = func(w http.ResponseWriter, r *http.Request) {
 					_, ok := dbtrxmiddlewarepkg.FromContext(r.Context())
 					if !ok {
-						responsehttputilpkg.RespondErrorWithJson(w, customerror.New("failed"))
+						responsehttputilpkg.RespondErrorWithJSON(w, customerror.New("failed"))
 						return
 					}
 
-					responsehttputilpkg.RespondWithJson(w, http.StatusOK, messagehttputilpkg.Message{Text: "ok"})
+					responsehttputilpkg.RespondWithJSON(w, http.StatusOK, responsehttputilpkg.Message{Text: "ok"})
 				}
 			},
 			WantError: true,
@@ -108,10 +107,10 @@ func (ts *TestSuite) TestDBTrx() {
 
 					result := dbAux.Create(&userDatastore)
 					if result.Error != nil {
-						responsehttputilpkg.RespondErrorWithJson(w, customerror.New("failed"))
+						responsehttputilpkg.RespondErrorWithJSON(w, customerror.New("failed"))
 					}
 
-					responsehttputilpkg.RespondWithJson(w, http.StatusOK, messagehttputilpkg.Message{Text: "ok"})
+					responsehttputilpkg.RespondWithJSON(w, http.StatusOK, responsehttputilpkg.Message{Text: "ok"})
 				}
 
 				mock.ExpectBegin()
@@ -140,10 +139,10 @@ func (ts *TestSuite) TestDBTrx() {
 
 					result := dbAux.Create(&userDatastore)
 					if result.Error != nil {
-						responsehttputilpkg.RespondErrorWithJson(w, customerror.New("failed"))
+						responsehttputilpkg.RespondErrorWithJSON(w, customerror.New("failed"))
 					}
 
-					responsehttputilpkg.RespondWithJson(w, http.StatusOK, messagehttputilpkg.Message{Text: "ok"})
+					responsehttputilpkg.RespondWithJSON(w, http.StatusOK, responsehttputilpkg.Message{Text: "ok"})
 				}
 
 				mock.ExpectBegin()
@@ -172,10 +171,10 @@ func (ts *TestSuite) TestDBTrx() {
 
 					result := dbAux.Create(&userDatastore)
 					if result.Error != nil {
-						responsehttputilpkg.RespondErrorWithJson(w, customerror.New("failed"))
+						responsehttputilpkg.RespondErrorWithJSON(w, customerror.New("failed"))
 					}
 
-					responsehttputilpkg.RespondWithJson(w, http.StatusOK, messagehttputilpkg.Message{Text: "ok"})
+					responsehttputilpkg.RespondWithJSON(w, http.StatusOK, responsehttputilpkg.Message{Text: "ok"})
 				}
 
 				mock.ExpectBegin()
@@ -206,8 +205,8 @@ func (ts *TestSuite) TestDBTrx() {
 					if result.Error != nil {
 						// It is duplicated only to test the code that evaluates
 						// if the header is already written in the WriteHeader method.
-						responsehttputilpkg.RespondErrorWithJson(w, customerror.New("failed"))
-						responsehttputilpkg.RespondErrorWithJson(w, customerror.New("failed"))
+						responsehttputilpkg.RespondErrorWithJSON(w, customerror.New("failed"))
+						responsehttputilpkg.RespondErrorWithJSON(w, customerror.New("failed"))
 					}
 
 					panic(customerror.New("failed"))
@@ -242,8 +241,8 @@ func (ts *TestSuite) TestDBTrx() {
 					if result.Error != nil {
 						// It is duplicated only to test the code that evaluates
 						// if the header is already written in the WriteHeader method.
-						responsehttputilpkg.RespondErrorWithJson(w, customerror.New("failed"))
-						responsehttputilpkg.RespondErrorWithJson(w, customerror.New("failed"))
+						responsehttputilpkg.RespondErrorWithJSON(w, customerror.New("failed"))
+						responsehttputilpkg.RespondErrorWithJSON(w, customerror.New("failed"))
 					}
 
 					panic("failed")
@@ -301,7 +300,7 @@ func (ts *TestSuite) TestDBTrx() {
 			if !tc.WantError {
 				assert.Equal(t, resprec.Result().Header.Get("Content-Type"), "application/json")
 				assert.Equal(t, statusCode, resprec.Result().StatusCode)
-				returnedMessage := messagehttputilpkg.Message{}
+				returnedMessage := responsehttputilpkg.Message{}
 				err := json.NewDecoder(resprec.Body).Decode(&returnedMessage)
 				assert.Nil(t, err, fmt.Sprintf("Unexpected error: %v", err))
 				assert.NotEmpty(t, returnedMessage.Text)

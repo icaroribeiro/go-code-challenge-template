@@ -66,8 +66,8 @@ github.com/icaroribeiro/new-go-code-challenge-template/pkg/httputil/handler/hand
 github.com/icaroribeiro/new-go-code-challenge-template/pkg/httputil/handler/handler.go:13:						GetMethodNotAllowedHandler	100.0%
 github.com/icaroribeiro/new-go-code-challenge-template/pkg/httputil/request/request.go:25:						PrepareRequestBody		100.0%
 github.com/icaroribeiro/new-go-code-challenge-template/pkg/httputil/request/request.go:53:						SetRequestHeaders		100.0%
-github.com/icaroribeiro/new-go-code-challenge-template/pkg/httputil/response/response.go:13:						RespondWithJson			100.0%
-github.com/icaroribeiro/new-go-code-challenge-template/pkg/httputil/response/response.go:28:						RespondErrorWithJson		100.0%
+github.com/icaroribeiro/new-go-code-challenge-template/pkg/httputil/response/response.go:13:						RespondWithJSON			100.0%
+github.com/icaroribeiro/new-go-code-challenge-template/pkg/httputil/response/response.go:28:						RespondErrorWithJSON		100.0%
 github.com/icaroribeiro/new-go-code-challenge-template/pkg/middleware/auth/middleware.go:22:						NewContext			100.0%
 github.com/icaroribeiro/new-go-code-challenge-template/pkg/middleware/auth/middleware.go:27:						FromContext			100.0%
 github.com/icaroribeiro/new-go-code-challenge-template/pkg/middleware/auth/middleware.go:32:						buildAuth			100.0%

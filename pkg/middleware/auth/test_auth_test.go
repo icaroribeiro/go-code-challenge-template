@@ -16,7 +16,6 @@ import (
 	domainmodel "github.com/icaroribeiro/new-go-code-challenge-template/internal/core/domain/entity"
 	"github.com/icaroribeiro/new-go-code-challenge-template/pkg/customerror"
 	adapterhttputilpkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/httputil/adapter"
-	messagehttputilpkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/httputil/message"
 	requesthttputilpkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/httputil/request"
 	responsehttputilpkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/httputil/response"
 	routehttputilpkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/httputil/route"
@@ -43,7 +42,7 @@ func (ts *TestSuite) TestAuth() {
 	headers := make(map[string][]string)
 
 	statusCode := 0
-	payload := messagehttputilpkg.Message{}
+	payload := responsehttputilpkg.Message{}
 
 	returnArgs := ReturnArgs{}
 
@@ -66,7 +65,7 @@ func (ts *TestSuite) TestAuth() {
 
 				statusCode = http.StatusOK
 
-				payload = messagehttputilpkg.Message{Text: "ok"}
+				payload = responsehttputilpkg.Message{Text: "ok"}
 
 				id := uuid.NewV4()
 				userID := uuid.NewV4()
@@ -331,7 +330,7 @@ func (ts *TestSuite) TestAuth() {
 			authMiddleware := authmiddlewarepkg.Auth(db, authN)
 
 			handlerFunc := func(w http.ResponseWriter, r *http.Request) {
-				responsehttputilpkg.RespondWithJson(w, http.StatusOK, messagehttputilpkg.Message{Text: "ok"})
+				responsehttputilpkg.RespondWithJSON(w, http.StatusOK, responsehttputilpkg.Message{Text: "ok"})
 			}
 
 			returnedHandlerFunc := adapterhttputilpkg.AdaptFunc(handlerFunc).With(authMiddleware)
@@ -366,7 +365,7 @@ func (ts *TestSuite) TestAuth() {
 			if !tc.WantError {
 				assert.Equal(t, resprec.Result().Header.Get("Content-Type"), "application/json")
 				assert.Equal(t, statusCode, resprec.Result().StatusCode)
-				returnedMessage := messagehttputilpkg.Message{}
+				returnedMessage := responsehttputilpkg.Message{}
 				err := json.NewDecoder(resprec.Body).Decode(&returnedMessage)
 				assert.Nil(t, err, fmt.Sprintf("Unexpected error: %v", err))
 				assert.Equal(t, payload, returnedMessage)

@@ -11,8 +11,8 @@ import (
 	healthcheckmockservice "github.com/icaroribeiro/new-go-code-challenge-template/internal/core/ports/application/mockservice/healthcheck"
 	healthcheckhandler "github.com/icaroribeiro/new-go-code-challenge-template/internal/presentation/api/handler/healthcheck"
 	"github.com/icaroribeiro/new-go-code-challenge-template/pkg/customerror"
-	messagehttputilpkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/httputil/message"
 	requesthttputilpkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/httputil/request"
+	responsehttputilpkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/httputil/response"
 	routehttputilpkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/httputil/route"
 	"github.com/stretchr/testify/assert"
 )
@@ -20,7 +20,7 @@ import (
 func (ts *TestSuite) TestGetStatus() {
 	text := "everything is up and running"
 
-	message := messagehttputilpkg.Message{Text: text}
+	message := responsehttputilpkg.Message{Text: text}
 
 	returnArgs := ReturnArgs{}
 
@@ -83,7 +83,7 @@ func (ts *TestSuite) TestGetStatus() {
 
 			if !tc.WantError {
 				assert.Equal(t, resprec.Code, tc.StatusCode)
-				returnedMessage := messagehttputilpkg.Message{}
+				returnedMessage := responsehttputilpkg.Message{}
 				err := json.NewDecoder(resprec.Body).Decode(&returnedMessage)
 				assert.Nil(t, err, fmt.Sprintf("Unexpected error: %v", err))
 				assert.Equal(t, returnedMessage.Text, message.Text)

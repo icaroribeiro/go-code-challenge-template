@@ -65,19 +65,19 @@ func Auth(db *gorm.DB, authN authpkg.IAuth) func(http.HandlerFunc) http.HandlerF
 
 			tokenString, err := authN.ExtractTokenString(authHeaderString)
 			if err != nil {
-				responsehttputilpkg.RespondErrorWithJson(w, err)
+				responsehttputilpkg.RespondErrorWithJSON(w, err)
 				return
 			}
 
 			token, err := authN.DecodeToken(tokenString)
 			if err != nil {
-				responsehttputilpkg.RespondErrorWithJson(w, customerror.Unauthorized.New(err.Error()))
+				responsehttputilpkg.RespondErrorWithJSON(w, customerror.Unauthorized.New(err.Error()))
 				return
 			}
 
 			auth, err := buildAuth(db, authN, token)
 			if err != nil {
-				responsehttputilpkg.RespondErrorWithJson(w, err)
+				responsehttputilpkg.RespondErrorWithJSON(w, err)
 				return
 			}
 
@@ -98,25 +98,25 @@ func AuthRenewal(db *gorm.DB, authN authpkg.IAuth, timeBeforeTokenExpTimeInSec i
 
 			tokenString, err := authN.ExtractTokenString(authHeaderString)
 			if err != nil {
-				responsehttputilpkg.RespondErrorWithJson(w, err)
+				responsehttputilpkg.RespondErrorWithJSON(w, err)
 				return
 			}
 
 			token, err := authN.DecodeToken(tokenString)
 			if err != nil {
-				responsehttputilpkg.RespondErrorWithJson(w, customerror.Unauthorized.New(err.Error()))
+				responsehttputilpkg.RespondErrorWithJSON(w, customerror.Unauthorized.New(err.Error()))
 				return
 			}
 
 			token, err = authN.ValidateTokenRenewal(token, timeBeforeTokenExpTimeInSec)
 			if err != nil {
-				responsehttputilpkg.RespondErrorWithJson(w, customerror.Unauthorized.New(err.Error()))
+				responsehttputilpkg.RespondErrorWithJSON(w, customerror.Unauthorized.New(err.Error()))
 				return
 			}
 
 			auth, err := buildAuth(db, authN, token)
 			if err != nil {
-				responsehttputilpkg.RespondErrorWithJson(w, err)
+				responsehttputilpkg.RespondErrorWithJSON(w, err)
 				return
 			}
 

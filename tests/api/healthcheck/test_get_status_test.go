@@ -10,9 +10,8 @@ import (
 	"github.com/gorilla/mux"
 	healthcheckservice "github.com/icaroribeiro/new-go-code-challenge-template/internal/application/service/healthcheck"
 	healthcheckhandler "github.com/icaroribeiro/new-go-code-challenge-template/internal/presentation/api/handler/healthcheck"
-	"github.com/icaroribeiro/new-go-code-challenge-template/pkg/httputil/message"
-	messagehttputilpkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/httputil/message"
 	requesthttputilpkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/httputil/request"
+	responsehttputilpkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/httputil/response"
 	routehttputilpkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/httputil/route"
 	"github.com/stretchr/testify/assert"
 	"gorm.io/gorm"
@@ -21,7 +20,7 @@ import (
 func (ts *TestSuite) TestGetStatus() {
 	db := &gorm.DB{}
 
-	message := message.Message{}
+	message := responsehttputilpkg.Message{}
 
 	var connPool gorm.ConnPool
 
@@ -31,7 +30,7 @@ func (ts *TestSuite) TestGetStatus() {
 			SetUp: func(t *testing.T) {
 				db = ts.DB
 
-				message = messagehttputilpkg.Message{Text: "everything is up and running"}
+				message = responsehttputilpkg.Message{Text: "everything is up and running"}
 			},
 			StatusCode: http.StatusOK,
 			WantError:  false,
@@ -86,7 +85,7 @@ func (ts *TestSuite) TestGetStatus() {
 
 			if !tc.WantError {
 				assert.Equal(t, resprec.Code, tc.StatusCode)
-				returnedMessage := messagehttputilpkg.Message{}
+				returnedMessage := responsehttputilpkg.Message{}
 				err := json.NewDecoder(resprec.Body).Decode(&returnedMessage)
 				assert.Nil(t, err, fmt.Sprintf("Unexpected error: %v.", err))
 				assert.Equal(t, message.Text, returnedMessage.Text)

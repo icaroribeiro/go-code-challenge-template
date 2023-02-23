@@ -2,9 +2,6 @@
 # API building and running locally
 # Set of tasks related to API building and running.
 #
-setup-api:
-	go mod download
-
 audit-api:
 	go mod tidy
 
@@ -28,8 +25,9 @@ build-mocks:
 
 test-api:
 	. ./scripts/setup_env_vars.test.sh; \
-	go test ./... -v -coverprofile=./docs/api/tests/unit/coverage.out && go tool cover -func=./docs/api/tests/unit/coverage.out > ./docs/api/tests/unit/coverage_report.out; \
-	go test ./tests/api/... -v -coverprofile=./docs/api/tests/integration/coverage.out && go tool cover -func=./docs/api/tests/integration/coverage.out > ./docs/api/tests/integration/coverage_report.out
+	go test ./internal/... -v -coverprofile=./docs/api/tests/unit/coverage.out; \
+	go tool cover -func=./docs/api/tests/unit/coverage.out > ./docs/api/tests/unit/coverage_report.out; \
+	go test ./tests/api/... -v
 
 #
 # APP test container
@@ -48,7 +46,7 @@ init-app:
 	docker network connect testapp_network apitest_container
 
 test-app:
-	docker exec --env-file ./.env.test apitest_container go test ./...; \
+	docker exec --env-file ./.env.test apitest_container go test ./... -v; \
 
 destroy-app:
 	docker stop apitest_container; \
@@ -59,6 +57,7 @@ finish-deps:
 	docker network disconnect testapp_network postgrestestdb_container; \
 	docker stop postgrestestdb_container; \
 	docker rm postgrestestdb_container; \
+	docker volume rm postgrestestdb-data; \
 	docker rmi postgrestestdb; \
 	docker network rm testapp_network
 

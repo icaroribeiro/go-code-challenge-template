@@ -33,12 +33,12 @@ func New(userService userservice.IService) IHandler {
 func (h *Handler) GetAll(w http.ResponseWriter, r *http.Request) {
 	domainUsers, err := h.UserService.WithDBTrx(nil).GetAll()
 	if err != nil {
-		responsehttputilpkg.RespondErrorWithJson(w, err)
+		responsehttputilpkg.RespondErrorWithJSON(w, err)
 		return
 	}
 
 	users := presentationentity.Users{}
 	users.FromDomain(domainUsers)
 
-	responsehttputilpkg.RespondWithJson(w, http.StatusOK, users)
+	responsehttputilpkg.RespondWithJSON(w, http.StatusOK, users)
 }

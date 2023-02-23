@@ -6,7 +6,6 @@ import (
 
 	authservice "github.com/icaroribeiro/new-go-code-challenge-template/internal/core/ports/application/service/auth"
 	"github.com/icaroribeiro/new-go-code-challenge-template/pkg/customerror"
-	messagehttputilpkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/httputil/message"
 	responsehttputilpkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/httputil/response"
 	tokenhttputilpkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/httputil/token"
 	authmiddlewarepkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/middleware/auth"
@@ -42,7 +41,7 @@ func New(authService authservice.IService) IHandler {
 func (h *Handler) SignUp(w http.ResponseWriter, r *http.Request) {
 	dbTrx, ok := dbtrxmiddlewarepkg.FromContext(r.Context())
 	if !ok || dbTrx == nil {
-		responsehttputilpkg.RespondErrorWithJson(w, customerror.New("failed to get the db_trx value from the request context"))
+		responsehttputilpkg.RespondErrorWithJSON(w, customerror.New("failed to get the db_trx value from the request context"))
 		return
 	}
 
@@ -50,17 +49,17 @@ func (h *Handler) SignUp(w http.ResponseWriter, r *http.Request) {
 
 	err := json.NewDecoder(r.Body).Decode(&credentials)
 	if err != nil {
-		responsehttputilpkg.RespondErrorWithJson(w, customerror.BadRequest.New(err.Error()))
+		responsehttputilpkg.RespondErrorWithJSON(w, customerror.BadRequest.New(err.Error()))
 		return
 	}
 
 	token, err := h.AuthService.WithDBTrx(dbTrx).Register(credentials)
 	if err != nil {
-		responsehttputilpkg.RespondErrorWithJson(w, err)
+		responsehttputilpkg.RespondErrorWithJSON(w, err)
 		return
 	}
 
-	responsehttputilpkg.RespondWithJson(w, http.StatusOK, tokenhttputilpkg.Token{Text: token})
+	responsehttputilpkg.RespondWithJSON(w, http.StatusOK, tokenhttputilpkg.Token{Text: token})
 }
 
 // SignIn godoc
@@ -81,24 +80,24 @@ func (h *Handler) SignUp(w http.ResponseWriter, r *http.Request) {
 func (h *Handler) SignIn(w http.ResponseWriter, r *http.Request) {
 	dbTrx, ok := dbtrxmiddlewarepkg.FromContext(r.Context())
 	if !ok || dbTrx == nil {
-		responsehttputilpkg.RespondErrorWithJson(w, customerror.New("failed to get the db_trx value from the request context"))
+		responsehttputilpkg.RespondErrorWithJSON(w, customerror.New("failed to get the db_trx value from the request context"))
 		return
 	}
 
 	credentials := securitypkg.Credentials{}
 
 	if err := json.NewDecoder(r.Body).Decode(&credentials); err != nil {
-		responsehttputilpkg.RespondErrorWithJson(w, customerror.BadRequest.New(err.Error()))
+		responsehttputilpkg.RespondErrorWithJSON(w, customerror.BadRequest.New(err.Error()))
 		return
 	}
 
 	token, err := h.AuthService.WithDBTrx(dbTrx).LogIn(credentials)
 	if err != nil {
-		responsehttputilpkg.RespondErrorWithJson(w, err)
+		responsehttputilpkg.RespondErrorWithJSON(w, err)
 		return
 	}
 
-	responsehttputilpkg.RespondWithJson(w, http.StatusOK, tokenhttputilpkg.Token{Text: token})
+	responsehttputilpkg.RespondWithJSON(w, http.StatusOK, tokenhttputilpkg.Token{Text: token})
 }
 
 // RefreshToken godoc
@@ -116,16 +115,16 @@ func (h *Handler) SignIn(w http.ResponseWriter, r *http.Request) {
 func (h *Handler) RefreshToken(w http.ResponseWriter, r *http.Request) {
 	auth, ok := authmiddlewarepkg.FromContext(r.Context())
 	if !ok || auth.IsEmpty() {
-		responsehttputilpkg.RespondErrorWithJson(w, customerror.New("failed to get the auth_details value from the request context"))
+		responsehttputilpkg.RespondErrorWithJSON(w, customerror.New("failed to get the auth_details value from the request context"))
 		return
 	}
 
 	token, err := h.AuthService.WithDBTrx(nil).RenewToken(auth)
 	if err != nil {
-		responsehttputilpkg.RespondErrorWithJson(w, err)
+		responsehttputilpkg.RespondErrorWithJSON(w, err)
 	}
 
-	responsehttputilpkg.RespondWithJson(w, http.StatusOK, tokenhttputilpkg.Token{Text: token})
+	responsehttputilpkg.RespondWithJSON(w, http.StatusOK, tokenhttputilpkg.Token{Text: token})
 }
 
 // ChangePassword godoc
@@ -146,24 +145,24 @@ func (h *Handler) RefreshToken(w http.ResponseWriter, r *http.Request) {
 func (h *Handler) ChangePassword(w http.ResponseWriter, r *http.Request) {
 	auth, ok := authmiddlewarepkg.FromContext(r.Context())
 	if !ok || auth.IsEmpty() {
-		responsehttputilpkg.RespondErrorWithJson(w, customerror.New("failed to get the auth_details value from the request context"))
+		responsehttputilpkg.RespondErrorWithJSON(w, customerror.New("failed to get the auth_details value from the request context"))
 		return
 	}
 
 	passwords := securitypkg.Passwords{}
 
 	if err := json.NewDecoder(r.Body).Decode(&passwords); err != nil {
-		responsehttputilpkg.RespondErrorWithJson(w, customerror.BadRequest.New(err.Error()))
+		responsehttputilpkg.RespondErrorWithJSON(w, customerror.BadRequest.New(err.Error()))
 		return
 	}
 
 	err := h.AuthService.WithDBTrx(nil).ModifyPassword(auth.UserID.String(), passwords)
 	if err != nil {
-		responsehttputilpkg.RespondErrorWithJson(w, err)
+		responsehttputilpkg.RespondErrorWithJSON(w, err)
 		return
 	}
 
-	responsehttputilpkg.RespondWithJson(w, http.StatusOK, messagehttputilpkg.Message{Text: "the password has been updated successfully"})
+	responsehttputilpkg.RespondWithJSON(w, http.StatusOK, responsehttputilpkg.Message{Text: "the password has been updated successfully"})
 }
 
 // SignOut godoc
@@ -182,15 +181,15 @@ func (h *Handler) ChangePassword(w http.ResponseWriter, r *http.Request) {
 func (h *Handler) SignOut(w http.ResponseWriter, r *http.Request) {
 	auth, ok := authmiddlewarepkg.FromContext(r.Context())
 	if !ok || auth.IsEmpty() {
-		responsehttputilpkg.RespondErrorWithJson(w, customerror.New("failed to get the auth_details value from the request context"))
+		responsehttputilpkg.RespondErrorWithJSON(w, customerror.New("failed to get the auth_details value from the request context"))
 		return
 	}
 
 	err := h.AuthService.WithDBTrx(nil).LogOut(auth.ID.String())
 	if err != nil {
-		responsehttputilpkg.RespondErrorWithJson(w, err)
+		responsehttputilpkg.RespondErrorWithJSON(w, err)
 		return
 	}
 
-	responsehttputilpkg.RespondWithJson(w, http.StatusOK, messagehttputilpkg.Message{Text: "you have logged out successfully"})
+	responsehttputilpkg.RespondWithJSON(w, http.StatusOK, responsehttputilpkg.Message{Text: "you have logged out successfully"})
 }
