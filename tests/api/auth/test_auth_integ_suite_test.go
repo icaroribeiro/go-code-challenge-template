@@ -117,6 +117,8 @@ func (ts *TestSuite) SetupSuite() {
 		log.Panicf("Got error when acessing the database instance: %s", err.Error())
 	}
 
+	_deleteTableRecords(ts.DB)
+
 	validationFuncs := map[string]validatorv2.ValidationFunc{
 		"uuid":     uuidvalidatorpkg.Validate,
 		"username": usernamevalidatorpkg.Validate,
@@ -129,6 +131,12 @@ func (ts *TestSuite) SetupSuite() {
 	}
 
 	ts.Security = securitypkg.New()
+}
+
+func _deleteTableRecords(db *gorm.DB) {
+	db.Exec("DELETE FROM auths")
+	db.Exec("DELETE FROM logins")
+	db.Exec("DELETE FROM users")
 }
 
 func (ts *TestSuite) TearDownSuite() {
