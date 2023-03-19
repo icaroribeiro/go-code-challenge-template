@@ -8,11 +8,11 @@ import (
 	"testing"
 
 	"github.com/gorilla/mux"
-	healthcheckservice "github.com/icaroribeiro/new-go-code-challenge-template/internal/application/service/healthcheck"
-	healthcheckhandler "github.com/icaroribeiro/new-go-code-challenge-template/internal/presentation/api/handler/healthcheck"
-	requesthttputilpkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/httputil/request"
-	responsehttputilpkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/httputil/response"
-	routehttputilpkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/httputil/route"
+	healthcheckservice "github.com/icaroribeiro/go-code-challenge-template/internal/application/service/healthcheck"
+	healthcheckhandler "github.com/icaroribeiro/go-code-challenge-template/internal/presentation/api/handler/healthcheck"
+	requesthttputilpkg "github.com/icaroribeiro/go-code-challenge-template/pkg/httputil/request"
+	responsehttputilpkg "github.com/icaroribeiro/go-code-challenge-template/pkg/httputil/response"
+	routehttputilpkg "github.com/icaroribeiro/go-code-challenge-template/pkg/httputil/route"
 	"github.com/stretchr/testify/assert"
 	"gorm.io/gorm"
 )

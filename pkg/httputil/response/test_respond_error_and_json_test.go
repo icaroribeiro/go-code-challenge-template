@@ -7,8 +7,8 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/icaroribeiro/new-go-code-challenge-template/pkg/customerror"
-	responsehttputilpkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/httputil/response"
+	"github.com/icaroribeiro/go-code-challenge-template/pkg/customerror"
+	responsehttputilpkg "github.com/icaroribeiro/go-code-challenge-template/pkg/httputil/response"
 	"github.com/stretchr/testify/assert"
 )
 

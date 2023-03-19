@@ -6,10 +6,10 @@ import (
 	"runtime"
 	"testing"
 
-	swaggerrouter "github.com/icaroribeiro/new-go-code-challenge-template/internal/presentation/api/router/swagger"
-	adapterhttputilpkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/httputil/adapter"
-	routehttputilpkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/httputil/route"
-	loggingmiddlewarepkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/middleware/logging"
+	swaggerrouter "github.com/icaroribeiro/go-code-challenge-template/internal/presentation/api/router/swagger"
+	adapterhttputilpkg "github.com/icaroribeiro/go-code-challenge-template/pkg/httputil/adapter"
+	routehttputilpkg "github.com/icaroribeiro/go-code-challenge-template/pkg/httputil/route"
+	loggingmiddlewarepkg "github.com/icaroribeiro/go-code-challenge-template/pkg/middleware/logging"
 	"github.com/stretchr/testify/assert"
 	httpswaggerpkg "github.com/swaggo/http-swagger"
 )

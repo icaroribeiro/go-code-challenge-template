@@ -9,17 +9,17 @@ import (
 
 	fake "github.com/brianvoe/gofakeit/v5"
 	"github.com/gorilla/mux"
-	authservice "github.com/icaroribeiro/new-go-code-challenge-template/internal/application/service/auth"
-	authdatastorerepository "github.com/icaroribeiro/new-go-code-challenge-template/internal/infrastructure/storage/datastore/repository/auth"
-	logindatastorerepository "github.com/icaroribeiro/new-go-code-challenge-template/internal/infrastructure/storage/datastore/repository/login"
-	userdatastorerepository "github.com/icaroribeiro/new-go-code-challenge-template/internal/infrastructure/storage/datastore/repository/user"
-	authhandler "github.com/icaroribeiro/new-go-code-challenge-template/internal/presentation/api/handler/auth"
-	authpkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/auth"
-	requesthttputilpkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/httputil/request"
-	routehttputilpkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/httputil/route"
-	tokenhttputilpkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/httputil/token"
-	dbtrxmiddlewarepkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/middleware/dbtrx"
-	securitypkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/security"
+	authservice "github.com/icaroribeiro/go-code-challenge-template/internal/application/service/auth"
+	authdatastorerepository "github.com/icaroribeiro/go-code-challenge-template/internal/infrastructure/datastore/repository/auth"
+	logindatastorerepository "github.com/icaroribeiro/go-code-challenge-template/internal/infrastructure/datastore/repository/login"
+	userdatastorerepository "github.com/icaroribeiro/go-code-challenge-template/internal/infrastructure/datastore/repository/user"
+	authhandler "github.com/icaroribeiro/go-code-challenge-template/internal/presentation/api/handler/auth"
+	authpkg "github.com/icaroribeiro/go-code-challenge-template/pkg/auth"
+	requesthttputilpkg "github.com/icaroribeiro/go-code-challenge-template/pkg/httputil/request"
+	routehttputilpkg "github.com/icaroribeiro/go-code-challenge-template/pkg/httputil/route"
+	tokenhttputilpkg "github.com/icaroribeiro/go-code-challenge-template/pkg/httputil/token"
+	dbtrxmiddlewarepkg "github.com/icaroribeiro/go-code-challenge-template/pkg/middleware/dbtrx"
+	securitypkg "github.com/icaroribeiro/go-code-challenge-template/pkg/security"
 	"github.com/stretchr/testify/assert"
 	"gorm.io/gorm"
 )
@@ -155,11 +155,11 @@ func (ts *TestSuite) TestSignUp() {
 		ts.T().Run(tc.Context, func(t *testing.T) {
 			tc.SetUp(t)
 
-			authDatastoreRepository := authdatastorerepository.New(dbTrx)
-			loginDatastoreRepository := logindatastorerepository.New(dbTrx)
-			userDatastoreRepository := userdatastorerepository.New(dbTrx)
+			persistentAuthRepository := authdatastorerepository.New(dbTrx)
+			persistentLoginRepository := logindatastorerepository.New(dbTrx)
+			persistentUserRepository := userdatastorerepository.New(dbTrx)
 
-			authService := authservice.New(authDatastoreRepository, loginDatastoreRepository, userDatastoreRepository,
+			authService := authservice.New(persistentAuthRepository, persistentLoginRepository, persistentUserRepository,
 				authN, ts.Security, ts.Validator, ts.TokenExpTimeInSec)
 			authHandler := authhandler.New(authService)
 

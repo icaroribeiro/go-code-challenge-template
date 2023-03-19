@@ -3,9 +3,9 @@ package user
 import (
 	"net/http"
 
-	userservice "github.com/icaroribeiro/new-go-code-challenge-template/internal/core/ports/application/service/user"
-	presentationentity "github.com/icaroribeiro/new-go-code-challenge-template/internal/presentation/api/entity"
-	responsehttputilpkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/httputil/response"
+	userservice "github.com/icaroribeiro/go-code-challenge-template/internal/core/ports/application/service/user"
+	presentableentity "github.com/icaroribeiro/go-code-challenge-template/internal/presentation/api/presentity"
+	responsehttputilpkg "github.com/icaroribeiro/go-code-challenge-template/pkg/httputil/response"
 )
 
 type Handler struct {
@@ -37,7 +37,7 @@ func (h *Handler) GetAll(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	users := presentationentity.Users{}
+	users := presentableentity.Users{}
 	users.FromDomain(domainUsers)
 
 	responsehttputilpkg.RespondWithJSON(w, http.StatusOK, users)

@@ -1,10 +1,10 @@
 package user
 
 import (
-	domainentity "github.com/icaroribeiro/new-go-code-challenge-template/internal/core/domain/entity"
-	userservice "github.com/icaroribeiro/new-go-code-challenge-template/internal/core/ports/application/service/user"
-	userdatastorerepository "github.com/icaroribeiro/new-go-code-challenge-template/internal/core/ports/infrastructure/storage/datastore/repository/user"
-	validatorpkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/validator"
+	domainentity "github.com/icaroribeiro/go-code-challenge-template/internal/core/domain/entity"
+	userservice "github.com/icaroribeiro/go-code-challenge-template/internal/core/ports/application/service/user"
+	userdatastorerepository "github.com/icaroribeiro/go-code-challenge-template/internal/core/ports/infrastructure/datastore/repository/user"
+	validatorpkg "github.com/icaroribeiro/go-code-challenge-template/pkg/validator"
 	"gorm.io/gorm"
 )
 
@@ -14,9 +14,9 @@ type Service struct {
 }
 
 // New is the factory function that encapsulates the implementation related to user service.
-func New(userDatastoreRepository userdatastorerepository.IRepository, validator validatorpkg.IValidator) userservice.IService {
+func New(persistentUserRepository userdatastorerepository.IRepository, validator validatorpkg.IValidator) userservice.IService {
 	return &Service{
-		UserDatastoreRepository: userDatastoreRepository,
+		UserDatastoreRepository: persistentUserRepository,
 	}
 }
 

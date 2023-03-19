@@ -5,15 +5,15 @@ import (
 	"testing"
 
 	fake "github.com/brianvoe/gofakeit/v5"
-	authservice "github.com/icaroribeiro/new-go-code-challenge-template/internal/application/service/auth"
-	domainentity "github.com/icaroribeiro/new-go-code-challenge-template/internal/core/domain/entity"
-	authdatastoremockrepository "github.com/icaroribeiro/new-go-code-challenge-template/internal/core/ports/infrastructure/storage/datastore/mockrepository/auth"
-	logindatastoremockrepository "github.com/icaroribeiro/new-go-code-challenge-template/internal/core/ports/infrastructure/storage/datastore/mockrepository/login"
-	userdatastoremockrepository "github.com/icaroribeiro/new-go-code-challenge-template/internal/core/ports/infrastructure/storage/datastore/mockrepository/user"
-	"github.com/icaroribeiro/new-go-code-challenge-template/pkg/customerror"
-	mockauth "github.com/icaroribeiro/new-go-code-challenge-template/tests/mocks/pkg/mockauth"
-	mocksecurity "github.com/icaroribeiro/new-go-code-challenge-template/tests/mocks/pkg/mocksecurity"
-	mockvalidator "github.com/icaroribeiro/new-go-code-challenge-template/tests/mocks/pkg/mockvalidator"
+	authservice "github.com/icaroribeiro/go-code-challenge-template/internal/application/service/auth"
+	domainentity "github.com/icaroribeiro/go-code-challenge-template/internal/core/domain/entity"
+	authdatastoremockrepository "github.com/icaroribeiro/go-code-challenge-template/internal/core/ports/infrastructure/datastore/mockrepository/auth"
+	logindatastoremockrepository "github.com/icaroribeiro/go-code-challenge-template/internal/core/ports/infrastructure/datastore/mockrepository/login"
+	userdatastoremockrepository "github.com/icaroribeiro/go-code-challenge-template/internal/core/ports/infrastructure/datastore/mockrepository/user"
+	"github.com/icaroribeiro/go-code-challenge-template/pkg/customerror"
+	mockauth "github.com/icaroribeiro/go-code-challenge-template/tests/mocks/pkg/mockauth"
+	mocksecuritypkg "github.com/icaroribeiro/go-code-challenge-template/tests/mocks/pkg/mocksecurity"
+	mockvalidator "github.com/icaroribeiro/go-code-challenge-template/tests/mocks/pkg/mockvalidator"
 	uuid "github.com/satori/go.uuid"
 	"github.com/stretchr/testify/assert"
 )
@@ -84,15 +84,15 @@ func (ts *TestSuite) TestRenewToken() {
 			authN := new(mockauth.Auth)
 			authN.On("CreateToken", auth, tokenExpTimeInSec).Return(returnArgs[1]...)
 
-			authDatastoreRepository := new(authdatastoremockrepository.Repository)
+			persistentAuthRepository := new(authdatastoremockrepository.Repository)
 
-			userDatastoreRepository := new(userdatastoremockrepository.Repository)
+			persistentUserRepository := new(userdatastoremockrepository.Repository)
 
-			loginDatastoreRepository := new(logindatastoremockrepository.Repository)
+			persistentLoginRepository := new(logindatastoremockrepository.Repository)
 
-			security := new(mocksecurity.Security)
+			security := new(mocksecuritypkg.Security)
 
-			authService := authservice.New(authDatastoreRepository, loginDatastoreRepository, userDatastoreRepository,
+			authService := authservice.New(persistentAuthRepository, persistentLoginRepository, persistentUserRepository,
 				authN, security, validator, tokenExpTimeInSec)
 
 			returnedToken, err := authService.RenewToken(auth)

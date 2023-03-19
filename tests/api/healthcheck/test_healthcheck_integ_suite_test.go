@@ -4,8 +4,8 @@ import (
 	"log"
 	"testing"
 
-	datastorepkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/datastore"
-	envpkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/env"
+	datastorepkg "github.com/icaroribeiro/go-code-challenge-template/pkg/datastore"
+	envpkg "github.com/icaroribeiro/go-code-challenge-template/pkg/env"
 	"github.com/stretchr/testify/suite"
 	"gorm.io/gorm"
 )

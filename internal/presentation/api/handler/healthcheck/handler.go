@@ -3,8 +3,8 @@ package healthcheck
 import (
 	"net/http"
 
-	healthcheckservice "github.com/icaroribeiro/new-go-code-challenge-template/internal/core/ports/application/service/healthcheck"
-	responsehttputilpkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/httputil/response"
+	healthcheckservice "github.com/icaroribeiro/go-code-challenge-template/internal/core/ports/application/service/healthcheck"
+	responsehttputilpkg "github.com/icaroribeiro/go-code-challenge-template/pkg/httputil/response"
 )
 
 type Handler struct {

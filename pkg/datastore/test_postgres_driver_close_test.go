@@ -5,7 +5,7 @@ import (
 	"testing"
 
 	"github.com/DATA-DOG/go-sqlmock"
-	datastorepkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/datastore"
+	datastorepkg "github.com/icaroribeiro/go-code-challenge-template/pkg/datastore"
 	"github.com/stretchr/testify/assert"
 	"gorm.io/gorm"
 )

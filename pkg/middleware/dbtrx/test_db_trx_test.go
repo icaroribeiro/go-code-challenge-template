@@ -10,21 +10,21 @@ import (
 
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/gorilla/mux"
-	datastoremodel "github.com/icaroribeiro/new-go-code-challenge-template/internal/infrastructure/storage/datastore/entity"
-	"github.com/icaroribeiro/new-go-code-challenge-template/pkg/customerror"
-	adapterhttputilpkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/httputil/adapter"
-	requesthttputilpkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/httputil/request"
-	responsehttputilpkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/httputil/response"
-	routehttputilpkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/httputil/route"
-	dbtrxmiddlewarepkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/middleware/dbtrx"
-	domainmodelfactory "github.com/icaroribeiro/new-go-code-challenge-template/tests/factory/core/domain/entity"
+	domainentity "github.com/icaroribeiro/go-code-challenge-template/internal/core/domain/entity"
+	persistententity "github.com/icaroribeiro/go-code-challenge-template/internal/infrastructure/datastore/perentity"
+	"github.com/icaroribeiro/go-code-challenge-template/pkg/customerror"
+	adapterhttputilpkg "github.com/icaroribeiro/go-code-challenge-template/pkg/httputil/adapter"
+	requesthttputilpkg "github.com/icaroribeiro/go-code-challenge-template/pkg/httputil/request"
+	responsehttputilpkg "github.com/icaroribeiro/go-code-challenge-template/pkg/httputil/response"
+	routehttputilpkg "github.com/icaroribeiro/go-code-challenge-template/pkg/httputil/route"
+	dbtrxmiddlewarepkg "github.com/icaroribeiro/go-code-challenge-template/pkg/middleware/dbtrx"
 	uuid "github.com/satori/go.uuid"
 	"github.com/stretchr/testify/assert"
 	"gorm.io/gorm"
 )
 
 func (ts *TestSuite) TestDBTrx() {
-	user := domainmodelfactory.NewUser(nil)
+	user := domainentity.UserFactory(nil)
 
 	body := fmt.Sprintf(`
 	{
@@ -53,11 +53,11 @@ func (ts *TestSuite) TestDBTrx() {
 				handlerFunc = func(w http.ResponseWriter, r *http.Request) {
 					dbAux, _ := dbtrxmiddlewarepkg.FromContext(r.Context())
 
-					userDatastore := datastoremodel.User{
+					persistentUser := persistententity.User{
 						Username: user.Username,
 					}
 
-					_ = dbAux.Create(&userDatastore)
+					_ = dbAux.Create(&persistentUser)
 
 					responsehttputilpkg.RespondWithJSON(w, http.StatusOK, responsehttputilpkg.Message{Text: "ok"})
 				}
@@ -101,11 +101,11 @@ func (ts *TestSuite) TestDBTrx() {
 				handlerFunc = func(w http.ResponseWriter, r *http.Request) {
 					dbAux, _ := dbtrxmiddlewarepkg.FromContext(r.Context())
 
-					userDatastore := datastoremodel.User{
+					persistentUser := persistententity.User{
 						Username: user.Username,
 					}
 
-					result := dbAux.Create(&userDatastore)
+					result := dbAux.Create(&persistentUser)
 					if result.Error != nil {
 						responsehttputilpkg.RespondErrorWithJSON(w, customerror.New("failed"))
 					}
@@ -133,11 +133,11 @@ func (ts *TestSuite) TestDBTrx() {
 				handlerFunc = func(w http.ResponseWriter, r *http.Request) {
 					dbAux, _ := dbtrxmiddlewarepkg.FromContext(r.Context())
 
-					userDatastore := datastoremodel.User{
+					persistentUser := persistententity.User{
 						Username: user.Username,
 					}
 
-					result := dbAux.Create(&userDatastore)
+					result := dbAux.Create(&persistentUser)
 					if result.Error != nil {
 						responsehttputilpkg.RespondErrorWithJSON(w, customerror.New("failed"))
 					}
@@ -165,11 +165,11 @@ func (ts *TestSuite) TestDBTrx() {
 				handlerFunc = func(w http.ResponseWriter, r *http.Request) {
 					dbAux, _ := dbtrxmiddlewarepkg.FromContext(r.Context())
 
-					userDatastore := datastoremodel.User{
+					persistentUser := persistententity.User{
 						Username: user.Username,
 					}
 
-					result := dbAux.Create(&userDatastore)
+					result := dbAux.Create(&persistentUser)
 					if result.Error != nil {
 						responsehttputilpkg.RespondErrorWithJSON(w, customerror.New("failed"))
 					}
@@ -197,11 +197,11 @@ func (ts *TestSuite) TestDBTrx() {
 				handlerFunc = func(w http.ResponseWriter, r *http.Request) {
 					dbAux, _ := dbtrxmiddlewarepkg.FromContext(r.Context())
 
-					userDatastore := datastoremodel.User{
+					persistentUser := persistententity.User{
 						Username: user.Username,
 					}
 
-					result := dbAux.Create(&userDatastore)
+					result := dbAux.Create(&persistentUser)
 					if result.Error != nil {
 						// It is duplicated only to test the code that evaluates
 						// if the header is already written in the WriteHeader method.
@@ -233,11 +233,11 @@ func (ts *TestSuite) TestDBTrx() {
 				handlerFunc = func(w http.ResponseWriter, r *http.Request) {
 					dbAux, _ := dbtrxmiddlewarepkg.FromContext(r.Context())
 
-					userDatastore := datastoremodel.User{
+					persistentUser := persistententity.User{
 						Username: user.Username,
 					}
 
-					result := dbAux.Create(&userDatastore)
+					result := dbAux.Create(&persistentUser)
 					if result.Error != nil {
 						// It is duplicated only to test the code that evaluates
 						// if the header is already written in the WriteHeader method.

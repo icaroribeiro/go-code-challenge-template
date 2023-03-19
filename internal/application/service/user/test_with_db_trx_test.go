@@ -3,9 +3,9 @@ package user_test
 import (
 	"testing"
 
-	userservice "github.com/icaroribeiro/new-go-code-challenge-template/internal/application/service/user"
-	userdatastoremockrepository "github.com/icaroribeiro/new-go-code-challenge-template/internal/core/ports/infrastructure/storage/datastore/mockrepository/user"
-	"github.com/icaroribeiro/new-go-code-challenge-template/tests/mocks/pkg/mockvalidator"
+	userservice "github.com/icaroribeiro/go-code-challenge-template/internal/application/service/user"
+	userdatastoremockrepository "github.com/icaroribeiro/go-code-challenge-template/internal/core/ports/infrastructure/datastore/mockrepository/user"
+	"github.com/icaroribeiro/go-code-challenge-template/tests/mocks/pkg/mockvalidator"
 	"github.com/stretchr/testify/assert"
 	"gorm.io/gorm"
 )
@@ -15,7 +15,7 @@ func (ts *TestSuite) TestWithDBTrx() {
 	db, _ := NewMockDB(driver)
 	dbTrx := &gorm.DB{}
 
-	userDatastoreRepositoryWithDBTrx := &userdatastoremockrepository.Repository{}
+	persistentUserRepositoryWithDBTrx := &userdatastoremockrepository.Repository{}
 
 	returnArgs := ReturnArgs{}
 
@@ -25,10 +25,10 @@ func (ts *TestSuite) TestWithDBTrx() {
 			SetUp: func(t *testing.T) {
 				dbTrx = db
 
-				userDatastoreRepositoryWithDBTrx = &userdatastoremockrepository.Repository{}
+				persistentUserRepositoryWithDBTrx = &userdatastoremockrepository.Repository{}
 
 				returnArgs = ReturnArgs{
-					{userDatastoreRepositoryWithDBTrx},
+					{persistentUserRepositoryWithDBTrx},
 				}
 			},
 			WantError: false,
@@ -39,12 +39,12 @@ func (ts *TestSuite) TestWithDBTrx() {
 		ts.T().Run(tc.Context, func(t *testing.T) {
 			tc.SetUp(t)
 
-			userDatastoreRepository := new(userdatastoremockrepository.Repository)
-			userDatastoreRepository.On("WithDBTrx", dbTrx).Return(returnArgs[0]...)
+			persistentUserRepository := new(userdatastoremockrepository.Repository)
+			persistentUserRepository.On("WithDBTrx", dbTrx).Return(returnArgs[0]...)
 
 			validator := new(mockvalidator.Validator)
 
-			userService := userservice.New(userDatastoreRepository, validator)
+			userService := userservice.New(persistentUserRepository, validator)
 
 			returnedUserService := userService.WithDBTrx(dbTrx)
 

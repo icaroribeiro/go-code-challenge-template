@@ -4,13 +4,13 @@ import (
 	"encoding/json"
 	"net/http"
 
-	authservice "github.com/icaroribeiro/new-go-code-challenge-template/internal/core/ports/application/service/auth"
-	"github.com/icaroribeiro/new-go-code-challenge-template/pkg/customerror"
-	responsehttputilpkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/httputil/response"
-	tokenhttputilpkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/httputil/token"
-	authmiddlewarepkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/middleware/auth"
-	dbtrxmiddlewarepkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/middleware/dbtrx"
-	securitypkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/security"
+	authservice "github.com/icaroribeiro/go-code-challenge-template/internal/core/ports/application/service/auth"
+	"github.com/icaroribeiro/go-code-challenge-template/pkg/customerror"
+	responsehttputilpkg "github.com/icaroribeiro/go-code-challenge-template/pkg/httputil/response"
+	tokenhttputilpkg "github.com/icaroribeiro/go-code-challenge-template/pkg/httputil/token"
+	authmiddlewarepkg "github.com/icaroribeiro/go-code-challenge-template/pkg/middleware/auth"
+	dbtrxmiddlewarepkg "github.com/icaroribeiro/go-code-challenge-template/pkg/middleware/dbtrx"
+	securitypkg "github.com/icaroribeiro/go-code-challenge-template/pkg/security"
 )
 
 type Handler struct {
@@ -31,7 +31,7 @@ func New(authService authservice.IService) IHandler {
 // @id SignUp
 // @accept json
 // @produce json
-// @param credentials body security.Credentials true "SignUp"
+// @param credentials body securitypkg.Credentials true "SignUp"
 // @success 200 {object} token.Token
 // @failure 400 {object} error.Error
 // @failure 404 {object} error.Error
@@ -69,7 +69,7 @@ func (h *Handler) SignUp(w http.ResponseWriter, r *http.Request) {
 // @id SignIn
 // @accept json
 // @produce json
-// @param credentials body security.Credentials true "SignIn"
+// @param credentials body securitypkg.Credentials true "SignIn"
 // @success 200 {object} token.Token
 // @failure 400 {object} error.Error
 // @failure 401 {object} error.Error
@@ -134,7 +134,7 @@ func (h *Handler) RefreshToken(w http.ResponseWriter, r *http.Request) {
 // @id ChangePassword
 // @accept json
 // @produce json
-// @param passwords body security.Passwords true "Reset Password"
+// @param passwords body securitypkg.Passwords true "Reset Password"
 // @success 200 {object} message.Message
 // @failure 400 {object} error.Error
 // @failure 401 {object} error.Error

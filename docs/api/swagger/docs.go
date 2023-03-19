@@ -57,7 +57,7 @@ var doc = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/security.Passwords"
+                            "$ref": "#/definitions/securitypkg.Passwords"
                         }
                     }
                 ],
@@ -158,7 +158,7 @@ var doc = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/security.Credentials"
+                            "$ref": "#/definitions/securitypkg.Credentials"
                         }
                     }
                 ],
@@ -271,7 +271,7 @@ var doc = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/security.Credentials"
+                            "$ref": "#/definitions/securitypkg.Credentials"
                         }
                     }
                 ],
@@ -404,7 +404,7 @@ var doc = `{
                 }
             }
         },
-        "security.Credentials": {
+        "securitypkg.Credentials": {
             "type": "object",
             "properties": {
                 "password": {
@@ -415,7 +415,7 @@ var doc = `{
                 }
             }
         },
-        "security.Passwords": {
+        "securitypkg.Passwords": {
             "type": "object",
             "properties": {
                 "current_password": {

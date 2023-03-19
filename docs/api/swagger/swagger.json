@@ -43,7 +43,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/security.Passwords"
+                            "$ref": "#/definitions/securitypkg.Passwords"
                         }
                     }
                 ],
@@ -144,7 +144,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/security.Credentials"
+                            "$ref": "#/definitions/securitypkg.Credentials"
                         }
                     }
                 ],
@@ -257,7 +257,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/security.Credentials"
+                            "$ref": "#/definitions/securitypkg.Credentials"
                         }
                     }
                 ],
@@ -390,7 +390,7 @@
                 }
             }
         },
-        "security.Credentials": {
+        "securitypkg.Credentials": {
             "type": "object",
             "properties": {
                 "password": {
@@ -401,7 +401,7 @@
                 }
             }
         },
-        "security.Passwords": {
+        "securitypkg.Passwords": {
             "type": "object",
             "properties": {
                 "current_password": {

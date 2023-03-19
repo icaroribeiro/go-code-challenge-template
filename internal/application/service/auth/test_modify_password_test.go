@@ -5,17 +5,16 @@ import (
 	"testing"
 
 	fake "github.com/brianvoe/gofakeit/v5"
-	authservice "github.com/icaroribeiro/new-go-code-challenge-template/internal/application/service/auth"
-	domainentity "github.com/icaroribeiro/new-go-code-challenge-template/internal/core/domain/entity"
-	authdatastoremockrepository "github.com/icaroribeiro/new-go-code-challenge-template/internal/core/ports/infrastructure/storage/datastore/mockrepository/auth"
-	logindatastoremockrepository "github.com/icaroribeiro/new-go-code-challenge-template/internal/core/ports/infrastructure/storage/datastore/mockrepository/login"
-	userdatastoremockrepository "github.com/icaroribeiro/new-go-code-challenge-template/internal/core/ports/infrastructure/storage/datastore/mockrepository/user"
-	"github.com/icaroribeiro/new-go-code-challenge-template/pkg/customerror"
-	"github.com/icaroribeiro/new-go-code-challenge-template/pkg/security"
-	securitypkgfactory "github.com/icaroribeiro/new-go-code-challenge-template/tests/factory/pkg/security"
-	mockauth "github.com/icaroribeiro/new-go-code-challenge-template/tests/mocks/pkg/mockauth"
-	mocksecurity "github.com/icaroribeiro/new-go-code-challenge-template/tests/mocks/pkg/mocksecurity"
-	mockvalidator "github.com/icaroribeiro/new-go-code-challenge-template/tests/mocks/pkg/mockvalidator"
+	authservice "github.com/icaroribeiro/go-code-challenge-template/internal/application/service/auth"
+	domainentity "github.com/icaroribeiro/go-code-challenge-template/internal/core/domain/entity"
+	authdatastoremockrepository "github.com/icaroribeiro/go-code-challenge-template/internal/core/ports/infrastructure/datastore/mockrepository/auth"
+	logindatastoremockrepository "github.com/icaroribeiro/go-code-challenge-template/internal/core/ports/infrastructure/datastore/mockrepository/login"
+	userdatastoremockrepository "github.com/icaroribeiro/go-code-challenge-template/internal/core/ports/infrastructure/datastore/mockrepository/user"
+	"github.com/icaroribeiro/go-code-challenge-template/pkg/customerror"
+	securitypkg "github.com/icaroribeiro/go-code-challenge-template/pkg/security"
+	mockauth "github.com/icaroribeiro/go-code-challenge-template/tests/mocks/pkg/mockauth"
+	mocksecuritypkg "github.com/icaroribeiro/go-code-challenge-template/tests/mocks/pkg/mocksecurity"
+	mockvalidator "github.com/icaroribeiro/go-code-challenge-template/tests/mocks/pkg/mockvalidator"
 	uuid "github.com/satori/go.uuid"
 	"github.com/stretchr/testify/assert"
 )
@@ -23,7 +22,7 @@ import (
 func (ts *TestSuite) TestModifyPassword() {
 	id := ""
 
-	passwords := security.Passwords{}
+	passwords := securitypkg.Passwords{}
 
 	login := domainentity.Login{}
 
@@ -40,7 +39,7 @@ func (ts *TestSuite) TestModifyPassword() {
 			Context: "ItShouldSucceedInModifyingThePassword",
 			SetUp: func(t *testing.T) {
 				id = uuid.NewV4().String()
-				passwords = securitypkgfactory.NewPasswords(nil)
+				passwords = securitypkg.PasswordsFactory(nil)
 
 				loginID := uuid.NewV4()
 				userID := uuid.NewV4()
@@ -88,7 +87,7 @@ func (ts *TestSuite) TestModifyPassword() {
 		{
 			Context: "ItShouldFailIfTheEvaluatedPasswordsValuesAreNotValid",
 			SetUp: func(t *testing.T) {
-				passwords = security.Passwords{}
+				passwords = securitypkg.Passwords{}
 
 				returnArgs = ReturnArgs{
 					{nil},
@@ -109,7 +108,7 @@ func (ts *TestSuite) TestModifyPassword() {
 				currentPassword := fake.Password(true, true, true, false, false, 8)
 				newPassword := fake.Password(true, true, true, false, false, 8)
 
-				passwords = security.Passwords{
+				passwords = securitypkg.Passwords{
 					CurrentPassword: currentPassword,
 					NewPassword:     newPassword,
 				}
@@ -133,7 +132,7 @@ func (ts *TestSuite) TestModifyPassword() {
 				currentPassword := fake.Password(true, true, true, false, false, 8)
 				newPassword := fake.Password(true, true, true, false, false, 8)
 
-				passwords = security.Passwords{
+				passwords = securitypkg.Passwords{
 					CurrentPassword: currentPassword,
 					NewPassword:     newPassword,
 				}
@@ -157,7 +156,7 @@ func (ts *TestSuite) TestModifyPassword() {
 				currentPassword := fake.Password(true, true, true, false, false, 8)
 				newPassword := fake.Password(true, true, true, false, false, 8)
 
-				passwords = security.Passwords{
+				passwords = securitypkg.Passwords{
 					CurrentPassword: currentPassword,
 					NewPassword:     newPassword,
 				}
@@ -192,7 +191,7 @@ func (ts *TestSuite) TestModifyPassword() {
 				currentPassword := fake.Password(true, true, true, false, false, 8)
 				newPassword := fake.Password(true, true, true, false, false, 8)
 
-				passwords = security.Passwords{
+				passwords = securitypkg.Passwords{
 					CurrentPassword: currentPassword,
 					NewPassword:     newPassword,
 				}
@@ -227,7 +226,7 @@ func (ts *TestSuite) TestModifyPassword() {
 				currentPassword := fake.Password(true, true, true, false, false, 8)
 				newPassword := currentPassword
 
-				passwords = security.Passwords{
+				passwords = securitypkg.Passwords{
 					CurrentPassword: currentPassword,
 					NewPassword:     newPassword,
 				}
@@ -262,7 +261,7 @@ func (ts *TestSuite) TestModifyPassword() {
 				currentPassword := fake.Password(true, true, true, false, false, 8)
 				newPassword := fake.Password(true, true, true, false, false, 8)
 
-				passwords = security.Passwords{
+				passwords = securitypkg.Passwords{
 					CurrentPassword: currentPassword,
 					NewPassword:     newPassword,
 				}
@@ -303,21 +302,21 @@ func (ts *TestSuite) TestModifyPassword() {
 			validator.On("ValidateWithTags", id, "nonzero, uuid").Return(returnArgs[0]...)
 			validator.On("Validate", passwords).Return(returnArgs[1]...)
 
-			loginDatastoreRepository := new(logindatastoremockrepository.Repository)
-			loginDatastoreRepository.On("GetByUserID", id).Return(returnArgs[2]...)
+			persistentLoginRepository := new(logindatastoremockrepository.Repository)
+			persistentLoginRepository.On("GetByUserID", id).Return(returnArgs[2]...)
 
-			security := new(mocksecurity.Security)
+			security := new(mocksecuritypkg.Security)
 			security.On("VerifyPasswords", login.Password, passwords.CurrentPassword).Return(returnArgs[3]...)
 
-			loginDatastoreRepository.On("Update", updatedLogin.ID.String(), updatedLogin).Return(returnArgs[4]...)
+			persistentLoginRepository.On("Update", updatedLogin.ID.String(), updatedLogin).Return(returnArgs[4]...)
 
-			authDatastoreRepository := new(authdatastoremockrepository.Repository)
+			persistentAuthRepository := new(authdatastoremockrepository.Repository)
 
-			userDatastoreRepository := new(userdatastoremockrepository.Repository)
+			persistentUserRepository := new(userdatastoremockrepository.Repository)
 
 			authN := new(mockauth.Auth)
 
-			authService := authservice.New(authDatastoreRepository, loginDatastoreRepository, userDatastoreRepository,
+			authService := authservice.New(persistentAuthRepository, persistentLoginRepository, persistentUserRepository,
 				authN, security, validator, tokenExpTimeInSec)
 
 			err := authService.ModifyPassword(id, passwords)

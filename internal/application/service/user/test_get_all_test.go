@@ -4,12 +4,11 @@ import (
 	"fmt"
 	"testing"
 
-	userservice "github.com/icaroribeiro/new-go-code-challenge-template/internal/application/service/user"
-	domainentity "github.com/icaroribeiro/new-go-code-challenge-template/internal/core/domain/entity"
-	userdatastoremockrepository "github.com/icaroribeiro/new-go-code-challenge-template/internal/core/ports/infrastructure/storage/datastore/mockrepository/user"
-	"github.com/icaroribeiro/new-go-code-challenge-template/pkg/customerror"
-	domainentityfactory "github.com/icaroribeiro/new-go-code-challenge-template/tests/factory/core/domain/entity"
-	"github.com/icaroribeiro/new-go-code-challenge-template/tests/mocks/pkg/mockvalidator"
+	userservice "github.com/icaroribeiro/go-code-challenge-template/internal/application/service/user"
+	domainentity "github.com/icaroribeiro/go-code-challenge-template/internal/core/domain/entity"
+	userdatastoremockrepository "github.com/icaroribeiro/go-code-challenge-template/internal/core/ports/infrastructure/datastore/mockrepository/user"
+	"github.com/icaroribeiro/go-code-challenge-template/pkg/customerror"
+	"github.com/icaroribeiro/go-code-challenge-template/tests/mocks/pkg/mockvalidator"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -24,7 +23,7 @@ func (ts *TestSuite) TestGetAll() {
 		{
 			Context: "ItShouldSucceedInGettingAllUsers",
 			SetUp: func(t *testing.T) {
-				user = domainentityfactory.NewUser(nil)
+				user = domainentity.UserFactory(nil)
 
 				returnArgs = ReturnArgs{
 					{domainentity.Users{user}, nil},
@@ -49,12 +48,12 @@ func (ts *TestSuite) TestGetAll() {
 		ts.T().Run(tc.Context, func(t *testing.T) {
 			tc.SetUp(t)
 
-			userDatastoreRepository := new(userdatastoremockrepository.Repository)
-			userDatastoreRepository.On("GetAll").Return(returnArgs[0]...)
+			persistentUserRepository := new(userdatastoremockrepository.Repository)
+			persistentUserRepository.On("GetAll").Return(returnArgs[0]...)
 
 			validator := new(mockvalidator.Validator)
 
-			userService := userservice.New(userDatastoreRepository, validator)
+			userService := userservice.New(persistentUserRepository, validator)
 
 			returnedUsers, err := userService.GetAll()
 

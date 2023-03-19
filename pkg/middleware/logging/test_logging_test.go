@@ -8,9 +8,9 @@ import (
 
 	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
-	requesthttputilpkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/httputil/request"
-	routehttputilpkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/httputil/route"
-	loggingmiddlewarepkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/middleware/logging"
+	requesthttputilpkg "github.com/icaroribeiro/go-code-challenge-template/pkg/httputil/request"
+	routehttputilpkg "github.com/icaroribeiro/go-code-challenge-template/pkg/httputil/route"
+	loggingmiddlewarepkg "github.com/icaroribeiro/go-code-challenge-template/pkg/middleware/logging"
 	"github.com/stretchr/testify/assert"
 )
 

@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"testing"
 
-	healthcheckservice "github.com/icaroribeiro/new-go-code-challenge-template/internal/application/service/healthcheck"
-	"github.com/icaroribeiro/new-go-code-challenge-template/pkg/customerror"
+	healthcheckservice "github.com/icaroribeiro/go-code-challenge-template/internal/application/service/healthcheck"
+	"github.com/icaroribeiro/go-code-challenge-template/pkg/customerror"
 	"github.com/stretchr/testify/assert"
 )
 

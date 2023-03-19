@@ -5,18 +5,18 @@ import (
 	"testing"
 
 	fake "github.com/brianvoe/gofakeit/v5"
-	authservice "github.com/icaroribeiro/new-go-code-challenge-template/internal/application/service/auth"
-	domainentity "github.com/icaroribeiro/new-go-code-challenge-template/internal/core/domain/entity"
-	authdatastoremockrepository "github.com/icaroribeiro/new-go-code-challenge-template/internal/core/ports/infrastructure/storage/datastore/mockrepository/auth"
-	logindatastoremockrepository "github.com/icaroribeiro/new-go-code-challenge-template/internal/core/ports/infrastructure/storage/datastore/mockrepository/login"
-	userdatastoremockrepository "github.com/icaroribeiro/new-go-code-challenge-template/internal/core/ports/infrastructure/storage/datastore/mockrepository/user"
-	"github.com/icaroribeiro/new-go-code-challenge-template/pkg/customerror"
-	"github.com/icaroribeiro/new-go-code-challenge-template/pkg/security"
-	domainentityfactory "github.com/icaroribeiro/new-go-code-challenge-template/tests/factory/core/domain/entity"
-	securitypkgfactory "github.com/icaroribeiro/new-go-code-challenge-template/tests/factory/pkg/security"
-	mockauth "github.com/icaroribeiro/new-go-code-challenge-template/tests/mocks/pkg/mockauth"
-	mocksecurity "github.com/icaroribeiro/new-go-code-challenge-template/tests/mocks/pkg/mocksecurity"
-	mockvalidator "github.com/icaroribeiro/new-go-code-challenge-template/tests/mocks/pkg/mockvalidator"
+	authservice "github.com/icaroribeiro/go-code-challenge-template/internal/application/service/auth"
+	domainentity "github.com/icaroribeiro/go-code-challenge-template/internal/core/domain/entity"
+	domainentityfactory "github.com/icaroribeiro/go-code-challenge-template/internal/core/domain/entity"
+	authdatastoremockrepository "github.com/icaroribeiro/go-code-challenge-template/internal/core/ports/infrastructure/datastore/mockrepository/auth"
+	logindatastoremockrepository "github.com/icaroribeiro/go-code-challenge-template/internal/core/ports/infrastructure/datastore/mockrepository/login"
+	userdatastoremockrepository "github.com/icaroribeiro/go-code-challenge-template/internal/core/ports/infrastructure/datastore/mockrepository/user"
+	"github.com/icaroribeiro/go-code-challenge-template/pkg/customerror"
+	"github.com/icaroribeiro/go-code-challenge-template/pkg/security"
+	securitypkg "github.com/icaroribeiro/go-code-challenge-template/pkg/security"
+	mockauth "github.com/icaroribeiro/go-code-challenge-template/tests/mocks/pkg/mockauth"
+	mocksecurity "github.com/icaroribeiro/go-code-challenge-template/tests/mocks/pkg/mocksecurity"
+	mockvalidator "github.com/icaroribeiro/go-code-challenge-template/tests/mocks/pkg/mockvalidator"
 	uuid "github.com/satori/go.uuid"
 	"github.com/stretchr/testify/assert"
 )
@@ -44,14 +44,14 @@ func (ts *TestSuite) TestRegister() {
 		{
 			Context: "ItShouldSucceedInRegisteringAUser",
 			SetUp: func(t *testing.T) {
-				credentials = securitypkgfactory.NewCredentials(nil)
+				credentials = securitypkg.CredentialsFactory(nil)
 
 				args := map[string]interface{}{
 					"id":       uuid.Nil,
 					"username": credentials.Username,
 				}
 
-				user = domainentityfactory.NewUser(args)
+				user = domainentityfactory.UserFactory(args)
 
 				id := uuid.NewV4()
 
@@ -60,7 +60,7 @@ func (ts *TestSuite) TestRegister() {
 					"username": credentials.Username,
 				}
 
-				newUser := domainentityfactory.NewUser(args)
+				newUser := domainentityfactory.UserFactory(args)
 
 				args = map[string]interface{}{
 					"id":       uuid.Nil,
@@ -69,14 +69,14 @@ func (ts *TestSuite) TestRegister() {
 					"password": credentials.Password,
 				}
 
-				login = domainentityfactory.NewLogin(args)
+				login = domainentityfactory.LoginFactory(args)
 
 				args = map[string]interface{}{
 					"id":     uuid.Nil,
 					"userID": newUser.ID,
 				}
 
-				auth = domainentityfactory.NewAuth(args)
+				auth = domainentityfactory.AuthFactory(args)
 
 				id = uuid.NewV4()
 
@@ -85,7 +85,7 @@ func (ts *TestSuite) TestRegister() {
 					"userID": newUser.ID,
 				}
 
-				newAuth = domainentityfactory.NewAuth(args)
+				newAuth = domainentityfactory.AuthFactory(args)
 
 				token = fake.Word()
 
@@ -104,7 +104,7 @@ func (ts *TestSuite) TestRegister() {
 		{
 			Context: "ItShouldFailIfTheCredentialsAreNotValid",
 			SetUp: func(t *testing.T) {
-				credentials = securitypkgfactory.NewCredentials(nil)
+				credentials = securitypkg.CredentialsFactory(nil)
 
 				returnArgs = ReturnArgs{
 					{customerror.New("failed")},
@@ -148,7 +148,7 @@ func (ts *TestSuite) TestRegister() {
 		{
 			Context: "ItShouldFailIfTheUsernameIsAlreadyRegistered",
 			SetUp: func(t *testing.T) {
-				credentials = securitypkgfactory.NewCredentials(nil)
+				credentials = securitypkg.CredentialsFactory(nil)
 
 				id := uuid.NewV4()
 				userID := uuid.NewV4()
@@ -177,7 +177,7 @@ func (ts *TestSuite) TestRegister() {
 		{
 			Context: "ItShouldFailIfAnErrorOccursWhenCreatingAUser",
 			SetUp: func(t *testing.T) {
-				credentials = securitypkgfactory.NewCredentials(nil)
+				credentials = securitypkg.CredentialsFactory(nil)
 
 				user = domainentity.User{
 					Username: credentials.Username,
@@ -200,7 +200,7 @@ func (ts *TestSuite) TestRegister() {
 		{
 			Context: "ItShouldFailIfAnErrorOccursWhenCreatingALogin",
 			SetUp: func(t *testing.T) {
-				credentials = securitypkgfactory.NewCredentials(nil)
+				credentials = securitypkg.CredentialsFactory(nil)
 
 				user = domainentity.User{
 					Username: credentials.Username,
@@ -236,7 +236,7 @@ func (ts *TestSuite) TestRegister() {
 		{
 			Context: "ItShouldFailIfAnErrorOccursWhenCreatingAnAuth",
 			SetUp: func(t *testing.T) {
-				credentials = securitypkgfactory.NewCredentials(nil)
+				credentials = securitypkg.CredentialsFactory(nil)
 
 				user = domainentity.User{
 					Username: credentials.Username,
@@ -285,7 +285,7 @@ func (ts *TestSuite) TestRegister() {
 		{
 			Context: "ItShouldFailIfAnErrorOccursWhenCreatingAToken",
 			SetUp: func(t *testing.T) {
-				credentials = securitypkgfactory.NewCredentials(nil)
+				credentials = securitypkg.CredentialsFactory(nil)
 
 				user = domainentity.User{
 					Username: credentials.Username,
@@ -347,23 +347,23 @@ func (ts *TestSuite) TestRegister() {
 			validator := new(mockvalidator.Validator)
 			validator.On("Validate", credentials).Return(returnArgs[0]...)
 
-			loginDatastoreRepository := new(logindatastoremockrepository.Repository)
-			loginDatastoreRepository.On("GetByUsername", credentials.Username).Return(returnArgs[1]...)
+			persistentLoginRepository := new(logindatastoremockrepository.Repository)
+			persistentLoginRepository.On("GetByUsername", credentials.Username).Return(returnArgs[1]...)
 
-			userDatastoreRepository := new(userdatastoremockrepository.Repository)
-			userDatastoreRepository.On("Create", user).Return(returnArgs[2]...)
+			persistentUserRepository := new(userdatastoremockrepository.Repository)
+			persistentUserRepository.On("Create", user).Return(returnArgs[2]...)
 
-			loginDatastoreRepository.On("Create", login).Return(returnArgs[3]...)
+			persistentLoginRepository.On("Create", login).Return(returnArgs[3]...)
 
-			authDatastoreRepository := new(authdatastoremockrepository.Repository)
-			authDatastoreRepository.On("Create", auth).Return(returnArgs[4]...)
+			persistentAuthRepository := new(authdatastoremockrepository.Repository)
+			persistentAuthRepository.On("Create", auth).Return(returnArgs[4]...)
 
 			authN := new(mockauth.Auth)
 			authN.On("CreateToken", newAuth, tokenExpTimeInSec).Return(returnArgs[5]...)
 
 			security := new(mocksecurity.Security)
 
-			authService := authservice.New(authDatastoreRepository, loginDatastoreRepository, userDatastoreRepository,
+			authService := authservice.New(persistentAuthRepository, persistentLoginRepository, persistentUserRepository,
 				authN, security, validator, tokenExpTimeInSec)
 
 			returnedToken, err := authService.Register(credentials)

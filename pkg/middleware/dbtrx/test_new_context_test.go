@@ -4,7 +4,7 @@ import (
 	"context"
 	"testing"
 
-	dbtrxmiddlewarepkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/middleware/dbtrx"
+	dbtrxmiddlewarepkg "github.com/icaroribeiro/go-code-challenge-template/pkg/middleware/dbtrx"
 	"github.com/stretchr/testify/assert"
 	"gorm.io/gorm"
 )

@@ -1,15 +1,15 @@
 package auth
 
 import (
-	domainentity "github.com/icaroribeiro/new-go-code-challenge-template/internal/core/domain/entity"
-	authservice "github.com/icaroribeiro/new-go-code-challenge-template/internal/core/ports/application/service/auth"
-	authdatastorerepository "github.com/icaroribeiro/new-go-code-challenge-template/internal/core/ports/infrastructure/storage/datastore/repository/auth"
-	logindatastorerepository "github.com/icaroribeiro/new-go-code-challenge-template/internal/core/ports/infrastructure/storage/datastore/repository/login"
-	userdatastorerepository "github.com/icaroribeiro/new-go-code-challenge-template/internal/core/ports/infrastructure/storage/datastore/repository/user"
-	authpkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/auth"
-	"github.com/icaroribeiro/new-go-code-challenge-template/pkg/customerror"
-	securitypkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/security"
-	validatorpkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/validator"
+	domainentity "github.com/icaroribeiro/go-code-challenge-template/internal/core/domain/entity"
+	authservice "github.com/icaroribeiro/go-code-challenge-template/internal/core/ports/application/service/auth"
+	authdatastorerepository "github.com/icaroribeiro/go-code-challenge-template/internal/core/ports/infrastructure/datastore/repository/auth"
+	logindatastorerepository "github.com/icaroribeiro/go-code-challenge-template/internal/core/ports/infrastructure/datastore/repository/login"
+	userdatastorerepository "github.com/icaroribeiro/go-code-challenge-template/internal/core/ports/infrastructure/datastore/repository/user"
+	authpkg "github.com/icaroribeiro/go-code-challenge-template/pkg/auth"
+	"github.com/icaroribeiro/go-code-challenge-template/pkg/customerror"
+	securitypkg "github.com/icaroribeiro/go-code-challenge-template/pkg/security"
+	validatorpkg "github.com/icaroribeiro/go-code-challenge-template/pkg/validator"
 	"gorm.io/gorm"
 )
 
@@ -24,18 +24,18 @@ type Service struct {
 }
 
 // New is the factory function that encapsulates the implementation related to auth.
-func New(authDatastoreRepository authdatastorerepository.IRepository,
-	loginDatastoreRepository logindatastorerepository.IRepository,
-	userDatastoreRepository userdatastorerepository.IRepository,
+func New(persistentAuthRepository authdatastorerepository.IRepository,
+	persistentLoginRepository logindatastorerepository.IRepository,
+	persistentUserRepository userdatastorerepository.IRepository,
 	authN authpkg.IAuth,
 	security securitypkg.ISecurity,
 	validator validatorpkg.IValidator,
 	tokenExpTimeInSec int) authservice.IService {
 
 	return &Service{
-		AuthDatastoreRepository:  authDatastoreRepository,
-		UserDatastoreRepository:  userDatastoreRepository,
-		LoginDatastoreRepository: loginDatastoreRepository,
+		AuthDatastoreRepository:  persistentAuthRepository,
+		UserDatastoreRepository:  persistentUserRepository,
+		LoginDatastoreRepository: persistentLoginRepository,
 		AuthN:                    authN,
 		Validator:                validator,
 		Security:                 security,

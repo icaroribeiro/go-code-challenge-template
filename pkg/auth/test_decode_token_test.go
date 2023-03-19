@@ -7,9 +7,9 @@ import (
 
 	fake "github.com/brianvoe/gofakeit/v5"
 	"github.com/golang-jwt/jwt"
-	domainentity "github.com/icaroribeiro/new-go-code-challenge-template/internal/core/domain/entity"
-	authpkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/auth"
-	"github.com/icaroribeiro/new-go-code-challenge-template/pkg/customerror"
+	domainentity "github.com/icaroribeiro/go-code-challenge-template/internal/core/domain/entity"
+	authpkg "github.com/icaroribeiro/go-code-challenge-template/pkg/auth"
+	"github.com/icaroribeiro/go-code-challenge-template/pkg/customerror"
 	uuid "github.com/satori/go.uuid"
 	"github.com/stretchr/testify/assert"
 )

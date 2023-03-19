@@ -3,9 +3,9 @@ package healthcheck
 import (
 	"net/http"
 
-	healthcheckhandler "github.com/icaroribeiro/new-go-code-challenge-template/internal/presentation/api/handler/healthcheck"
-	adapterhttputilpkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/httputil/adapter"
-	routehttputilpkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/httputil/route"
+	healthcheckhandler "github.com/icaroribeiro/go-code-challenge-template/internal/presentation/api/handler/healthcheck"
+	adapterhttputilpkg "github.com/icaroribeiro/go-code-challenge-template/pkg/httputil/adapter"
+	routehttputilpkg "github.com/icaroribeiro/go-code-challenge-template/pkg/httputil/route"
 )
 
 // ConfigureRoutes is the function that arranges the healthcheck's routes.

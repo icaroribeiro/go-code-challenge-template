@@ -9,13 +9,13 @@ import (
 
 	fake "github.com/brianvoe/gofakeit/v5"
 	"github.com/gorilla/mux"
-	userservice "github.com/icaroribeiro/new-go-code-challenge-template/internal/application/service/user"
-	datastoreentity "github.com/icaroribeiro/new-go-code-challenge-template/internal/infrastructure/storage/datastore/entity"
-	userdatastorerepository "github.com/icaroribeiro/new-go-code-challenge-template/internal/infrastructure/storage/datastore/repository/user"
-	presentationmodel "github.com/icaroribeiro/new-go-code-challenge-template/internal/presentation/api/entity"
-	userhandler "github.com/icaroribeiro/new-go-code-challenge-template/internal/presentation/api/handler/user"
-	requesthttputilpkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/httputil/request"
-	routehttputilpkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/httputil/route"
+	userservice "github.com/icaroribeiro/go-code-challenge-template/internal/application/service/user"
+	datastoreentity "github.com/icaroribeiro/go-code-challenge-template/internal/infrastructure/datastore/perentity"
+	userdatastorerepository "github.com/icaroribeiro/go-code-challenge-template/internal/infrastructure/datastore/repository/user"
+	userhandler "github.com/icaroribeiro/go-code-challenge-template/internal/presentation/api/handler/user"
+	presentableentity "github.com/icaroribeiro/go-code-challenge-template/internal/presentation/api/presentity"
+	requesthttputilpkg "github.com/icaroribeiro/go-code-challenge-template/pkg/httputil/request"
+	routehttputilpkg "github.com/icaroribeiro/go-code-challenge-template/pkg/httputil/route"
 	"github.com/stretchr/testify/assert"
 	"gorm.io/gorm"
 )
@@ -23,9 +23,9 @@ import (
 func (ts *TestSuite) TestGetAll() {
 	dbTrx := &gorm.DB{}
 
-	userDatastore := datastoreentity.User{}
+	persistentUser := datastoreentity.User{}
 
-	user := presentationmodel.User{}
+	user := presentableentity.User{}
 
 	ts.Cases = Cases{
 		{
@@ -36,14 +36,14 @@ func (ts *TestSuite) TestGetAll() {
 
 				username := fake.Username()
 
-				userDatastore = datastoreentity.User{
+				persistentUser = datastoreentity.User{
 					Username: username,
 				}
 
-				result := dbTrx.Create(&userDatastore)
+				result := dbTrx.Create(&persistentUser)
 				assert.Nil(t, result.Error, fmt.Sprintf("Unexpected error: %v.", result.Error))
 
-				domainUser := userDatastore.ToDomain()
+				domainUser := persistentUser.ToDomain()
 				user.FromDomain(domainUser)
 			},
 			StatusCode: http.StatusOK,
@@ -72,8 +72,8 @@ func (ts *TestSuite) TestGetAll() {
 		ts.T().Run(tc.Context, func(t *testing.T) {
 			tc.SetUp(t)
 
-			userDatastoreRepository := userdatastorerepository.New(dbTrx)
-			userService := userservice.New(userDatastoreRepository, ts.Validator)
+			persistentUserRepository := userdatastorerepository.New(dbTrx)
+			userService := userservice.New(persistentUserRepository, ts.Validator)
 			userHandler := userhandler.New(userService)
 
 			route := routehttputilpkg.Route{
@@ -103,7 +103,7 @@ func (ts *TestSuite) TestGetAll() {
 
 			if !tc.WantError {
 				assert.Equal(t, resprec.Code, tc.StatusCode)
-				returnedUsers := presentationmodel.Users{}
+				returnedUsers := presentableentity.Users{}
 				err := json.NewDecoder(resprec.Body).Decode(&returnedUsers)
 				assert.Nil(t, err, fmt.Sprintf("Unexpected error: %v.", err))
 				assert.Equal(t, user.ID, returnedUsers[0].ID)

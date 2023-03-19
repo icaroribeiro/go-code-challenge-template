@@ -9,19 +9,19 @@ import (
 
 	fake "github.com/brianvoe/gofakeit/v5"
 	"github.com/gorilla/mux"
-	authservice "github.com/icaroribeiro/new-go-code-challenge-template/internal/application/service/auth"
-	domainmodel "github.com/icaroribeiro/new-go-code-challenge-template/internal/core/domain/entity"
-	datastoremodel "github.com/icaroribeiro/new-go-code-challenge-template/internal/infrastructure/storage/datastore/entity"
-	authdatastorerepository "github.com/icaroribeiro/new-go-code-challenge-template/internal/infrastructure/storage/datastore/repository/auth"
-	logindatastorerepository "github.com/icaroribeiro/new-go-code-challenge-template/internal/infrastructure/storage/datastore/repository/login"
-	userdatastorerepository "github.com/icaroribeiro/new-go-code-challenge-template/internal/infrastructure/storage/datastore/repository/user"
-	authhandler "github.com/icaroribeiro/new-go-code-challenge-template/internal/presentation/api/handler/auth"
-	authpkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/auth"
-	requesthttputilpkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/httputil/request"
-	responsehttputilpkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/httputil/response"
-	routehttputilpkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/httputil/route"
-	authmiddlewarepkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/middleware/auth"
-	securitypkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/security"
+	authservice "github.com/icaroribeiro/go-code-challenge-template/internal/application/service/auth"
+	domainentity "github.com/icaroribeiro/go-code-challenge-template/internal/core/domain/entity"
+	persistententity "github.com/icaroribeiro/go-code-challenge-template/internal/infrastructure/datastore/perentity"
+	authdatastorerepository "github.com/icaroribeiro/go-code-challenge-template/internal/infrastructure/datastore/repository/auth"
+	logindatastorerepository "github.com/icaroribeiro/go-code-challenge-template/internal/infrastructure/datastore/repository/login"
+	userdatastorerepository "github.com/icaroribeiro/go-code-challenge-template/internal/infrastructure/datastore/repository/user"
+	authhandler "github.com/icaroribeiro/go-code-challenge-template/internal/presentation/api/handler/auth"
+	authpkg "github.com/icaroribeiro/go-code-challenge-template/pkg/auth"
+	requesthttputilpkg "github.com/icaroribeiro/go-code-challenge-template/pkg/httputil/request"
+	responsehttputilpkg "github.com/icaroribeiro/go-code-challenge-template/pkg/httputil/response"
+	routehttputilpkg "github.com/icaroribeiro/go-code-challenge-template/pkg/httputil/route"
+	authmiddlewarepkg "github.com/icaroribeiro/go-code-challenge-template/pkg/middleware/auth"
+	securitypkg "github.com/icaroribeiro/go-code-challenge-template/pkg/security"
 	"github.com/stretchr/testify/assert"
 	"gorm.io/gorm"
 )
@@ -31,17 +31,17 @@ func (ts *TestSuite) TestChangePassword() {
 
 	var authN authpkg.IAuth
 
-	authDatastore := datastoremodel.Auth{}
-	loginDatastore := datastoremodel.Login{}
-	userDatastore := datastoremodel.User{}
+	persistentAuth := persistententity.Auth{}
+	persistentLogin := persistententity.Login{}
+	persistentUser := persistententity.User{}
 
-	auth := domainmodel.Auth{}
+	auth := domainentity.Auth{}
 
 	passwords := securitypkg.Passwords{}
 
 	body := ""
 
-	authDetailsCtxValue := domainmodel.Auth{}
+	authDetailsCtxValue := domainentity.Auth{}
 
 	ts.Cases = Cases{
 		{
@@ -55,30 +55,30 @@ func (ts *TestSuite) TestChangePassword() {
 				username := fake.Username()
 				password := fake.Password(true, true, true, false, false, 8)
 
-				userDatastore = datastoremodel.User{
+				persistentUser = persistententity.User{
 					Username: username,
 				}
 
-				result := dbTrx.Create(&userDatastore)
+				result := dbTrx.Create(&persistentUser)
 				assert.Nil(t, result.Error, fmt.Sprintf("Unexpected error: %v.", result.Error))
 
-				loginDatastore = datastoremodel.Login{
-					UserID:   userDatastore.ID,
+				persistentLogin = persistententity.Login{
+					UserID:   persistentUser.ID,
 					Username: username,
 					Password: password,
 				}
 
-				result = dbTrx.Create(&loginDatastore)
+				result = dbTrx.Create(&persistentLogin)
 				assert.Nil(t, result.Error, fmt.Sprintf("Unexpected error: %v.", result.Error))
 
-				authDatastore = datastoremodel.Auth{
-					UserID: userDatastore.ID,
+				persistentAuth = persistententity.Auth{
+					UserID: persistentUser.ID,
 				}
 
-				result = dbTrx.Create(&authDatastore)
+				result = dbTrx.Create(&persistentAuth)
 				assert.Nil(t, result.Error, fmt.Sprintf("Unexpected error: %v.", result.Error))
 
-				auth = authDatastore.ToDomain()
+				auth = persistentAuth.ToDomain()
 
 				currentPassword := password
 				newPassword := fake.Password(true, true, true, false, false, 8)
@@ -112,7 +112,7 @@ func (ts *TestSuite) TestChangePassword() {
 
 				authN = authpkg.New(ts.RSAKeys)
 
-				authDetailsCtxValue = domainmodel.Auth{}
+				authDetailsCtxValue = domainentity.Auth{}
 			},
 			StatusCode: http.StatusInternalServerError,
 			WantError:  true,
@@ -129,30 +129,30 @@ func (ts *TestSuite) TestChangePassword() {
 				username := fake.Username()
 				password := fake.Password(true, true, true, false, false, 8)
 
-				userDatastore = datastoremodel.User{
+				persistentUser = persistententity.User{
 					Username: username,
 				}
 
-				result := dbTrx.Create(&userDatastore)
+				result := dbTrx.Create(&persistentUser)
 				assert.Nil(t, result.Error, fmt.Sprintf("Unexpected error: %v.", result.Error))
 
-				loginDatastore = datastoremodel.Login{
-					UserID:   userDatastore.ID,
+				persistentLogin = persistententity.Login{
+					UserID:   persistentUser.ID,
 					Username: username,
 					Password: password,
 				}
 
-				result = dbTrx.Create(&loginDatastore)
+				result = dbTrx.Create(&persistentLogin)
 				assert.Nil(t, result.Error, fmt.Sprintf("Unexpected error: %v.", result.Error))
 
-				authDatastore = datastoremodel.Auth{
-					UserID: userDatastore.ID,
+				persistentAuth = persistententity.Auth{
+					UserID: persistentUser.ID,
 				}
 
-				result = dbTrx.Create(&authDatastore)
+				result = dbTrx.Create(&persistentAuth)
 				assert.Nil(t, result.Error, fmt.Sprintf("Unexpected error: %v.", result.Error))
 
-				auth = authDatastore.ToDomain()
+				auth = persistentAuth.ToDomain()
 
 				currentPassword := fake.Password(true, true, true, false, false, 8)
 				newPassword := fake.Password(true, true, true, false, false, 8)
@@ -185,7 +185,7 @@ func (ts *TestSuite) TestChangePassword() {
 
 				authN = authpkg.New(ts.RSAKeys)
 
-				auth = domainmodel.Auth{}
+				auth = domainentity.Auth{}
 
 				currentPassword := fake.Password(true, true, true, false, false, 8)
 				newPassword := fake.Password(true, true, true, false, false, 8)
@@ -214,11 +214,11 @@ func (ts *TestSuite) TestChangePassword() {
 		ts.T().Run(tc.Context, func(t *testing.T) {
 			tc.SetUp(t)
 
-			authDatastoreRepository := authdatastorerepository.New(dbTrx)
-			loginDatastoreRepository := logindatastorerepository.New(dbTrx)
-			userDatastoreRepository := userdatastorerepository.New(dbTrx)
+			persistentAuthRepository := authdatastorerepository.New(dbTrx)
+			persistentLoginRepository := logindatastorerepository.New(dbTrx)
+			persistentUserRepository := userdatastorerepository.New(dbTrx)
 
-			authService := authservice.New(authDatastoreRepository, loginDatastoreRepository, userDatastoreRepository,
+			authService := authservice.New(persistentAuthRepository, persistentLoginRepository, persistentUserRepository,
 				authN, ts.Security, ts.Validator, ts.TokenExpTimeInSec)
 			authHandler := authhandler.New(authService)
 

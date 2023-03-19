@@ -6,12 +6,12 @@ import (
 	"runtime"
 	"testing"
 
-	healthcheckmockservice "github.com/icaroribeiro/new-go-code-challenge-template/internal/core/ports/application/mockservice/healthcheck"
-	healthcheckhandler "github.com/icaroribeiro/new-go-code-challenge-template/internal/presentation/api/handler/healthcheck"
-	healthcheckrouter "github.com/icaroribeiro/new-go-code-challenge-template/internal/presentation/api/router/healthcheck"
-	adapterhttputilpkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/httputil/adapter"
-	routehttputilpkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/httputil/route"
-	loggingmiddlewarepkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/middleware/logging"
+	healthcheckmockservice "github.com/icaroribeiro/go-code-challenge-template/internal/core/ports/application/mockservice/healthcheck"
+	healthcheckhandler "github.com/icaroribeiro/go-code-challenge-template/internal/presentation/api/handler/healthcheck"
+	healthcheckrouter "github.com/icaroribeiro/go-code-challenge-template/internal/presentation/api/router/healthcheck"
+	adapterhttputilpkg "github.com/icaroribeiro/go-code-challenge-template/pkg/httputil/adapter"
+	routehttputilpkg "github.com/icaroribeiro/go-code-challenge-template/pkg/httputil/route"
+	loggingmiddlewarepkg "github.com/icaroribeiro/go-code-challenge-template/pkg/middleware/logging"
 	"github.com/stretchr/testify/assert"
 )
 

@@ -16,14 +16,14 @@ definitions:
       username:
         type: string
     type: object
-  security.Credentials:
+  securitypkg.Credentials:
     properties:
       password:
         type: string
       username:
         type: string
     type: object
-  security.Passwords:
+  securitypkg.Passwords:
     properties:
       current_password:
         type: string
@@ -58,7 +58,7 @@ paths:
         name: passwords
         required: true
         schema:
-          $ref: '#/definitions/security.Passwords'
+          $ref: '#/definitions/securitypkg.Passwords'
       produces:
       - application/json
       responses:
@@ -125,7 +125,7 @@ paths:
         name: credentials
         required: true
         schema:
-          $ref: '#/definitions/security.Credentials'
+          $ref: '#/definitions/securitypkg.Credentials'
       produces:
       - application/json
       responses:
@@ -198,7 +198,7 @@ paths:
         name: credentials
         required: true
         schema:
-          $ref: '#/definitions/security.Credentials'
+          $ref: '#/definitions/securitypkg.Credentials'
       produces:
       - application/json
       responses:

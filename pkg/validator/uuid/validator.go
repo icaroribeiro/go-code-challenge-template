@@ -3,7 +3,7 @@ package uuid
 import (
 	"reflect"
 
-	"github.com/icaroribeiro/new-go-code-challenge-template/pkg/customerror"
+	"github.com/icaroribeiro/go-code-challenge-template/pkg/customerror"
 	_uuid "github.com/satori/go.uuid"
 	validatorv2 "gopkg.in/validator.v2"
 )

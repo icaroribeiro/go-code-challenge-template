@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/icaroribeiro/new-go-code-challenge-template/pkg/customerror"
+	"github.com/icaroribeiro/go-code-challenge-template/pkg/customerror"
 )
 
 // RespondWithJSON is the function that generates a JSON response along with the suitable header and given status code.

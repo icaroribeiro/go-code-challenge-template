@@ -4,14 +4,14 @@ import (
 	"context"
 	"testing"
 
-	domainmodel "github.com/icaroribeiro/new-go-code-challenge-template/internal/core/domain/entity"
-	authmiddlewarepkg "github.com/icaroribeiro/new-go-code-challenge-template/pkg/middleware/auth"
-	domainmodelfactory "github.com/icaroribeiro/new-go-code-challenge-template/tests/factory/core/domain/entity"
+	domainentity "github.com/icaroribeiro/go-code-challenge-template/internal/core/domain/entity"
+	domainentityfactory "github.com/icaroribeiro/go-code-challenge-template/internal/core/domain/entity"
+	authmiddlewarepkg "github.com/icaroribeiro/go-code-challenge-template/pkg/middleware/auth"
 	"github.com/stretchr/testify/assert"
 )
 
 func (ts *TestSuite) TestFromContext() {
-	authDetailsCtxValue := domainmodel.Auth{}
+	authDetailsCtxValue := domainentity.Auth{}
 
 	ctx := context.Background()
 
@@ -19,7 +19,7 @@ func (ts *TestSuite) TestFromContext() {
 		{
 			Context: "ItShouldSucceedInGettingAnAssociatedValueFromAContext",
 			SetUp: func(t *testing.T) {
-				authDetailsCtxValue = domainmodelfactory.NewAuth(nil)
+				authDetailsCtxValue = domainentityfactory.AuthFactory(nil)
 				ctx = authmiddlewarepkg.NewContext(ctx, authDetailsCtxValue)
 			},
 			WantError: false,

@@ -4,18 +4,18 @@
 # Internal
 #
 # Generate a mock object related to auth's datastore repository.
-AUTH_DATASTORE_REPOSITORY_PATH="internal/core/ports/infrastructure/storage/datastore/repository/auth"
-MOCK_AUTH_DATASTORE_REPOSITORY_PATH="internal/core/ports/infrastructure/storage/datastore/mockrepository/auth"
+AUTH_DATASTORE_REPOSITORY_PATH="internal/core/ports/infrastructure/datastore/repository/auth"
+MOCK_AUTH_DATASTORE_REPOSITORY_PATH="internal/core/ports/infrastructure/datastore/mockrepository/auth"
 mockery --dir "$AUTH_DATASTORE_REPOSITORY_PATH" --name IRepository --outpkg auth --structname Repository --output "$MOCK_AUTH_DATASTORE_REPOSITORY_PATH" --filename mock_repository.go
 
 # Generate a mock object related to login's datastore repository.
-LOGIN_DATASTORE_REPOSITORY_PATH="internal/core/ports/infrastructure/storage/datastore/repository/login"
-MOCK_LOGIN_DATASTORE_REPOSITORY_PATH="internal/core/ports/infrastructure/storage/datastore/mockrepository/login"
+LOGIN_DATASTORE_REPOSITORY_PATH="internal/core/ports/infrastructure/datastore/repository/login"
+MOCK_LOGIN_DATASTORE_REPOSITORY_PATH="internal/core/ports/infrastructure/datastore/mockrepository/login"
 mockery --dir "$LOGIN_DATASTORE_REPOSITORY_PATH" --name IRepository --outpkg login --structname Repository --output "$MOCK_LOGIN_DATASTORE_REPOSITORY_PATH" --filename mock_repository.go
 
 # Generate a mock object related to user's datastore repository.
-USER_DATASTORE_REPOSITORY_PATH="internal/core/ports/infrastructure/storage/datastore/repository/user"
-MOCK_USER_DATASTORE_REPOSITORY_PATH="internal/core/ports/infrastructure/storage/datastore/mockrepository/user"
+USER_DATASTORE_REPOSITORY_PATH="internal/core/ports/infrastructure/datastore/repository/user"
+MOCK_USER_DATASTORE_REPOSITORY_PATH="internal/core/ports/infrastructure/datastore/mockrepository/user"
 mockery --dir "$USER_DATASTORE_REPOSITORY_PATH" --name IRepository --outpkg user --structname Repository --output "$MOCK_USER_DATASTORE_REPOSITORY_PATH" --filename mock_repository.go
 
 # Generate a mock object related to auth's service.
@@ -41,7 +41,7 @@ AUTH_PATH="pkg/auth"
 MOCK_AUTH_PATH="tests/mocks/pkg/mockauth"
 mockery --dir "$AUTH_PATH" --name IAuth --outpkg mockauth --structname Auth --output "$MOCK_AUTH_PATH" --filename mock_auth.go
 
-# Generate a mock object related to security.
+# Generate a mock object related to securitypkg.
 SECURITY_PATH="pkg/security"
 MOCK_SECURITY_PATH="tests/mocks/pkg/mocksecurity"
 mockery --dir "$SECURITY_PATH" --name ISecurity --outpkg mocksecurity --structname Security --output "$MOCK_SECURITY_PATH" --filename mock_security.go
