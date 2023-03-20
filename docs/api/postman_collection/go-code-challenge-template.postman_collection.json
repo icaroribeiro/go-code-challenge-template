@@ -1,15 +1,25 @@
 {
 	"info": {
-		"_postman_id": "0c8894db-df5f-448d-9be4-deb086a5c9ec",
-		"name": "go-code-challenge-template",
+		"_postman_id": "82c3694f-ad8c-4ac1-bfed-92133e7a480b",
+		"name": "new-go-code-challenge-template",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
 	"item": [
 		{
 			"name": "GetStatus",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
 			"request": {
-				"method": http.MethodGet,
+				"method": "GET",
 				"header": [],
+				"body": {
+					"mode": "graphql",
+					"graphql": {
+						"query": "",
+						"variables": ""
+					}
+				},
 				"url": {
 					"raw": "http://127.0.0.1:8080/status",
 					"protocol": "http",
@@ -28,19 +38,13 @@
 			"response": []
 		},
 		{
-			"name": "Upload",
+			"name": "SignUp",
 			"request": {
-				"method": http.MethodPost,
+				"method": "POST",
 				"header": [],
 				"body": {
-					"mode": "formdata",
-					"formdata": [
-						{
-							"key": "file",
-							"type": "file",
-							"src": "/C:/Go/workspace/src/github.com/icaroribeiro/nasdaq_symbols.csv"
-						}
-					],
+					"mode": "raw",
+					"raw": "{\r\n    \"username\": \"icaro.ribeiro150\",\r\n    \"password\": \"secret123!\"\r\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -48,7 +52,7 @@
 					}
 				},
 				"url": {
-					"raw": "http://127.0.0.1:8080/files/upload",
+					"raw": "http://127.0.0.1:8080/sign_up",
 					"protocol": "http",
 					"host": [
 						"127",
@@ -58,20 +62,35 @@
 					],
 					"port": "8080",
 					"path": [
-						"files",
-						"upload"
+						"sign_up"
 					]
 				}
 			},
 			"response": []
 		},
 		{
-			"name": "ReadChunk",
+			"name": "SignIn",
 			"request": {
-				"method": http.MethodGet,
-				"header": [],
+				"method": "POST",
+				"header": [
+					{
+						"key": "",
+						"value": "",
+						"type": "text",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"username\": \"icaro.ribeiro2\",\r\n    \"password\": \"secret456!\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
 				"url": {
-					"raw": "http://127.0.0.1:8080/files/8347d314-9cf0-4b26-b12b-9e0f876d6843/chunk?offset=3&limit=1000",
+					"raw": "http://127.0.0.1:8080/sign_in",
 					"protocol": "http",
 					"host": [
 						"127",
@@ -81,19 +100,132 @@
 					],
 					"port": "8080",
 					"path": [
-						"files",
-						"8347d314-9cf0-4b26-b12b-9e0f876d6843",
-						"chunk"
+						"sign_in"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "SignOut",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdXRoX2lkIjoiYTU3MzE2YjEtYWY1OC00OGM4LTgxZDAtYzAwZTIyMjcwMWUxIiwiYXV0aG9yaXplZCI6dHJ1ZSwiZXhwIjoxNjUyNzI0MzIzLCJpYXQiOjE2NTI3MjQyNjMsInVzZXJfaWQiOiJjNDY0ZTEwOC00OGZhLTRmNTItOWFlYy01NGY1NzRkYmQxNDkifQ.O2hbNirhKFBqPD0SUFsZhgUSX5-VWOINMojBzj3xs_ILeRJGw2X8vqqlS1gHSI8TEb4jkcly2hBxg_667DHS2YEjkz7zXdbC8h-FnjcFKQhmwJezh-yb1ZAyW9hcG7mCQfvTjMhAGGxnzXiLFkKMysDllVJqLa3kznLW4vU9YCw",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "http://127.0.0.1:8080/sign_out",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
 					],
-					"query": [
-						{
-							"key": "offset",
-							"value": "3"
-						},
-						{
-							"key": "limit",
-							"value": "1000"
+					"port": "8080",
+					"path": [
+						"sign_out"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "RefreshToken",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdXRoX2lkIjoiYTU3MzE2YjEtYWY1OC00OGM4LTgxZDAtYzAwZTIyMjcwMWUxIiwiYXV0aG9yaXplZCI6dHJ1ZSwiZXhwIjoxNjUyNzI0Mjc2LCJpYXQiOjE2NTI3MjQyMTYsInVzZXJfaWQiOiJjNDY0ZTEwOC00OGZhLTRmNTItOWFlYy01NGY1NzRkYmQxNDkifQ.hMC20mkLK3-7ySeuEYY0scSK-l-uI1jV59LhujNfp8h872wiaKWXUk_iMvdIx9Ilqb4wc9TxhKnDQY2DU5RuvOwDJkry23PqXk07YuFE4XTLIYQ2D-U2Q3zkj5SUkJx3gVqaXO64koP8rpcroDBzDuLfgojWGLZwg3QSuc2ZSaA",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "http://127.0.0.1:8080/refresh_token",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8080",
+					"path": [
+						"refresh_token"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "ChangePassword",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdXRoX2lkIjoiNmRmMzVjYmEtN2QyMC00Yjk4LTlhNWYtNmFlOGI5NDdjNzZhIiwiYXV0aG9yaXplZCI6dHJ1ZSwiZXhwIjoxNjUyNzI0MDYxLCJpYXQiOjE2NTI3MjM0NjEsInVzZXJfaWQiOiJiYjk4MzU3Yy03MTc0LTRmYmYtYWY2My00MjZhNTFlMWJiNDAifQ.hmBUNJ4dL5h5Bh46rmP4PE68qdYMv1YsH7LWlbSfwv3tUQQHtOr5g-hFRtg2CIGvgv2YD_lE5S1YfYDVWcfI6iE8qVToKK5AUTT4zBNjrWLo2eTpmjPlrx7kiS8dl4sZcS5jZGFMPfs9XdbwmFWz2qMJgjW__sNNnAyqGg7wa-8",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"current_password\": \"secret123!\",\r\n    \"new_password\": \"secret456!\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
 						}
+					}
+				},
+				"url": {
+					"raw": "http://127.0.0.1:8080/change_password",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8080",
+					"path": [
+						"change_password"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GetAllUsers",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdXRoX2lkIjoiZjYxNzhhMGMtZTc3Ni00YmU1LWJlZjAtYTZlZmY5ZDM1MWEyIiwiYXV0aG9yaXplZCI6dHJ1ZSwiZXhwIjoxNjUyOTAzMjA4LCJpYXQiOjE2NTI5MDMwODgsInVzZXJfaWQiOiI4ZTEyMzhkZS03N2ExLTRkYWYtYWUyNi1kNDgwMTIzY2IwZmYifQ.lvB-4XxtwdlzHGKpp4hy9y0S_3kKgDMUk7ZEsIx_INTlJ9CHszgbx4tUwAl7POG1P7xStWmGRcT4qS0hw3Bz4KJ-4PTOEa6BOrZULqI_KzVvjhKInYO5CEbxL0rHsPSjTdV2VtJo_YSajIEK5AjCwX3HRi1kZ_uiRyQWKd039wA",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "http://127.0.0.1:8080/users",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8080",
+					"path": [
+						"users"
 					]
 				}
 			},

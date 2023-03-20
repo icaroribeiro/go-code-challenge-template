@@ -24,7 +24,7 @@ func (ts *TestSuite) TestCreate() {
 
 	errorType := customerror.NoType
 
-	firstSqlQuery := `INSERT INTO "auths" ("user_id","created_at","id") VALUES ($1,$2,$3) RETURNING "id"`
+	firstSqlQuery := `INSERT INTO "auths" ("id","user_id","created_at") VALUES ($1,$2,$3)`
 
 	secondSqlQuery := `SELECT * FROM "logins" WHERE user_id=$1`
 
@@ -50,9 +50,9 @@ func (ts *TestSuite) TestCreate() {
 
 				mock.ExpectBegin()
 
-				mock.ExpectQuery(regexp.QuoteMeta(firstSqlQuery)).
-					WithArgs(auth.UserID, sqlmock.AnyArg(), sqlmock.AnyArg()).
-					WillReturnRows(sqlmock.NewRows([]string{"id"}).AddRow(uuid.NewV4()))
+				mock.ExpectExec(regexp.QuoteMeta(firstSqlQuery)).
+					WithArgs(sqlmock.AnyArg(), auth.UserID, sqlmock.AnyArg()).
+					WillReturnResult(sqlmock.NewResult(1, 1))
 
 				mock.ExpectCommit()
 			},
@@ -72,8 +72,8 @@ func (ts *TestSuite) TestCreate() {
 
 				mock.ExpectBegin()
 
-				mock.ExpectQuery(regexp.QuoteMeta(firstSqlQuery)).
-					WithArgs(auth.UserID, sqlmock.AnyArg(), sqlmock.AnyArg()).
+				mock.ExpectExec(regexp.QuoteMeta(firstSqlQuery)).
+					WithArgs(sqlmock.AnyArg(), auth.UserID, sqlmock.AnyArg()).
 					WillReturnError(customerror.New("failed"))
 
 				mock.ExpectRollback()
@@ -96,8 +96,8 @@ func (ts *TestSuite) TestCreate() {
 
 				mock.ExpectBegin()
 
-				mock.ExpectQuery(regexp.QuoteMeta(firstSqlQuery)).
-					WithArgs(auth.UserID, sqlmock.AnyArg(), sqlmock.AnyArg()).
+				mock.ExpectExec(regexp.QuoteMeta(firstSqlQuery)).
+					WithArgs(sqlmock.AnyArg(), auth.UserID, sqlmock.AnyArg()).
 					WillReturnError(customerror.Conflict.New("auths_user_id_key"))
 
 				mock.ExpectRollback()
@@ -134,8 +134,8 @@ func (ts *TestSuite) TestCreate() {
 
 				mock.ExpectBegin()
 
-				mock.ExpectQuery(regexp.QuoteMeta(firstSqlQuery)).
-					WithArgs(auth.UserID, sqlmock.AnyArg(), sqlmock.AnyArg()).
+				mock.ExpectExec(regexp.QuoteMeta(firstSqlQuery)).
+					WithArgs(sqlmock.AnyArg(), auth.UserID, sqlmock.AnyArg()).
 					WillReturnError(customerror.New("auths_user_id_key"))
 
 				mock.ExpectRollback()
@@ -162,8 +162,8 @@ func (ts *TestSuite) TestCreate() {
 
 				mock.ExpectBegin()
 
-				mock.ExpectQuery(regexp.QuoteMeta(firstSqlQuery)).
-					WithArgs(auth.UserID, sqlmock.AnyArg(), sqlmock.AnyArg()).
+				mock.ExpectExec(regexp.QuoteMeta(firstSqlQuery)).
+					WithArgs(sqlmock.AnyArg(), auth.UserID, sqlmock.AnyArg()).
 					WillReturnError(customerror.New("auths_user_id_key"))
 
 				mock.ExpectRollback()
