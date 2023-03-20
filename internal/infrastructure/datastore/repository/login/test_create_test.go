@@ -1,126 +1,126 @@
 package login_test
 
-// import (
-// 	"fmt"
-// 	"regexp"
-// 	"testing"
+import (
+	"fmt"
+	"regexp"
+	"testing"
 
-// 	"github.com/DATA-DOG/go-sqlmock"
-// 	domainentity "github.com/icaroribeiro/go-code-challenge-template/internal/core/domain/entity"
-// 	logindatastorerepository "github.com/icaroribeiro/go-code-challenge-template/internal/infrastructure/datastore/repository/login"
-// 	"github.com/icaroribeiro/go-code-challenge-template/pkg/customerror"
-// 	securitypkg "github.com/icaroribeiro/go-code-challenge-template/pkg/security"
-// 	uuid "github.com/satori/go.uuid"
-// 	"github.com/stretchr/testify/assert"
-// )
+	"github.com/DATA-DOG/go-sqlmock"
+	domainentity "github.com/icaroribeiro/go-code-challenge-template/internal/core/domain/entity"
+	logindatastorerepository "github.com/icaroribeiro/go-code-challenge-template/internal/infrastructure/datastore/repository/login"
+	"github.com/icaroribeiro/go-code-challenge-template/pkg/customerror"
+	securitypkg "github.com/icaroribeiro/go-code-challenge-template/pkg/security"
+	uuid "github.com/satori/go.uuid"
+	"github.com/stretchr/testify/assert"
+)
 
-// func (ts *TestSuite) TestCreate() {
-// 	driver := "postgres"
-// 	db, mock := NewMockDB(driver)
+func (ts *TestSuite) TestCreate() {
+	driver := "postgres"
+	db, mock := NewMockDB(driver)
 
-// 	login := domainentity.Login{}
+	login := domainentity.Login{}
 
-// 	newLogin := domainentity.Login{}
+	newLogin := domainentity.Login{}
 
-// 	errorType := customerror.NoType
+	errorType := customerror.NoType
 
-// 	sqlQuery := `INSERT INTO "logins" ("user_id","username","password","created_at","updated_at","id") VALUES ($1,$2,$3,$4,$5,$6) RETURNING "id"`
+	sqlQuery := `INSERT INTO "logins" ("id","user_id","username","password","created_at","updated_at") VALUES ($1,$2,$3,$4,$5,$6)`
 
-// 	ts.Cases = Cases{
-// 		{
-// 			Context: "ItShouldSucceedInCreatingTheLogin",
-// 			SetUp: func(t *testing.T) {
-// 				args := map[string]interface{}{
-// 					"id": uuid.Nil,
-// 				}
+	ts.Cases = Cases{
+		{
+			Context: "ItShouldSucceedInCreatingTheLogin",
+			SetUp: func(t *testing.T) {
+				args := map[string]interface{}{
+					"id": uuid.Nil,
+				}
 
-// 				login = domainentity.LoginFactory(args)
+				login = domainentity.LoginFactory(args)
 
-// 				args = map[string]interface{}{
-// 					"userID":   login.UserID,
-// 					"username": login.Username,
-// 					"password": login.Password,
-// 				}
+				args = map[string]interface{}{
+					"userID":   login.UserID,
+					"username": login.Username,
+					"password": login.Password,
+				}
 
-// 				newLogin = domainentity.LoginFactory(args)
+				newLogin = domainentity.LoginFactory(args)
 
-// 				mock.ExpectBegin()
+				mock.ExpectBegin()
 
-// 				mock.ExpectQuery(regexp.QuoteMeta(sqlQuery)).
-// 					WithArgs(login.UserID, login.Username, sqlmock.AnyArg(), sqlmock.AnyArg(), sqlmock.AnyArg(), sqlmock.AnyArg()).
-// 					WillReturnRows(sqlmock.NewRows([]string{"id"}).AddRow(uuid.NewV4()))
+				mock.ExpectExec(regexp.QuoteMeta(sqlQuery)).
+					WithArgs(sqlmock.AnyArg(), login.UserID, login.Username, sqlmock.AnyArg(), sqlmock.AnyArg(), sqlmock.AnyArg()).
+					WillReturnResult(sqlmock.NewResult(1, 1))
 
-// 				mock.ExpectCommit()
-// 			},
-// 			WantError: false,
-// 		},
-// 		{
-// 			Context: "ItShouldFailIfAnErrorOccursWhenCreatingTheLogin",
-// 			SetUp: func(t *testing.T) {
-// 				args := map[string]interface{}{
-// 					"id": uuid.Nil,
-// 				}
+				mock.ExpectCommit()
+			},
+			WantError: false,
+		},
+		{
+			Context: "ItShouldFailIfAnErrorOccursWhenCreatingTheLogin",
+			SetUp: func(t *testing.T) {
+				args := map[string]interface{}{
+					"id": uuid.Nil,
+				}
 
-// 				login = domainentity.LoginFactory(args)
+				login = domainentity.LoginFactory(args)
 
-// 				mock.ExpectBegin()
+				mock.ExpectBegin()
 
-// 				mock.ExpectQuery(regexp.QuoteMeta(sqlQuery)).
-// 					WithArgs(login.UserID, login.Username, sqlmock.AnyArg(), sqlmock.AnyArg(), sqlmock.AnyArg(), sqlmock.AnyArg()).
-// 					WillReturnError(customerror.New("failed"))
+				mock.ExpectExec(regexp.QuoteMeta(sqlQuery)).
+					WithArgs(sqlmock.AnyArg(), login.UserID, login.Username, sqlmock.AnyArg(), sqlmock.AnyArg(), sqlmock.AnyArg()).
+					WillReturnError(customerror.New("failed"))
 
-// 				mock.ExpectRollback()
+				mock.ExpectRollback()
 
-// 				errorType = customerror.NoType
-// 			},
-// 			WantError: true,
-// 		},
-// 		{
-// 			Context: "ItShouldFailIfAnErrorOccursWhenCreatingTheLoginBecauseTheUserLoginIsAlreadyRegistered",
-// 			SetUp: func(t *testing.T) {
-// 				args := map[string]interface{}{
-// 					"id": uuid.Nil,
-// 				}
+				errorType = customerror.NoType
+			},
+			WantError: true,
+		},
+		{
+			Context: "ItShouldFailIfAnErrorOccursWhenCreatingTheLoginBecauseTheUserLoginIsAlreadyRegistered",
+			SetUp: func(t *testing.T) {
+				args := map[string]interface{}{
+					"id": uuid.Nil,
+				}
 
-// 				login = domainentity.LoginFactory(args)
+				login = domainentity.LoginFactory(args)
 
-// 				mock.ExpectBegin()
+				mock.ExpectBegin()
 
-// 				mock.ExpectQuery(regexp.QuoteMeta(sqlQuery)).
-// 					WithArgs(login.UserID, login.Username, sqlmock.AnyArg(), sqlmock.AnyArg(), sqlmock.AnyArg(), sqlmock.AnyArg()).
-// 					WillReturnError(customerror.Conflict.New("logins_user_id_key"))
+				mock.ExpectExec(regexp.QuoteMeta(sqlQuery)).
+					WithArgs(sqlmock.AnyArg(), login.UserID, login.Username, sqlmock.AnyArg(), sqlmock.AnyArg(), sqlmock.AnyArg()).
+					WillReturnError(customerror.Conflict.New("logins_user_id_key"))
 
-// 				mock.ExpectRollback()
+				mock.ExpectRollback()
 
-// 				errorType = customerror.Conflict
-// 			},
-// 			WantError: true,
-// 		},
-// 	}
+				errorType = customerror.Conflict
+			},
+			WantError: true,
+		},
+	}
 
-// 	for _, tc := range ts.Cases {
-// 		ts.T().Run(tc.Context, func(t *testing.T) {
-// 			tc.SetUp(t)
+	for _, tc := range ts.Cases {
+		ts.T().Run(tc.Context, func(t *testing.T) {
+			tc.SetUp(t)
 
-// 			persistentLoginRepository := logindatastorerepository.New(db)
+			persistentLoginRepository := logindatastorerepository.New(db)
 
-// 			returnedLogin, err := persistentLoginRepository.Create(login)
+			returnedLogin, err := persistentLoginRepository.Create(login)
 
-// 			if !tc.WantError {
-// 				assert.Nil(t, err, fmt.Sprintf("Unexpected error: %v.", err))
-// 				assert.Equal(t, newLogin.UserID, returnedLogin.UserID)
-// 				assert.Equal(t, newLogin.Username, returnedLogin.Username)
-// 				security := securitypkg.New()
-// 				err := security.VerifyPasswords(returnedLogin.Password, newLogin.Password)
-// 				assert.Nil(t, err, fmt.Sprintf("Unexpected error: %v.", err))
-// 			} else {
-// 				assert.NotNil(t, err, "Predicted error lost.")
-// 				assert.Equal(t, errorType, customerror.GetType(err))
-// 				assert.Empty(t, returnedLogin)
-// 			}
+			if !tc.WantError {
+				assert.Nil(t, err, fmt.Sprintf("Unexpected error: %v.", err))
+				assert.Equal(t, newLogin.UserID, returnedLogin.UserID)
+				assert.Equal(t, newLogin.Username, returnedLogin.Username)
+				security := securitypkg.New()
+				err := security.VerifyPasswords(returnedLogin.Password, newLogin.Password)
+				assert.Nil(t, err, fmt.Sprintf("Unexpected error: %v.", err))
+			} else {
+				assert.NotNil(t, err, "Predicted error lost.")
+				assert.Equal(t, errorType, customerror.GetType(err))
+				assert.Empty(t, returnedLogin)
+			}
 
-// 			err = mock.ExpectationsWereMet()
-// 			assert.Nil(ts.T(), err, fmt.Sprintf("There were unfulfilled expectations: %v.", err))
-// 		})
-// 	}
-// }
+			err = mock.ExpectationsWereMet()
+			assert.Nil(ts.T(), err, fmt.Sprintf("There were unfulfilled expectations: %v.", err))
+		})
+	}
+}
