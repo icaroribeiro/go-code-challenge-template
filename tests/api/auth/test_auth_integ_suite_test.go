@@ -50,7 +50,7 @@ var (
 	dbUser     = envpkg.GetEnvWithDefaultValue("DB_USER", "postgres")
 	dbPassword = envpkg.GetEnvWithDefaultValue("DB_PASSWORD", "postgres")
 	dbHost     = envpkg.GetEnvWithDefaultValue("DB_HOST", "localhost")
-	dbPort     = envpkg.GetEnvWithDefaultValue("DB_PORT", "5432")
+	dbPort     = envpkg.GetEnvWithDefaultValue("DB_PORT", "5434")
 	dbName     = envpkg.GetEnvWithDefaultValue("DB_NAME", "testdb")
 )
 
@@ -117,8 +117,6 @@ func (ts *TestSuite) SetupSuite() {
 		log.Panicf("Got error when acessing the database instance: %s", err.Error())
 	}
 
-	_deleteTableRecords(ts.DB)
-
 	validationFuncs := map[string]validatorv2.ValidationFunc{
 		"uuid":     uuidvalidatorpkg.Validate,
 		"username": usernamevalidatorpkg.Validate,
@@ -131,12 +129,6 @@ func (ts *TestSuite) SetupSuite() {
 	}
 
 	ts.Security = securitypkg.New()
-}
-
-func _deleteTableRecords(db *gorm.DB) {
-	db.Exec("DELETE FROM auths")
-	db.Exec("DELETE FROM logins")
-	db.Exec("DELETE FROM users")
 }
 
 func (ts *TestSuite) TearDownSuite() {
