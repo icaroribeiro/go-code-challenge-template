@@ -1,7 +1,7 @@
 {
 	"info": {
 		"_postman_id": "82c3694f-ad8c-4ac1-bfed-92133e7a480b",
-		"name": "new-go-code-challenge-template",
+		"name": "go-code-challenge-template",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
 	"item": [
